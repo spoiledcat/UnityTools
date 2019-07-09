@@ -1,0 +1,27 @@
+{
+    "assets": [
+        {
+            "needsUnzip": true,
+            "hash": "",
+            "path": "Assets",
+            "url": "http://localhost:61111/Wwise.zip"
+        },
+        {
+            "needsUnzip": true,
+            "hash": "",
+            "path": "Assets",
+            "url": "http://localhost:61111/WwiseUnityIntegration.zip"
+        },
+        {
+            "needsUnzip": true,
+            "hash": "",
+            "path": "Assets/StreamingAssets/Audio",
+            "url": "http://localhost:61111/GeneratedSoundBanks.zip"
+        },
+        {
+            "needsUnzip": true,
+            "hash": "",
+            "path": "Assets",
+            "url": "http://localhost:61111/NintendoSDKPlugin.zip"
+        }    ]
+}

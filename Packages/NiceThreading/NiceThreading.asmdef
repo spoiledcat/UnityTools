@@ -1,0 +1,18 @@
+{
+    "name": "NiceThreading",
+    "references": [
+        "SimpleLogging",
+        "NiceIO",
+        "com.unity.mono-posix"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

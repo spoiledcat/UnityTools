@@ -1,0 +1,6 @@
+{
+    "name": "com.spoiledcat.simple-logging",
+    "displayName": "Simple Logging",
+    "description": "A friendly and simple logging framework with multiple outputs",
+    "version": "1.0.0"
+}

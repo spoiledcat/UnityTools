@@ -1,0 +1,20 @@
+{
+    "name": "OfflineAssetManager",
+    "references": [
+        "UIFramework",
+        "SimpleJson",
+        "NiceIO",
+        "NiceThreading",
+        "SimpleLogging"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}
