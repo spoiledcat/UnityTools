@@ -1,5 +1,4 @@
-﻿using SpoiledCat;
-using SpoiledCat.Json;
+﻿using SpoiledCat.Json;
 using SpoiledCat.LocalTools;
 using SpoiledCat.Logging;
 using SpoiledCat.NiceIO;
@@ -9,7 +8,6 @@ using SpoiledCat.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEngine;
 
 namespace SpoiledCat.LocalTools
 {

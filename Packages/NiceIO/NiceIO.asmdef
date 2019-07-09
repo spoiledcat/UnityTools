@@ -2,13 +2,13 @@
     "name": "NiceIO",
     "references": [],
     "optionalUnityReferences": [],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "Mono.Posix.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": []
 }

@@ -2,8 +2,8 @@
     "name": "QuickConsole",
     "references": [
         "SimpleJson",
-        "NiceIO",
-        "UIFramework"
+        "UIFramework",
+        "NiceIO"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

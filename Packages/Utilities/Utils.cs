@@ -1,12 +1,12 @@
-﻿using SpoiledCat.NiceIO;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
 
 namespace SpoiledCat.Utilities
 {
-    public static class Utils
+	using NiceIO;
+
+	public static class Utils
     {
         public static bool Copy(Stream source, Stream destination,
             long totalSize = 0,

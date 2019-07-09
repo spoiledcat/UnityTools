@@ -34,7 +34,7 @@
 // http://www.opensource.org/licenses/mit-license.php
 //-----------------------------------------------------------------------
 
-// If you don't have a reference to Mono.Posix, uncomment this line
+// If you get compilation errors with Mono.Unix and you don't want to include the Mono.Posix library, uncomment this line to disable it
 //#undef ENABLE_MONO
 
 using System;
@@ -42,6 +42,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace SpoiledCat.NiceIO
@@ -1204,19 +1205,15 @@ namespace SpoiledCat.NiceIO
 			return new NPath(path);
 		}
 
-		public static NPath Resolve(this NPath path)
-		{
-			// Add a reference to Mono.Posix with an .rsp file in the Assets folder with the line "-r:Mono.Posix.dll" for this to work
-#if ENABLE_MONO
-            if (!path.IsInitialized || !NPath.IsUnix /* nothing to resolve on windows */ || path.IsRelative || !path.FileExists())
-                return path;
-            return new NPath(Mono.Unix.UnixPath.GetCompleteRealPath(path.ToString()));
-#else
-			return path;
-#endif
-		}
+        public static NPath Resolve(this NPath path)
+        {
+	        if (!path.IsInitialized || !NPath.IsUnix /* nothing to resolve on windows */ || path.IsRelative ||
+		        !path.FileExists())
+		        return path;
+	        return NPath.FileSystem.Resolve(path.ToString()).ToNPath();
+        }
 
-		public static NPath CreateTempDirectory(this NPath baseDir, string myprefix = "")
+        public static NPath CreateTempDirectory(this NPath baseDir, string myprefix = "")
 		{
 			var random = new Random();
 			while (true)
@@ -1298,6 +1295,7 @@ namespace SpoiledCat.NiceIO
 		char DirectorySeparatorChar { get; }
 		string GetProcessDirectory();
 		void SetProcessDirectory(string directory);
+		string Resolve(string path);
 	}
 
 
@@ -1431,6 +1429,51 @@ namespace SpoiledCat.NiceIO
 			return Directory.GetFiles(path, pattern);
 		}
 
+		private static Func<string, string> getCompleteRealPathFunc = null;
+        
+		private static Func<string, string> GetCompleteRealPath
+		{
+			get
+			{
+				if (getCompleteRealPathFunc == null)
+				{
+#if ENABLE_MONO
+					getCompleteRealPathFunc = path => new NPath(Mono.Unix.UnixPath.GetCompleteRealPath(path));
+#else
+                    var asm = AppDomain.CurrentDomain.GetAssemblies()
+					                   .FirstOrDefault(x => x.FullName.StartsWith("Mono.Posix"));
+					if (asm != null)
+					{
+						var type = asm.GetType("Mono.Unity.UnixPath");
+						if (type != null)
+						{
+							var method = type.GetMethod("GetCompleteRealPath",
+								BindingFlags.Static | BindingFlags.Public);
+							if (method != null)
+							{
+								getCompleteRealPathFunc = (p) => {
+									var ret = method.Invoke(null, new object[] { p.ToString() });
+									if (ret != null)
+										return ret.ToString();
+									return p;
+								};
+							}
+						}
+					}
+
+					if (getCompleteRealPathFunc == null)
+						getCompleteRealPathFunc = p => p;
+#endif
+				}
+				return getCompleteRealPathFunc;
+			}
+		}
+
+		public string Resolve(string path)
+		{
+			return GetCompleteRealPath(path);
+		}
+
 		public IEnumerable<string> GetFiles(string path, string pattern, SearchOption searchOption)
 		{
 			foreach (var file in GetFiles(path, pattern))
@@ -1439,31 +1482,31 @@ namespace SpoiledCat.NiceIO
 			if (searchOption != SearchOption.AllDirectories)
 				yield break;
 
-#if ENABLE_MONO
-            if (NPath.IsUnix)
-            {
+			
+			if (NPath.IsUnix)
+			{
                 try
                 {
-                    path = Mono.Unix.UnixPath.GetCompleteRealPath(path);
+                    path = Resolve(path);
                 }
                 catch
                 {}
-            }
-#endif
+			}
+
 			foreach (var dir in GetDirectories(path))
 			{
 				var realdir = dir;
-#if ENABLE_MONO
-                if (NPath.IsUnix)
+
+				if (NPath.IsUnix)
                 {
                     try
                     {
-                        realdir = Mono.Unix.UnixPath.GetCompleteRealPath(dir);
+                        realdir = Resolve(dir);
                     }
                     catch
                     {}
                 }
-#endif
+
 				if (path != realdir)
 				{
 					foreach (var file in GetFiles(dir, pattern, searchOption))

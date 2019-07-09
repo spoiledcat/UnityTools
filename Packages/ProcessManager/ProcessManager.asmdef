@@ -1,17 +1,14 @@
 {
-    "name": "OfflineAssetManager",
+    "name": "Process Manager",
     "references": [
-        "UIFramework",
-        "SimpleJson",
         "NiceIO",
         "NiceThreading",
         "SimpleLogging",
+        "Unity Environment",
         "Utilities"
     ],
     "optionalUnityReferences": [],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

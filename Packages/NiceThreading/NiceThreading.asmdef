@@ -3,7 +3,8 @@
     "references": [
         "SimpleLogging",
         "NiceIO",
-        "com.unity.mono-posix"
+        "com.unity.mono-posix",
+        "Utilities"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

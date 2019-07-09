@@ -1,0 +1,6 @@
+{
+    "name": "com.spoiledcat.processmanager",
+    "displayName": "Process Manager",
+    "description": "A nice process manager that knows how to run processes and return data",
+    "version": "1.0.0"
+}

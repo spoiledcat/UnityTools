@@ -1,17 +1,15 @@
 {
-    "name": "OfflineAssetManager",
+    "name": "Git Installer",
     "references": [
-        "UIFramework",
-        "SimpleJson",
         "NiceIO",
         "NiceThreading",
         "SimpleLogging",
-        "Utilities"
+        "Utilities",
+        "Unity Environment",
+        "Process Manager"
     ],
     "optionalUnityReferences": [],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

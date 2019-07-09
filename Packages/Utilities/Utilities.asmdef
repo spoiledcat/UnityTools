@@ -1,17 +1,12 @@
 {
-    "name": "OfflineAssetManager",
+    "name": "Utilities",
     "references": [
-        "UIFramework",
-        "SimpleJson",
         "NiceIO",
-        "NiceThreading",
         "SimpleLogging",
-        "Utilities"
+        "SimpleJson"
     ],
     "optionalUnityReferences": [],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
