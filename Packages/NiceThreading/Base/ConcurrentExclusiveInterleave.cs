@@ -1,6 +1,4 @@
-﻿using SpoiledCat.Utilities;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -9,7 +7,9 @@ using System.Threading.Tasks;
 
 namespace SpoiledCat.Threading
 {
-    public interface ITaskScheduler
+	using Utilities;
+
+	public interface ITaskScheduler
     {
         Queue<Task> Tasks { get; }
         void ExecuteTask(Task task);

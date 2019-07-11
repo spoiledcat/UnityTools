@@ -1,9 +1,8 @@
 {
-    "name": "Unity Environment",
+    "name": "UnityEnvironment",
     "references": [
         "NiceIO",
         "SimpleLogging",
-        "Utilities",
         "SimpleJson"
     ],
     "optionalUnityReferences": [],

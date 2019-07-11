@@ -3,7 +3,9 @@
     "references": [
         "NiceIO",
         "SimpleLogging",
-        "SimpleJson"
+        "SimpleJson",
+        "UnityEnvironment",
+        "SharpZipLib"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

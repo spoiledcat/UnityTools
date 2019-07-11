@@ -3,139 +3,132 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using SpoiledCat.Logging;
-using SpoiledCat.NiceIO;
-using SpoiledCat.Utilities;
 
 namespace SpoiledCat.ProcessManager
 {
-    public class ProcessManager : IProcessManager
-    {
-        private static readonly ILogging logger = LogHelper.GetLogger<ProcessManager>();
+	using Logging;
+	using NiceIO;
+	using Unity;
+	using Utilities;
 
-        private readonly IEnvironment environment;
-        private readonly IProcessEnvironment gitEnvironment;
-        private readonly CancellationToken cancellationToken;
-        private readonly HashSet<IProcess> processes = new HashSet<IProcess>();
+	public class ProcessManager : IProcessManager
+	{
+		private static readonly ILogging logger = LogHelper.GetLogger<ProcessManager>();
 
-        public ProcessManager(IEnvironment environment, IProcessEnvironment gitEnvironment, CancellationToken cancellationToken)
-        {
-            this.environment = environment;
-            this.gitEnvironment = gitEnvironment;
-            this.cancellationToken = cancellationToken;
-        }
+		private readonly IEnvironment environment;
+		private readonly HashSet<IProcess> processes = new HashSet<IProcess>();
+		public static IProcessManager Instance { get; private set; }
 
-        public T Configure<T>(T processTask, NPath? executable = null, string arguments = null,
-            NPath? workingDirectory = null,
-            bool withInput = false,
-            bool dontSetupGit = false)
-             where T : IProcess
-        {
-            executable = executable ?? processTask.ProcessName?.ToNPath() ?? environment.GitExecutablePath;
+		public ProcessManager(IEnvironment environment,
+			NPath defaultWorkingDirectory,
+			CancellationToken cancellationToken)
+		{
+			Instance = this;
+			this.environment = environment;
+			DefaultProcessEnvironment = new ProcessEnvironment(environment, defaultWorkingDirectory);
+			CancellationToken = cancellationToken;
+		}
 
-            //If this null check fails, be sure you called Configure() on your task
-            Guard.ArgumentNotNull(executable, nameof(executable));
+		public T Configure<T>(T processTask,
+			NPath? workingDirectory = null,
+			bool withInput = false)
+				where T : IProcessTask
+		{
+			var startInfo = new ProcessStartInfo {
+				RedirectStandardInput = withInput,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+				UseShellExecute = false,
+				CreateNoWindow = true,
+				StandardOutputEncoding = Encoding.UTF8,
+				StandardErrorEncoding = Encoding.UTF8
+			};
 
-            var startInfo = new ProcessStartInfo
-            {
-                RedirectStandardInput = withInput,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                StandardOutputEncoding = Encoding.UTF8,
-                StandardErrorEncoding = Encoding.UTF8
-            };
+			startInfo.Configure(processTask.ProcessEnvironment, workingDirectory);
 
-            gitEnvironment.Configure(startInfo, workingDirectory ?? environment.RepositoryPath, dontSetupGit);
+			startInfo.FileName = processTask.ProcessName;
+			startInfo.Arguments = processTask.ProcessArguments;
+			processTask.Configure(startInfo);
+			processTask.OnStartProcess += p => processes.Add(p);
+			processTask.OnEndProcess += p => {
+				if (processes.Contains(p))
+					processes.Remove(p);
+			};
+			return processTask;
+		}
 
-            string filename = executable.Value;
-            if (executable.Value.IsRelative && filename.StartsWith("git"))
-            {
-                var file = FindExecutableInPath(executable.Value.FileName, false, startInfo.EnvironmentVariables["PATH"].ToNPathList(environment).ToArray());
-                filename = file.IsInitialized ? file : executable.Value.FileName;
-            }
-            startInfo.FileName = filename;
-            startInfo.Arguments = arguments ?? processTask.ProcessArguments;
-            processTask.Configure(startInfo);
-            processTask.OnStartProcess += p => processes.Add(p);
-            processTask.OnEndProcess += p => {
-                if (processes.Contains(p))
-                    processes.Remove(p);
-            };
-            return processTask;
-        }
+		public void RunCommandLineWindow(NPath workingDirectory)
+		{
+			var startInfo = new ProcessStartInfo
+			{
+				RedirectStandardInput = false,
+				RedirectStandardOutput = false,
+				RedirectStandardError = false,
+				UseShellExecute = false,
+				CreateNoWindow = false
+			};
 
-        public void RunCommandLineWindow(NPath workingDirectory)
-        {
-            var startInfo = new ProcessStartInfo
-            {
-                RedirectStandardInput = false,
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
-                UseShellExecute = false,
-                CreateNoWindow = false
-            };
+			if (environment.IsWindows)
+			{
+				startInfo.FileName = "cmd";
+				startInfo.Configure(DefaultProcessEnvironment, workingDirectory);
+			}
+			else if (environment.IsMac)
+			{
+				// we need to create a temp bash script to set up the environment properly, because
+				// osx terminal app doesn't inherit the PATH env var and there's no way to pass it in
 
-            if (environment.IsWindows)
-            {
-                startInfo.FileName = "cmd";
-                gitEnvironment.Configure(startInfo, workingDirectory);
-            }
-            else if (environment.IsMac)
-            {
-                // we need to create a temp bash script to set up the environment properly, because
-                // osx terminal app doesn't inherit the PATH env var and there's no way to pass it in
+				var envVarFile = NPath.GetTempFilename();
+				startInfo.FileName = "open";
+				startInfo.Arguments = $"-a Terminal {envVarFile}";
+				startInfo.Configure(DefaultProcessEnvironment, workingDirectory);
 
-                var envVarFile = NPath.GetTempFilename();
-                startInfo.FileName = "open";
-                startInfo.Arguments = $"-a Terminal {envVarFile}";
-                gitEnvironment.Configure(startInfo, workingDirectory);
+				var envVars = startInfo.EnvironmentVariables;
+				var scriptContents = new[] {
+						  $"cd \"{envVars["GHU_WORKINGDIR"]}\"",
+						  $"PATH=\"{envVars["GHU_FULLPATH"]}\" /bin/bash"
+					 };
+				environment.FileSystem.WriteAllLines(envVarFile, scriptContents);
+				Mono.Unix.Native.Syscall.chmod(envVarFile, (Mono.Unix.Native.FilePermissions)493); // -rwxr-xr-x mode (0755)
+			}
+			else
+			{
+				startInfo.FileName = "sh";
+				startInfo.Configure(DefaultProcessEnvironment, workingDirectory);
+			}
 
-                var envVars = startInfo.EnvironmentVariables;
-                var scriptContents = new[] {
-                    $"cd \"{envVars["GHU_WORKINGDIR"]}\"",
-                    $"PATH=\"{envVars["GHU_FULLPATH"]}\" /bin/bash"
-                };
-                environment.FileSystem.WriteAllLines(envVarFile, scriptContents);
-                Mono.Unix.Native.Syscall.chmod(envVarFile, (Mono.Unix.Native.FilePermissions)493); // -rwxr-xr-x mode (0755)
-            }
-            else
-            {
-                startInfo.FileName = "sh";
-                gitEnvironment.Configure(startInfo, workingDirectory);
-            }
+			Process.Start(startInfo);
+		}
 
-            Process.Start(startInfo);
-        }
+		public IProcess Reconnect(IProcess processTask, int pid)
+		{
+			logger.Trace("Reconnecting process " + pid);
+			var p = Process.GetProcessById(pid);
+			p.StartInfo.RedirectStandardInput = true;
+			p.StartInfo.RedirectStandardOutput = true;
+			p.StartInfo.RedirectStandardError = true;
+			processTask.Configure(p);
+			return processTask;
+		}
 
-        public IProcess Reconnect(IProcess processTask, int pid)
-        {
-            logger.Trace("Reconnecting process " + pid);
-            var p = Process.GetProcessById(pid);
-            p.StartInfo.RedirectStandardInput = true;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.RedirectStandardError = true;
-            processTask.Configure(p);
-            return processTask;
-        }
+		public void Stop()
+		{
+			foreach (var p in processes.ToArray())
+				p.Stop();
+		}
 
-        public void Stop()
-        {
-            foreach (var p in processes.ToArray())
-                p.Stop();
-        }
+		public static NPath FindExecutableInPath(string executable, bool recurse = false, params NPath[] searchPaths)
+		{
+			Guard.ArgumentNotNullOrWhiteSpace(executable, "executable");
 
-        public static NPath FindExecutableInPath(string executable, bool recurse = false, params NPath[] searchPaths)
-        {
-            Guard.ArgumentNotNullOrWhiteSpace(executable, "executable");
+			return searchPaths
+				 .Where(x => x.IsInitialized && !x.IsRelative && x.DirectoryExists())
+				 .SelectMany(x => x.Files(executable, recurse))
+				 .FirstOrDefault();
+		}
 
-            return searchPaths
-                .Where(x => x.IsInitialized && !x.IsRelative && x.DirectoryExists())
-                .SelectMany(x => x.Files(executable, recurse))
-                .FirstOrDefault();
-        }
+		public CancellationToken CancellationToken { get; }
 
-        public CancellationToken CancellationToken { get { return cancellationToken; } }
-    }
+		public static IProcessEnvironment DefaultProcessEnvironment { get; private set;  }
+	}
 }

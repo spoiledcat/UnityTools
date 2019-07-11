@@ -8,7 +8,6 @@ namespace SpoiledCat.Unity
 	using Json;
 	using Logging;
 	using NiceIO;
-	using Utilities;
 
 	public interface ISettings
 	{
@@ -76,7 +75,7 @@ namespace SpoiledCat.Unity
                 if (typeof(T) == typeof(DateTimeOffset))
                 {
                     DateTimeOffset dt;
-                    if (DateTimeOffset.TryParseExact(value?.ToString().ToEmptyIfNull(), Constants.Iso8601Formats,
+                    if (DateTimeOffset.TryParseExact(value?.ToString() ?? "", DateTimeFormatConstants.Iso8601Formats,
                         CultureInfo.InvariantCulture, DateTimeStyles.None, out dt))
                     {
                         value = dt;
@@ -116,7 +115,7 @@ namespace SpoiledCat.Unity
             {
                 object val = value;
                 if (value is DateTimeOffset)
-                    val = ((DateTimeOffset)(object)value).ToString(Constants.Iso8601Format);
+                    val = ((DateTimeOffset)(object)value).ToString(DateTimeFormatConstants.Iso8601Format);
                 if (!cacheData.ContainsKey(key))
                     cacheData.Add(key, val);
                 else

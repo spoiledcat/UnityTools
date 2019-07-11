@@ -1,11 +1,12 @@
-using SpoiledCat.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SpoiledCat.Threading
 {
-    public interface ITaskManager : IDisposable
+	using Logging;
+
+	public interface ITaskManager : IDisposable
     {
         TaskScheduler ConcurrentScheduler { get; }
         TaskScheduler ExclusiveScheduler { get; }

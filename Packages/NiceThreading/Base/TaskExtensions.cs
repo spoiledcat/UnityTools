@@ -1,11 +1,12 @@
-using SpoiledCat.Logging;
-using SpoiledCat.Utilities;
 using System;
 using System.Threading.Tasks;
 
 namespace SpoiledCat.Threading
 {
-    public static class TaskExtensions
+	using Logging;
+	using Utilities;
+
+	public static class TaskExtensions
     {
         public static async Task StartAwait(this ITask source, Action<Exception> handler = null)
         {

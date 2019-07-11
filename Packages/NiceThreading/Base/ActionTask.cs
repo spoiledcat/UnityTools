@@ -1,4 +1,3 @@
-using SpoiledCat.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -8,7 +7,9 @@ using System.Threading.Tasks;
 
 namespace SpoiledCat.Threading
 {
-    public class TaskQueue : TPLTask
+	using Utilities;
+
+	public class TaskQueue : TPLTask
     {
         private TaskCompletionSource<bool> aggregateTask = new TaskCompletionSource<bool>();
         private readonly List<ITask> queuedTasks = new List<ITask>();

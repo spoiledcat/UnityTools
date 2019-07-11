@@ -1,12 +1,13 @@
-﻿using SpoiledCat.NiceIO;
-using SpoiledCat.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 
 namespace SpoiledCat.Threading
 {
-    public class UnzipTask : TaskBase<NPath>
+	using NiceIO;
+	using Utilities;
+
+	public class UnzipTask : TaskBase<NPath>
     {
         private readonly string archiveFilePath;
         private readonly NPath extractedPath;

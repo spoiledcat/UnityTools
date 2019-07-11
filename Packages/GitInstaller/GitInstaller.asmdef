@@ -1,12 +1,13 @@
 {
-    "name": "Git Installer",
+    "name": "GitInstaller",
     "references": [
         "NiceIO",
         "NiceThreading",
         "SimpleLogging",
         "Utilities",
-        "Unity Environment",
-        "Process Manager"
+        "UnityEnvironment",
+        "ProcessManager",
+        "SimpleJson"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

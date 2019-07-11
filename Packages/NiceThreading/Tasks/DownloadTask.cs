@@ -1,271 +1,282 @@
-﻿using SpoiledCat.Logging;
-using SpoiledCat.NiceIO;
-using SpoiledCat.Utilities;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
+using System.Net.Cache;
 using System.Threading;
 
 namespace SpoiledCat.Threading
 {
-    public class DownloadTask : TaskBase<NPath>
-    {
-        protected readonly IFileSystem fileSystem;
+	using Logging;
+	using NiceIO;
+	using Utilities;
 
-        public DownloadTask(UriString url, NPath targetDirectory, int retryCount = 0)
-            : this(TaskManager.Instance.Token, NPath.FileSystem, url, targetDirectory, retryCount)
-            {}
+	public class DownloadTask : TaskBase<NPath>
+	{
+		protected readonly IFileSystem fileSystem;
 
-        public DownloadTask(CancellationToken token,
-            IFileSystem fileSystem,
-            UriString url,
-            NPath targetDirectory,
-            int retryCount = 0)
-            : base(token)
-        {
-            this.fileSystem = fileSystem;
-            RetryCount = retryCount;
-            Url = url;
-            Filename = url.Filename;
-            TargetDirectory = targetDirectory;
-            this.Name = $"Download {Url}";
-            this.Message = Filename;
-        }
+		public DownloadTask(UriString url, NPath targetDirectory, string filename = null, int retryCount = 0)
+			 : this(TaskManager.Instance.Token, NPath.FileSystem, url, targetDirectory, filename, retryCount)
+		{ }
 
-        protected string BaseRunWithReturn(bool success)
-        {
-            return base.RunWithReturn(success);
-        }
+		public DownloadTask(CancellationToken token,
+			 IFileSystem fileSystem,
+			 UriString url,
+			 NPath targetDirectory,
+		 string filename = null,
+			 int retryCount = 0)
+			 : base(token)
+		{
+			this.fileSystem = fileSystem;
+			RetryCount = retryCount;
+			Url = url;
+			Filename = string.IsNullOrEmpty(filename) ? url.Filename : filename;
+			TargetDirectory = targetDirectory;
+			this.Name = $"Download {Url}";
+			this.Message = Filename;
+		}
 
-        protected override NPath RunWithReturn(bool success)
-        {
-            var result = base.RunWithReturn(success);
-            try
-            {
-                result = RunDownload(success);
-            }
-            catch (Exception ex)
-            {
-                if (!RaiseFaultHandlers(ex))
-                    ThrownException.Rethrow();
-            }
-            return result;
-        }
+		protected string BaseRunWithReturn(bool success)
+		{
+			return base.RunWithReturn(success);
+		}
 
-        /// <summary>
-        /// The actual functionality to download with optional hash verification
-        /// subclasses that wish to return the contents of the downloaded file
-        /// or do something else with it can override this instead of RunWithReturn.
-        /// </summary>
-        /// <param name="success"></param>
-        /// <returns></returns>
-        protected virtual NPath RunDownload(bool success)
-        {
-            Exception exception = null;
-            var attempts = 0;
-            bool result = false;
-            var partialFile = TargetDirectory.Combine(Filename + ".partial");
-            TargetDirectory.EnsureDirectoryExists();
-            do
-            {
-                exception = null;
+		protected override NPath RunWithReturn(bool success)
+		{
+			var result = base.RunWithReturn(success);
+			try
+			{
+				result = RunDownload(success);
+			}
+			catch (Exception ex)
+			{
+				if (!RaiseFaultHandlers(ex))
+					ThrownException.Rethrow();
+			}
+			return result;
+		}
 
-                if (Token.IsCancellationRequested)
-                    break;
+		/// <summary>
+		/// The actual functionality to download with optional hash verification
+		/// subclasses that wish to return the contents of the downloaded file
+		/// or do something else with it can override this instead of RunWithReturn.
+		/// </summary>
+		/// <param name="success"></param>
+		/// <returns></returns>
+		protected virtual NPath RunDownload(bool success)
+		{
+			Exception exception = null;
+			var attempts = 0;
+			bool result = false;
+			var partialFile = TargetDirectory.Combine(Filename + ".partial");
+			TargetDirectory.EnsureDirectoryExists();
+			do
+			{
+				exception = null;
 
-                try
-                {
-                    Logger.Trace($"Download of {Url} to {Destination} Attempt {attempts + 1} of {RetryCount + 1}");
+				if (Token.IsCancellationRequested)
+					break;
 
-                    using (var destinationStream = fileSystem.OpenWrite(partialFile, FileMode.Append))
-                    {
-                        result = Downloader.Download(Logger, Url, destinationStream,
-                            (value, total) =>
-                            {
-                                UpdateProgress(value, total);
-                                return !Token.IsCancellationRequested;
-                            });
-                    }
+				try
+				{
+					Logger.Trace($"Download of {Url} to {Destination} Attempt {attempts + 1} of {RetryCount + 1}");
 
-                    if (result)
-                    {
-                        partialFile.Move(Destination);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    exception = ex;
-                    result = false;
-                }
-            } while (!result && attempts++ < RetryCount);
+					using (var destinationStream = fileSystem.OpenWrite(partialFile, FileMode.Append))
+					{
+						result = Downloader.Download(Logger, Url, destinationStream,
+							 (value, total) => {
+								 UpdateProgress(value, total);
+								 return !Token.IsCancellationRequested;
+							 });
+					}
 
-            if (!result)
-            {
-                Token.ThrowIfCancellationRequested();
-                throw new DownloadException("Error downloading file", exception);
-            }
+					if (result)
+					{
+						partialFile.Move(Destination);
+					}
+				}
+				catch (Exception ex)
+				{
+					exception = ex;
+					result = false;
+				}
+			} while (!result && attempts++ < RetryCount);
 
-            return Destination;
-        }
+			if (!result)
+			{
+				Token.ThrowIfCancellationRequested();
+				throw new DownloadException("Error downloading file", exception);
+			}
 
-        public override string ToString()
-        {
-            return $"{base.ToString()} {Url}";
-        }
+			return Destination;
+		}
 
-        public UriString Url { get; }
+		public override string ToString()
+		{
+			return $"{base.ToString()} {Url}";
+		}
 
-        public NPath TargetDirectory { get; }
+		public UriString Url { get; }
 
-        public string Filename { get; }
+		public NPath TargetDirectory { get; }
 
-        public NPath Destination { get { return TargetDirectory.Combine(Filename); } }
+		public string Filename { get; }
 
-        protected int RetryCount { get; }
-    }
+		public NPath Destination { get { return TargetDirectory.Combine(Filename); } }
 
-    class DownloadException : Exception
-    {
-        public DownloadException(string message) : base(message)
-        { }
+		protected int RetryCount { get; }
+	}
 
-        public DownloadException(string message, Exception innerException) : base(message, innerException)
-        { }
-    }
+	class DownloadException : Exception
+	{
+		public DownloadException(string message) : base(message)
+		{ }
 
-    public static class WebRequestExtensions
-    {
-        public static WebResponse GetResponseWithoutException(this WebRequest request)
-        {
-            try
-            {
-                return request.GetResponse();
-            }
-            catch (WebException e)
-            {
-                if (e.Response != null)
-                {
-                    return e.Response;
-                }
+		public DownloadException(string message, Exception innerException) : base(message, innerException)
+		{ }
+	}
 
-                throw;
-            }
-        }
-    }
+	public static class WebRequestExtensions
+	{
+		public static WebResponse GetResponseWithoutException(this WebRequest request)
+		{
+			try
+			{
+				return request.GetResponse();
+			}
+			catch (WebException e)
+			{
+				if (e.Response != null)
+				{
+					return e.Response;
+				}
 
-    public class DownloadData
-    {
-        public UriString Url { get; }
-        public NPath File { get; }
-        public DownloadData(UriString url, NPath file)
-        {
-            this.Url = url;
-            this.File = file;
-        }
-    }
+				throw;
+			}
+		}
+	}
 
-    public class Downloader : TaskQueue<NPath, DownloadData>
-    {
-        public event Action<UriString> OnDownloadStart;
-        public event Action<UriString, NPath> OnDownloadComplete;
-        public event Action<UriString, Exception> OnDownloadFailed;
+	public class DownloadData
+	{
+		public UriString Url { get; }
+		public NPath File { get; }
+		public DownloadData(UriString url, NPath file)
+		{
+			this.Url = url;
+			this.File = file;
+		}
+	}
 
-        private readonly IFileSystem fileSystem;
-        public Downloader(IFileSystem fileSystem = null)
-            : base(t =>
-            {
-                var dt = t as DownloadTask;
-                var destinationFile = dt.TargetDirectory.Combine(dt.Url.Filename);
-                return new DownloadData(dt.Url, destinationFile);
-            })
-        {
-            this.fileSystem = fileSystem ?? NPath.FileSystem;
-            Name = "Downloader";
-            Message = "Downloading...";
-        }
+	public class Downloader : TaskQueue<NPath, DownloadData>
+	{
+		public event Action<UriString> OnDownloadStart;
+		public event Action<UriString, NPath> OnDownloadComplete;
+		public event Action<UriString, Exception> OnDownloadFailed;
 
-        public void QueueDownload(UriString url, NPath targetDirectory, int retryCount = 0)
-        {
-            var download = new DownloadTask(Token, fileSystem, url, targetDirectory, retryCount);
-            download.OnStart += t => OnDownloadStart?.Invoke(((DownloadTask)t).Url);
-            download.OnEnd += (t, res, s, ex) =>
-            {
-                if (s)
-                    OnDownloadComplete?.Invoke(((DownloadTask)t).Url, res);
-                else
-                    OnDownloadFailed?.Invoke(((DownloadTask)t).Url, ex);
-            };
-            // queue after hooking up events so OnDownload* gets called first
-            Queue(download);
-        }
+		private readonly IFileSystem fileSystem;
+		public Downloader(IFileSystem fileSystem = null)
+			 : base(t => {
+				 var dt = t as DownloadTask;
+				 var destinationFile = dt.TargetDirectory.Combine(dt.Url.Filename);
+				 return new DownloadData(dt.Url, destinationFile);
+			 })
+		{
+			this.fileSystem = fileSystem ?? NPath.FileSystem;
+			Name = "Downloader";
+			Message = "Downloading...";
+		}
 
-        public static bool Download(ILogging logger, UriString url,
-            Stream destinationStream,
-            Func<long, long, bool> onProgress)
-        {
-            long bytes = destinationStream.Length;
+		public void QueueDownload(UriString url, NPath targetDirectory, string filename = null, int retryCount = 0)
+		{
+			var download = new DownloadTask(Token, fileSystem, url, targetDirectory, filename, retryCount);
+			download.OnStart += t => OnDownloadStart?.Invoke(((DownloadTask)t).Url);
+			download.OnEnd += (t, res, s, ex) => {
+				if (s)
+					OnDownloadComplete?.Invoke(((DownloadTask)t).Url, res);
+				else
+					OnDownloadFailed?.Invoke(((DownloadTask)t).Url, ex);
+			};
+			// queue after hooking up events so OnDownload* gets called first
+			Queue(download);
+		}
 
-            var expectingResume = bytes > 0;
+		public static bool Download(ILogging logger,
+			UriString url,
+			Stream destinationStream,
+			Func<long, long, bool> onProgress)
+		{
+			long bytes = destinationStream.Length;
 
-            var webRequest = (HttpWebRequest)WebRequest.Create(url);
+			var expectingResume = bytes > 0;
 
-            if (expectingResume)
-            {
-#if NET_35
-                // classlib for 3.5 doesn't take long overloads...
-                webRequest.AddRange((int)bytes);
-#else
-                webRequest.AddRange(bytes);
+#if !NET_35
+			ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 #endif
-            }
 
-            webRequest.Method = "GET";
-            webRequest.Timeout = 3000;
+			var webRequest = (HttpWebRequest)WebRequest.Create(url);
 
-            if (expectingResume)
-                logger.Trace($"Resuming download of {url}");
-            else
-                logger.Trace($"Downloading {url}");
+			if (expectingResume)
+			{
+#if NET_35
+				// classlib for 3.5 doesn't take long overloads...
+				webRequest.AddRange((int)bytes);
+#else
+				webRequest.AddRange(bytes);
+#endif
+			}
 
-            if (!onProgress(bytes, bytes * 2))
-                return false;
+			webRequest.Method = "GET";
+			webRequest.Accept = "*/*";
+			webRequest.UserAgent = "gfu/2.0";
+			webRequest.CachePolicy = new HttpRequestCachePolicy(HttpRequestCacheLevel.BypassCache);
+			webRequest.ServicePoint.ConnectionLimit = 10;
+			webRequest.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+			webRequest.AllowAutoRedirect = true;
 
-            using (var webResponse = (HttpWebResponse)webRequest.GetResponseWithoutException())
-            {
-                var httpStatusCode = webResponse.StatusCode;
-                logger.Trace($"Downloading {url} StatusCode:{(int)webResponse.StatusCode}");
+			if (expectingResume)
+				logger.Trace($"Resuming download of {url}");
+			else
+				logger.Trace($"Downloading {url}");
 
-                if (expectingResume && httpStatusCode == HttpStatusCode.RequestedRangeNotSatisfiable)
-                {
-                    return !onProgress(bytes, bytes);
-                }
+			if (!onProgress(bytes, bytes * 2))
+				return false;
 
-                if (!(httpStatusCode == HttpStatusCode.OK || httpStatusCode == HttpStatusCode.PartialContent))
-                {
-                    return false;
-                }
+			using (var webResponse = (HttpWebResponse)webRequest.GetResponseWithoutException())
+			{
+				var httpStatusCode = webResponse.StatusCode;
+				logger.Trace($"Downloading {url} StatusCode:{(int)webResponse.StatusCode}");
 
-                if (expectingResume && httpStatusCode == HttpStatusCode.OK)
-                {
-                    expectingResume = false;
-                    destinationStream.Seek(0, SeekOrigin.Begin);
-                }
+				if (expectingResume && httpStatusCode == HttpStatusCode.RequestedRangeNotSatisfiable)
+				{
+					return !onProgress(bytes, bytes);
+				}
 
-                var responseLength = webResponse.ContentLength;
-                if (expectingResume)
-                {
-                    if (!onProgress(bytes, bytes + responseLength))
-                        return false;
-                }
+				if (!(httpStatusCode == HttpStatusCode.OK || httpStatusCode == HttpStatusCode.PartialContent))
+				{
+					return false;
+				}
 
-                using (var responseStream = webResponse.GetResponseStream())
-                {
-                    return Utils.Copy(responseStream, destinationStream, responseLength,
-                        progress: (totalRead, timeToFinish) =>
-                        {
-                            return onProgress(totalRead, responseLength);
-                        });
-                }
-            }
-        }
-    }}
+				if (expectingResume && httpStatusCode == HttpStatusCode.OK)
+				{
+					expectingResume = false;
+					destinationStream.Seek(0, SeekOrigin.Begin);
+				}
+
+				var responseLength = webResponse.ContentLength;
+				responseLength = responseLength > 0 ? webResponse.ContentLength : 0;
+				if (expectingResume)
+				{
+					if (!onProgress(bytes, bytes + responseLength))
+						return false;
+				}
+
+				using (var responseStream = webResponse.GetResponseStream())
+				{
+					return Utils.Copy(responseStream, destinationStream, responseLength,
+						 progress: (totalRead, timeToFinish) => {
+							 return onProgress(totalRead, responseLength);
+						 });
+				}
+			}
+		}
+	}
+}

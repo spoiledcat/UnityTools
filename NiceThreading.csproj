@@ -71,6 +71,7 @@
     <Compile Include="Packages\NiceThreading\Base\TaskHelpers.cs" />
     <Compile Include="Packages\NiceThreading\Base\TaskManager.cs" />
     <Compile Include="Packages\NiceThreading\Base\ThreadingHelper.cs" />
+    <Compile Include="Packages\NiceThreading\OutputProcessor\BaseOutputProcessor.cs" />
     <Compile Include="Packages\NiceThreading\Tasks\ActionTask.cs" />
     <Compile Include="Packages\NiceThreading\Tasks\DownloadTask.cs" />
     <Compile Include="Packages\NiceThreading\Tasks\FuncTask.cs" />

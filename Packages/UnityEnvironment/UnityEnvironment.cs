@@ -7,6 +7,21 @@ namespace SpoiledCat.Unity
 {
 	using Logging;
 	using NiceIO;
+	using System.Collections.Generic;
+
+	public static class EnvironmentExtensions
+	{
+		public static IEnumerable<NPath> ToNPathList(this IEnvironment environment, string envPath)
+		{
+			return envPath
+					  .Split(Path.PathSeparator)
+					  .Where(x => x != null)
+					  .Select(x => environment.ExpandEnvironmentVariables(x.Trim('"', '\'')))
+					  .Where(x => !String.IsNullOrEmpty(x))
+					  .Select(x => x.ToNPath());
+		}
+	}
+
 	public interface IEnvironment
 	{
 		void Initialize(string unityVersion, NPath extensionInstallPath, NPath unityApplicationPath, NPath unityApplicationContentsPath, NPath assetsPath);
@@ -19,6 +34,7 @@ namespace SpoiledCat.Unity
 		bool IsWindows { get; }
 		bool IsLinux { get; }
 		bool IsMac { get; }
+		bool Is32Bit { get; }
 		string UnityVersion { get; }
 		NPath UnityApplication { get; }
 		NPath UnityApplicationContents { get; }
@@ -36,156 +52,93 @@ namespace SpoiledCat.Unity
 		string GetEnvironmentVariableKey(string name);
 	}
 
-    public class UnityEnvironment : IEnvironment
-    {
-	    private const string DefaultLogFilename = "github-unity.log";
-        private static bool? onWindows;
-        private static bool? onLinux;
-        private static bool? onMac;
+	public class UnityEnvironment : IEnvironment
+	{
+		private const string DefaultLogFilename = "github-unity.log";
 
-        public UnityEnvironment(string applicationName, string logFile = DefaultLogFilename)
-        {
-	        ApplicationName = applicationName;
-	        NPath localAppData;
-            NPath commonAppData;
-            if (IsWindows)
-            {
-                localAppData = GetSpecialFolder(Environment.SpecialFolder.LocalApplicationData).ToNPath();
-                commonAppData = GetSpecialFolder(Environment.SpecialFolder.CommonApplicationData).ToNPath();
-            }
-            else if (IsMac)
-            {
-                localAppData = NPath.HomeDirectory.Combine("Library", "Application Support");
-                // there is no such thing on the mac that is guaranteed to be user accessible (/usr/local might not be)
-                commonAppData = GetSpecialFolder(Environment.SpecialFolder.ApplicationData).ToNPath();
-            }
-            else
-            {
-                localAppData = GetSpecialFolder(Environment.SpecialFolder.LocalApplicationData).ToNPath();
-                commonAppData = GetSpecialFolder(Environment.SpecialFolder.ApplicationData).ToNPath();
-            }
+		public UnityEnvironment(string applicationName, string logFile = DefaultLogFilename)
+		{
+			ApplicationName = applicationName;
 
-            UserCachePath = localAppData.Combine(applicationName);
-            SystemCachePath = commonAppData.Combine(applicationName);
-            LogPath = IsMac ? NPath.HomeDirectory.Combine("Library/Logs").Combine(applicationName) : UserCachePath;
-            LogPath = LogPath.Combine(logFile);
-            LogPath.EnsureParentDirectoryExists();
-        }
+			UserCachePath = NPath.LocalAppData.Combine(applicationName);
+			SystemCachePath = NPath.CommonAppData.Combine(applicationName);
+			LogPath = IsMac ? NPath.HomeDirectory.Combine("Library/Logs").Combine(applicationName) : UserCachePath;
+			LogPath = LogPath.Combine(logFile);
+			LogPath.EnsureParentDirectoryExists();
+		}
 
-        /// <summary>
-        /// This is for tests to reset the static OS flags
-        /// </summary>
-        public static void Reset()
-        {
-            onWindows = null;
-            onLinux = null;
-            onMac = null;
-        }
-
-        public void Initialize(string unityVersion,
-	        NPath extensionInstallPath,
+		public virtual void Initialize(string unityVersion,
+			NPath extensionInstallPath,
 			NPath EditorApplication_applicationPath,
 			NPath EditorApplication_applicationContentsPath,
 			NPath Application_dataPath)
-        {
-            ExtensionInstallPath = extensionInstallPath;
-            UnityApplication = EditorApplication_applicationPath;
-            UnityApplicationContents = EditorApplication_applicationContentsPath;
-            UnityAssetsPath = Application_dataPath;
-            UnityProjectPath = UnityAssetsPath.Parent;
-            UnityVersion = unityVersion;
-            UserSettings = new UserSettings(this);
-            LocalSettings = new LocalSettings(this);
-            SystemSettings = new SystemSettings(this);
-        }
+		{
+			ExtensionInstallPath = extensionInstallPath;
+			UnityApplication = EditorApplication_applicationPath;
+			UnityApplicationContents = EditorApplication_applicationContentsPath;
+			UnityAssetsPath = Application_dataPath;
+			UnityProjectPath = UnityAssetsPath.Parent;
+			UnityVersion = unityVersion;
+			UserSettings = new UserSettings(this);
+			LocalSettings = new LocalSettings(this);
+			SystemSettings = new SystemSettings(this);
+		}
 
-        public string GetSpecialFolder(Environment.SpecialFolder folder)
-        {
-            return Environment.GetFolderPath(folder);
-        }
+		public string GetSpecialFolder(Environment.SpecialFolder folder) => FileSystem.GetFolderPath(folder);
 
-        public string ExpandEnvironmentVariables(string name)
-        {
-            var key = GetEnvironmentVariableKey(name);
-            return Environment.ExpandEnvironmentVariables(key);
-        }
+		public string ExpandEnvironmentVariables(string name)
+		{
+			var key = GetEnvironmentVariableKey(name);
+			return Environment.ExpandEnvironmentVariables(key);
+		}
 
-        public string GetEnvironmentVariable(string name)
-        {
-            var key = GetEnvironmentVariableKey(name);
-            return Environment.GetEnvironmentVariable(key);
-        }
+		public string GetEnvironmentVariable(string name)
+		{
+			var key = GetEnvironmentVariableKey(name);
+			return Environment.GetEnvironmentVariable(key);
+		}
 
-        public string GetEnvironmentVariableKey(string name)
-        {
-            return GetEnvironmentVariableKeyInternal(name);
-        }
+		public string GetEnvironmentVariableKey(string name)
+		{
+			return GetEnvironmentVariableKeyInternal(name);
+		}
 
-        private static string GetEnvironmentVariableKeyInternal(string name)
-        {
-            return Environment.GetEnvironmentVariables().Keys.Cast<string>()
-                                 .FirstOrDefault(k => string.Compare(name, k, true, CultureInfo.InvariantCulture) == 0) ?? name;
-        }
+		private static string GetEnvironmentVariableKeyInternal(string name)
+		{
+			return Environment.GetEnvironmentVariables().Keys.Cast<string>()
+										.FirstOrDefault(k => string.Compare(name, k, true, CultureInfo.InvariantCulture) == 0) ?? name;
+		}
 
-        public string ApplicationName { get; }
-        public NPath LogPath { get; }
-        public IFileSystem FileSystem { get => NPath.FileSystem; set => NPath.FileSystem = value; }
-        public string UnityVersion { get; set; }
-        public NPath UnityApplication { get; set; }
-        public NPath UnityApplicationContents { get; set; }
-        public NPath UnityAssetsPath { get; set; }
-        public NPath UnityProjectPath { get; set; }
-        public NPath ExtensionInstallPath { get; set; }
-        public NPath UserCachePath { get; set; }
-        public NPath SystemCachePath { get; set; }
-        public string Path { get; set; } = Environment.GetEnvironmentVariable(GetEnvironmentVariableKeyInternal("PATH"));
+		public string ApplicationName { get; }
+		public NPath LogPath { get; }
+		public IFileSystem FileSystem { get => NPath.FileSystem; set => NPath.FileSystem = value; }
+		public string UnityVersion { get; set; }
+		public NPath UnityApplication { get; set; }
+		public NPath UnityApplicationContents { get; set; }
+		public NPath UnityAssetsPath { get; set; }
+		public NPath UnityProjectPath { get; set; }
+		public NPath ExtensionInstallPath { get; set; }
+		public NPath UserCachePath { get; set; }
+		public NPath SystemCachePath { get; set; }
+		public string Path { get; set; } = Environment.GetEnvironmentVariable(GetEnvironmentVariableKeyInternal("PATH"));
 
-        public string NewLine => Environment.NewLine;
+		public string NewLine => Environment.NewLine;
 
-        public ISettings LocalSettings { get; protected set; }
-        public ISettings SystemSettings { get; protected set; }
-        public ISettings UserSettings { get; protected set; }
+		public ISettings LocalSettings { get; protected set; }
+		public ISettings SystemSettings { get; protected set; }
+		public ISettings UserSettings { get; protected set; }
 
-        public bool IsWindows => OnWindows;
-        public bool IsLinux => OnLinux;
-        public bool IsMac => OnMac;
+		public bool IsWindows => OnWindows;
+		public bool IsLinux => OnLinux;
+		public bool IsMac => OnMac;
+		public bool Is32Bit => IntPtr.Size == 4;
 
-        public static bool OnWindows
-        {
-            get
-            {
-                if (onWindows.HasValue)
-                    return onWindows.Value;
-                return Environment.OSVersion.Platform != PlatformID.Unix && Environment.OSVersion.Platform != PlatformID.MacOSX;
-            }
-            set => onWindows = value;
-        }
+		public static bool OnWindows => NPath.IsWindows;
 
-        public static bool OnLinux
-        {
-            get
-            {
-                if (onLinux.HasValue)
-                    return onLinux.Value;
-                return Environment.OSVersion.Platform == PlatformID.Unix && Directory.Exists("/proc");
-            }
-            set => onLinux = value;
-        }
+		public static bool OnLinux => NPath.IsLinux;
+		public static bool OnMac => NPath.IsMac;
 
-        public static bool OnMac
-        {
-            get
-            {
-                if (onMac.HasValue)
-                    return onMac.Value;
-                // most likely it'll return the proper id but just to be on the safe side, have a fallback
-                return Environment.OSVersion.Platform == PlatformID.MacOSX ||
-                      (Environment.OSVersion.Platform == PlatformID.Unix && !Directory.Exists("/proc"));
-            }
-            set => onMac = value;
-        }
-
-        public static string ExecutableExtension => OnWindows ? ".exe" : string.Empty;
-        public static ILogging Logger { get; } = LogHelper.GetLogger<UnityEnvironment>();
-    }
+		public static string ExecutableExtension => OnWindows ? ".exe" : string.Empty;
+		public static ILogging Logger { get; } = LogHelper.GetLogger<UnityEnvironment>();
+	}
 }

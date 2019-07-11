@@ -60,7 +60,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Packages\GitInstaller\GitEnvironment.cs" />
     <Compile Include="Packages\GitInstaller\GitInstaller.cs" />
+    <Compile Include="Packages\GitInstaller\GitLfsVersionTask.cs" />
+    <Compile Include="Packages\GitInstaller\GitProcessEnvironment.cs" />
+    <Compile Include="Packages\GitInstaller\GitProcessTask.cs" />
+    <Compile Include="Packages\GitInstaller\GitReleaseManifest.cs" />
+    <Compile Include="Packages\GitInstaller\GitVersionTask.cs" />
+    <Compile Include="Packages\GitInstaller\LfsVersionOutputProcessor.cs" />
+    <Compile Include="Packages\GitInstaller\VersionOutputProcessor.cs" />
     <Reference Include="UnityEngine.ARModule">
       <HintPath>D:/soft/Unity/2018.4.2f1/Editor/Data/Managed/UnityEngine/UnityEngine.ARModule.dll</HintPath>
     </Reference>
@@ -598,13 +606,17 @@
       <Project>{0FF1870C-F08A-52DE-A730-AF2C24C17D0C}</Project>
       <Name>Utilities</Name>
     </ProjectReference>
-    <ProjectReference Include="Unity Environment.csproj">
-      <Project>{0154B745-9778-DD15-A5A1-9DE41C0FF4F9}</Project>
-      <Name>Unity Environment</Name>
+    <ProjectReference Include="UnityEnvironment.csproj">
+      <Project>{EAEC01AA-2D55-8CDD-6D43-92F8291CC537}</Project>
+      <Name>UnityEnvironment</Name>
     </ProjectReference>
-    <ProjectReference Include="Process Manager.csproj">
-      <Project>{7E42A4C0-8018-0744-436E-C8304509233A}</Project>
-      <Name>Process Manager</Name>
+    <ProjectReference Include="ProcessManager.csproj">
+      <Project>{76269010-95E1-BD80-A492-43A77C96FDAE}</Project>
+      <Name>ProcessManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="SimpleJson.csproj">
+      <Project>{19105B87-1A06-D602-2F47-DB4FC2076BE7}</Project>
+      <Name>SimpleJson</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

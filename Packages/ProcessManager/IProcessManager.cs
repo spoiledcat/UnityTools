@@ -2,14 +2,10 @@
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using SpoiledCat.NiceIO;
 
 namespace SpoiledCat.ProcessManager
 {
-	public interface IProcessEnvironment
-	{
-		void Configure(ProcessStartInfo psi, NPath workingDirectory);
-	}
+	using NiceIO;
 
 	public interface IProcess
 	{
@@ -29,9 +25,11 @@ namespace SpoiledCat.ProcessManager
 
 	public interface IProcessManager
 	{
-		T Configure<T>(T processTask, NPath? executable = null, string arguments = null, NPath? workingDirectory = null,
+		T Configure<T>(T processTask,
+			NPath? workingDirectory = null,
 			bool withInput = false)
-			where T : IProcess;
+			where T : IProcessTask;
+
 		IProcess Reconnect(IProcess processTask, int i);
 		CancellationToken CancellationToken { get; }
 		void RunCommandLineWindow(NPath workingDirectory);

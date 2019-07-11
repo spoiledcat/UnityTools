@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Git Installer.csproj" />
+    <ProjectReference Include="..\..\NiceIO.csproj" />
+    <ProjectReference Include="..\..\NiceThreading.csproj" />
+    <ProjectReference Include="..\..\ProcessManager.csproj" />
+    <ProjectReference Include="..\..\SharpZipLib.csproj" />
+    <ProjectReference Include="..\..\SimpleJson.csproj" />
+    <ProjectReference Include="..\..\SimpleLogging.csproj" />
+    <ProjectReference Include="..\..\UnityEnvironment.csproj" />
+    <ProjectReference Include="..\..\Utilities.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,10 +1,11 @@
-﻿using SpoiledCat.Utilities;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace SpoiledCat.Threading
 {
-    public static class ThreadingHelper
+	using Utilities;
+
+	public static class ThreadingHelper
     {
         public static TaskScheduler MainThreadScheduler { get; set; }
 

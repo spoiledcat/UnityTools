@@ -1,18 +1,18 @@
-using SpoiledCat.Logging;
-using SpoiledCat.Utilities;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SpoiledCat.Threading
 {
-    public enum TaskRunOptions
+	using Logging;
+	using Utilities;
+
+	public enum TaskRunOptions
     {
         OnSuccess,
         OnFailure,
         OnAlways
     }
-
     public interface ITask : IAsyncResult
     {
         T Then<T>(T continuation, TaskRunOptions runOptions = TaskRunOptions.OnSuccess, bool taskIsTopOfChain = false) where T : ITask;
@@ -86,7 +86,7 @@ namespace SpoiledCat.Threading
         new event Action<ITask<TResult>, TResult, bool, Exception> OnEnd;
     }
 
-    interface ITask<TData, T> : ITask<T>
+    public interface ITask<TData, T> : ITask<T>
     {
         event Action<TData> OnData;
     }

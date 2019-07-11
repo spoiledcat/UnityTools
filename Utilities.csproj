@@ -60,49 +60,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Packages\Utilities\AssemblyResources.cs" />
     <Compile Include="Packages\Utilities\Constants.cs" />
+    <Compile Include="Packages\Utilities\CopyHelper.cs" />
     <Compile Include="Packages\Utilities\Guard.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Checksums\Adler32.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Checksums\CRC32.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Checksums\IChecksum.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Checksums\StrangeCRC.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Core\FileSystemScanner.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Core\INameTransform.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Core\IScanFilter.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Core\NameFilter.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Core\PathFilter.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Core\StreamUtils.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Core\WindowsPathUtils.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Encryption\PkzipClassic.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Encryption\ZipAESStream.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Encryption\ZipAESTransform.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\SharpZipBaseException.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\Compression\Deflater.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\Compression\DeflaterConstants.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\Compression\DeflaterEngine.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\Compression\DeflaterHuffman.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\Compression\DeflaterPending.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\Compression\Inflater.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\Compression\InflaterDynHeader.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\Compression\InflaterHuffmanTree.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\Compression\PendingBuffer.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\Compression\Streams\DeflaterOutputStream.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\Compression\Streams\InflaterInputStream.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\Compression\Streams\OutputWindow.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\Compression\Streams\StreamManipulator.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\FastZip.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\IEntryFactory.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\WindowsNameTransform.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\ZipConstants.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\ZipEntry.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\ZipEntryFactory.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\ZipException.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\ZipExtraData.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\ZipFile.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\ZipHelperStream.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\ZipInputStream.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\ZipNameTransform.cs" />
-    <Compile Include="Packages\Utilities\SharpZipLib\Zip\ZipOutputStream.cs" />
+    <Compile Include="Packages\Utilities\StreamExtensions.cs" />
     <Compile Include="Packages\Utilities\StringExtensions.cs" />
     <Compile Include="Packages\Utilities\TheVersion.cs" />
     <Compile Include="Packages\Utilities\UriString.cs" />
@@ -640,6 +602,14 @@
     <ProjectReference Include="SimpleJson.csproj">
       <Project>{19105B87-1A06-D602-2F47-DB4FC2076BE7}</Project>
       <Name>SimpleJson</Name>
+    </ProjectReference>
+    <ProjectReference Include="UnityEnvironment.csproj">
+      <Project>{EAEC01AA-2D55-8CDD-6D43-92F8291CC537}</Project>
+      <Name>UnityEnvironment</Name>
+    </ProjectReference>
+    <ProjectReference Include="SharpZipLib.csproj">
+      <Project>{5554AB69-1A57-0876-0678-D3152A6A51FA}</Project>
+      <Name>SharpZipLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

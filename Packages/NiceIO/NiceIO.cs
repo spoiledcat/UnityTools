@@ -776,7 +776,7 @@ namespace SpoiledCat.NiceIO
 			var random = new Random();
 			while (true)
 			{
-				var candidate = new NPath(FileSystem.GetTempPath() + "/" + myprefix + "_" + random.Next());
+				var candidate = new NPath(FileSystem.TempPath+ "/" + myprefix + "_" + random.Next());
 				if (!candidate.Exists())
 					return candidate.CreateDirectory();
 			}
@@ -785,7 +785,7 @@ namespace SpoiledCat.NiceIO
 		public static NPath GetTempFilename(string myprefix = "")
 		{
 			var random = new Random();
-			var prefix = FileSystem.GetTempPath() + "/" + (String.IsNullOrEmpty(myprefix) ? "" : myprefix + "_");
+			var prefix = FileSystem.TempPath+ "/" + (String.IsNullOrEmpty(myprefix) ? "" : myprefix + "_");
 			while (true)
 			{
 				var candidate = new NPath(prefix + random.Next());
@@ -930,19 +930,48 @@ namespace SpoiledCat.NiceIO
 
 		#region special paths
 
+		private static NPath currentDirectory;
 		public static NPath CurrentDirectory {
-			get { return new NPath(FileSystem.GetCurrentDirectory()); }
+			get {
+				if (!currentDirectory.IsInitialized)
+					currentDirectory = new NPath(FileSystem.CurrentDirectory);
+				return currentDirectory;
+			}
 		}
 
+		private static NPath processDirectory;
 		public static NPath ProcessDirectory {
-			get { return new NPath(FileSystem.GetProcessDirectory()); }
+			get {
+				if (!processDirectory.IsInitialized)
+					processDirectory = new NPath(FileSystem.CurrentDirectory);
+				return processDirectory;
+			}
 		}
 
+		private static NPath homeDirectory;
 		public static NPath HomeDirectory {
 			get {
-				if (FileSystem.DirectorySeparatorChar == '\\')
-					return new NPath(Environment.GetEnvironmentVariable("USERPROFILE"));
-				return new NPath(Environment.GetEnvironmentVariable("HOME"));
+				if (!homeDirectory.IsInitialized)
+					homeDirectory = new NPath(FileSystem.HomeDirectory);
+				return homeDirectory;
+			}
+		}
+
+		private static NPath localAppData;
+		public static NPath LocalAppData {
+			get {
+				if (!localAppData.IsInitialized)
+					localAppData = new NPath(FileSystem.LocalAppData);
+				return localAppData;
+			}
+		}
+
+		private static NPath commonAppData;
+		public static NPath CommonAppData {
+			get {
+				if (!commonAppData.IsInitialized)
+					commonAppData = new NPath(FileSystem.CommonAppData);
+				return commonAppData;
 			}
 		}
 
@@ -950,7 +979,7 @@ namespace SpoiledCat.NiceIO
 		public static NPath SystemTemp {
 			get {
 				if (!systemTemp.IsInitialized)
-					systemTemp = new NPath(FileSystem.GetTempPath());
+					systemTemp = new NPath(FileSystem.TempPath);
 				return systemTemp;
 			}
 		}
@@ -1129,15 +1158,10 @@ namespace SpoiledCat.NiceIO
 			set { _fileSystem = value; }
 		}
 
-		private static bool? _isUnix;
-		public static bool IsUnix {
-			get {
-				if (!_isUnix.HasValue)
-					_isUnix = Environment.OSVersion.Platform == PlatformID.MacOSX ||
-					          Environment.OSVersion.Platform == PlatformID.Unix;
-				return _isUnix.Value;
-			}
-		}
+		public static bool IsUnix => FileSystem.IsLinux || FileSystem.IsMac;
+		public static bool IsWindows => FileSystem.IsWindows;
+		public static bool IsLinux => FileSystem.IsLinux;
+		public static bool IsMac => FileSystem.IsMac;
 
 		private static StringComparison? _pathStringComparison;
 		private static StringComparison PathStringComparison {
@@ -1268,7 +1292,7 @@ namespace SpoiledCat.NiceIO
 		void FileDelete(string path);
 		bool FileExists(string path);
 		void FileMove(string sourceFileName, string s);
-		string GetCurrentDirectory();
+
 		IEnumerable<string> GetDirectories(string path);
 		IEnumerable<string> GetDirectories(string path, string pattern);
 		IEnumerable<string> GetDirectories(string path, string pattern, SearchOption searchOption);
@@ -1278,24 +1302,32 @@ namespace SpoiledCat.NiceIO
 		IEnumerable<string> GetFiles(string path, string pattern, SearchOption searchOption);
 		string GetFullPath(string path);
 		string GetRandomFileName();
-		string GetTempPath();
+		string GetFolderPath(Environment.SpecialFolder folder);
 		Stream OpenRead(string path);
 		Stream OpenWrite(string path, FileMode mode);
 		byte[] ReadAllBytes(string path);
 		string[] ReadAllLines(string path);
 		string ReadAllText(string path);
 		string ReadAllText(string path, Encoding encoding);
-		void SetCurrentDirectory(string currentDirectory);
 		void WriteAllBytes(string path, byte[] bytes);
 		void WriteAllLines(string path, string[] contents);
 		void WriteAllText(string path, string contents);
 		void WriteAllText(string path, string contents, Encoding encoding);
 		void WriteLines(string path, string[] contents);
 
-		char DirectorySeparatorChar { get; }
-		string GetProcessDirectory();
-		void SetProcessDirectory(string directory);
 		string Resolve(string path);
+
+		char DirectorySeparatorChar { get; }
+
+		string TempPath { get; }
+		string ProcessDirectory { get; set; }
+		string CurrentDirectory { get; set; }
+		string HomeDirectory { get; set; }
+		string LocalAppData { get; set; }
+		string CommonAppData { get; set; }
+		bool IsWindows { get; set; }
+		bool IsLinux { get; set; }
+		bool IsMac { get; set; }
 	}
 
 
@@ -1308,6 +1340,11 @@ namespace SpoiledCat.NiceIO
 	{
 		private string currentDirectory;
 		private string processDirectory;
+		private string localAppData;
+		private string commonAppData;
+		private bool? isMac;
+		private bool? isLinux;
+		private bool? isWindows;
 
 		public FileSystem()
 		{}
@@ -1321,29 +1358,123 @@ namespace SpoiledCat.NiceIO
 			currentDirectory = directory;
 		}
 
-		public void SetCurrentDirectory(string directory)
+		public string CurrentDirectory
 		{
-			if (!Path.IsPathRooted(directory))
-				throw new ArgumentException("SetCurrentDirectory requires a rooted path", "directory");
-			currentDirectory = directory;
+			get => currentDirectory ?? Directory.GetCurrentDirectory();
+			set
+			{
+				if (!Path.IsPathRooted(value))
+					throw new ArgumentException("SetCurrentDirectory requires a rooted path", "directory");
+				currentDirectory = value;
+			}
 		}
 
-		public void SetProcessDirectory(string directory)
+		public string ProcessDirectory
 		{
-			if (!Path.IsPathRooted(directory))
-				throw new ArgumentException("SetProcessDirectory requires a rooted path", "directory");
-			processDirectory = directory;
+			get => processDirectory ?? Directory.GetCurrentDirectory();
+			set
+			{
+				if (!Path.IsPathRooted(value))
+					throw new ArgumentException("SetProcessDirectory requires a rooted path", "directory");
+				processDirectory = value;
+			}
 		}
 
-		public string GetCurrentDirectory()
+		public bool IsWindows
 		{
-			return currentDirectory ?? Directory.GetCurrentDirectory();
+			get
+			{
+				if (isWindows.HasValue)
+					return isWindows.Value;
+				return Environment.OSVersion.Platform != PlatformID.Unix && Environment.OSVersion.Platform != PlatformID.MacOSX;
+			}
+			set => isWindows = value;
 		}
 
-		public string GetProcessDirectory()
+		public bool IsLinux
 		{
-			return processDirectory ?? Directory.GetCurrentDirectory();
+			get
+			{
+				if (isLinux.HasValue)
+					return isLinux.Value;
+				return Environment.OSVersion.Platform == PlatformID.Unix && Directory.Exists("/proc");
+			}
+			set => isLinux = value;
 		}
+
+		public bool IsMac
+		{
+			get
+			{
+				if (isMac.HasValue)
+					return isMac.Value;
+				// most likely it'll return the proper id but just to be on the safe side, have a fallback
+				return Environment.OSVersion.Platform == PlatformID.MacOSX ||
+						(Environment.OSVersion.Platform == PlatformID.Unix && !Directory.Exists("/proc"));
+			}
+			set => isMac = value;
+		}
+
+		private string homeDirectory;
+		public string HomeDirectory
+		{
+			get
+			{
+				if (homeDirectory == null)
+				{
+					if (NPath.IsUnix)
+						homeDirectory = new NPath(Environment.GetEnvironmentVariable("HOME"));
+					else
+						homeDirectory = new NPath(Environment.GetEnvironmentVariable("USERPROFILE"));
+				}
+				return homeDirectory;
+			}
+			set => homeDirectory = value;
+		}
+
+		public string LocalAppData
+		{
+			get => localAppData ?? (localAppData = GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+			set => localAppData = value;
+		}
+
+		public string CommonAppData
+		{
+			get => commonAppData ?? (localAppData = GetFolderPath(Environment.SpecialFolder.CommonApplicationData));
+			set => commonAppData = value;
+		}
+
+		public string GetFolderPath(Environment.SpecialFolder folder)
+		{
+			switch (folder)
+			{
+				case Environment.SpecialFolder.LocalApplicationData:
+					if (localAppData == null)
+					{
+						if (NPath.IsMac)
+							localAppData = NPath.HomeDirectory.Combine("Library", "Application Support");
+						else
+							localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).ToNPath();
+					}
+					return localAppData;
+				case Environment.SpecialFolder.CommonApplicationData:
+					if (commonAppData == null)
+					{
+						if (NPath.IsWindows)
+							commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData).ToNPath();
+						else
+						{
+							// there is no such thing on the mac that is guaranteed to be user accessible (/usr/local might not be)
+							commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToNPath();
+						}
+					}
+					return commonAppData;
+				default:
+					return "";
+			}
+		}
+
+		public string TempPath => Path.GetTempPath();
 
 		public bool FileExists(string filename)
 		{
@@ -1357,11 +1488,6 @@ namespace SpoiledCat.NiceIO
 			if (!Path.IsPathRooted(path))
 				throw new ArgumentException("GetDirectories requires a rooted path", "path");
 			return Directory.GetDirectories(path);
-		}
-
-		public string GetTempPath()
-		{
-			return Path.GetTempPath();
 		}
 
 		public string Combine(string path1, string path2)
@@ -1415,7 +1541,6 @@ namespace SpoiledCat.NiceIO
 		{
 			return Path.GetFileNameWithoutExtension(fileName);
 		}
-
 
 		public IEnumerable<string> GetFiles(string path)
 		{

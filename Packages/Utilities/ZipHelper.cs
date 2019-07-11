@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 namespace SpoiledCat.Utilities
 {
+	using ICSharpCode.SharpZipLib;
+	using ICSharpCode.SharpZipLib.GZip;
+	using ICSharpCode.SharpZipLib.Tar;
 	using ICSharpCode.SharpZipLib.Zip;
 	using Logging;
 	using NiceIO;
@@ -34,107 +37,158 @@ namespace SpoiledCat.Utilities
 		public bool Extract(string archive, string outFolder, CancellationToken cancellationToken,
 			Action<string, long> onStart, Func<long, long, string, bool> onProgress, Func<string, bool> onFilter = null)
 		{
-			const int chunkSize = 4096; // 4K is optimum
+
+			var destDir = outFolder.ToNPath();
+			destDir.EnsureDirectoryExists();
+			if (archive.EndsWith(".tar.gz"))
+			{
+				var gzipFile = archive.ToNPath();
+
+				archive = NPath.CreateTempDirectory("git").Combine(gzipFile.FileNameWithoutExtension);
+				using (var instream = NPath.FileSystem.OpenRead(gzipFile))
+				using (var outstream = NPath.FileSystem.OpenWrite(archive, FileMode.CreateNew))
+				{
+					GZip.Decompress(instream, outstream, false);
+				}
+			}
+
+			if (archive.EndsWith(".tar"))
+				return ExtractTar(archive, destDir, cancellationToken, onStart, onProgress, onFilter);
+			return ExtractZip(archive, destDir, cancellationToken, onStart, onProgress, onFilter);
+		}
+
+		private bool ExtractZip(string archive, NPath outFolder, CancellationToken cancellationToken,
+			Action<string, long> onStart, Func<long, long, string, bool> onProgress, Func<string, bool> onFilter = null)
+		{
 			ZipFile zf = null;
-			var processed = 0;
-			var totalBytes = 0L;
 
 			try
 			{
-				var fs = File.OpenRead(archive);
+				var fs = NPath.FileSystem.OpenRead(archive);
 				zf = new ZipFile(fs);
-				long totalSize = 0;
-				var entries = new List<ZipEntry>((int)zf.Count);
-
-				foreach (ZipEntry zipEntry in zf)
-				{
-					if (zipEntry.IsDirectory)
-					{
-						continue; // Ignore directories
-					}
-					if (!onFilter?.Invoke(zipEntry.Name) ?? false)
-						continue;
-					entries.Add(zipEntry);
-					totalSize += zipEntry.Size;
-					onStart(zipEntry.Name, zipEntry.Size);
-				}
-
-				for (var i = 0; i < entries.Count; i++)
-				{
-					var zipEntry = entries[i];
-					cancellationToken.ThrowIfCancellationRequested();
-					var entryFileName = zipEntry.Name;
-
-					// to remove the folder from the entry:- entryFileName = Path.GetFileName(entryFileName);
-					// Optionally match entrynames against a selection list here to skip as desired.
-					// The unpacked length is available in the zipEntry.Size property.
-
-					var zipStream = zf.GetInputStream(zipEntry);
-
-					var fullZipToPath = Path.Combine(outFolder, entryFileName);
-					var directoryName = Path.GetDirectoryName(fullZipToPath);
-					if (directoryName.Length > 0)
-					{
-						Directory.CreateDirectory(directoryName);
-					}
-
-					try
-					{
-						if (NPath.IsUnix)
-						{
-							if (zipEntry.ExternalFileAttributes == -2115174400)
-							{
-								int fd = Mono.Unix.Native.Syscall.open(fullZipToPath,
-									Mono.Unix.Native.OpenFlags.O_CREAT |
-									Mono.Unix.Native.OpenFlags.O_TRUNC,
-									Mono.Unix.Native.FilePermissions.S_IRWXU |
-									Mono.Unix.Native.FilePermissions.S_IRGRP |
-									Mono.Unix.Native.FilePermissions.S_IXGRP |
-									Mono.Unix.Native.FilePermissions.S_IROTH |
-									Mono.Unix.Native.FilePermissions.S_IXOTH);
-								Mono.Unix.Native.Syscall.close(fd);
-							}
-						}
-					}
-					catch (Exception ex)
-					{
-						LogHelper.Error(ex, "Error setting file attributes in " + fullZipToPath);
-					}
-
-					// Unzip file in buffered chunks. This is just as fast as unpacking to a buffer the full size
-					// of the file, but does not waste memory.
-					// The "using" will close the stream even if an exception occurs.
-					var targetFile = new FileInfo(fullZipToPath);
-					var filename = zipEntry.Name;
-					using (var streamWriter = targetFile.OpenWrite())
-					{
-						if (!Utils.Copy(zipStream, streamWriter, zipEntry.Size, chunkSize,
-							progress: (totalRead, timeToFinish) => {
-								totalBytes += totalRead;
-								return onProgress?.Invoke(totalRead, zipEntry.Size, filename) ?? true;
-							}))
-							return false;
-					}
-
-					targetFile.LastWriteTime = zipEntry.DateTime;
-					processed++;
-				}
+				List<IArchiveEntry> entries = PreprocessEntries(outFolder, zf, onStart, onFilter);
+				return ExtractArchive(archive, outFolder, cancellationToken, zf, entries, onStart, onProgress, onFilter);
 			}
 			catch (Exception ex)
 			{
 				LogHelper.GetLogger<ZipHelper>().Error(ex);
-				//return false;
 				throw;
 			}
 			finally
 			{
-				if (zf != null)
+				zf?.Close(); // Ensure we release resources
+			}
+		}
+
+		private bool ExtractTar(string archive, NPath outFolder, CancellationToken cancellationToken,
+			Action<string, long> onStart, Func<long, long, string, bool> onProgress, Func<string, bool> onFilter = null)
+		{
+			TarArchive zf = null;
+
+			try
+			{
+				List<IArchiveEntry> entries;
+				using (var read = TarArchive.CreateInputTarArchive(NPath.FileSystem.OpenRead(archive)))
 				{
-					//zf.IsStreamOwner = true; // Makes close also shut the underlying stream
-					zf.Close(); // Ensure we release resources
+					entries = PreprocessEntries(outFolder, read, onStart, onFilter);
 				}
+				zf = TarArchive.CreateInputTarArchive(NPath.FileSystem.OpenRead(archive));
+				return ExtractArchive(archive, outFolder, cancellationToken, zf, entries, onStart, onProgress, onFilter);
+			}
+			catch (Exception ex)
+			{
+				LogHelper.GetLogger<ZipHelper>().Error(ex);
+				throw;
+			}
+			finally
+			{
+				zf?.Close(); // Ensure we release resources
+			}
+		}
+
+		private static bool ExtractArchive(string archive, NPath outFolder, CancellationToken cancellationToken,
+			IArchive zf, List<IArchiveEntry> entries,
+			Action<string, long> onStart, Func<long, long, string, bool> onProgress, Func<string, bool> onFilter = null)
+		{
+
+			const int chunkSize = 4096; // 4K is optimum
+			foreach (var e in entries)
+			{
+				cancellationToken.ThrowIfCancellationRequested();
+
+				var filename = e.Name;
+				var entry = zf.FindEntry(filename);
+				var fullZipToPath = MaybeSetPermissions(outFolder, filename, entry.FileAttributes);
+				var targetFile = new FileInfo(fullZipToPath);
+
+				var stream = zf.GetInputStream(entry);
+				using (var streamWriter = targetFile.OpenWrite())
+				{
+					if (!Utils.Copy(stream, streamWriter, entry.Size, chunkSize,
+						progress: (totalRead, timeToFinish) => {
+							return onProgress?.Invoke(totalRead, entry.Size, filename) ?? true;
+						}))
+						return false;
+				}
+
+				targetFile.LastWriteTime = entry.LastModifiedTime;
 			}
 			return true;
+		}
+
+		private static List<IArchiveEntry> PreprocessEntries(NPath outFolder, IArchive zf, Action<string, long> onStart, Func<string, bool> onFilter)
+		{
+			var entries = new List<IArchiveEntry>();
+
+			foreach (IArchiveEntry entry in zf)
+			{
+				if (entry.IsLink ||
+					entry.IsSymLink)
+					continue;
+
+				if (entry.IsDirectory)
+				{
+					outFolder.Combine(entry.Name).EnsureDirectoryExists();
+					continue; // Ignore directories
+				}
+				if (!onFilter?.Invoke(entry.Name) ?? false)
+					continue;
+
+				entries.Add(entry);
+				onStart(entry.Name, entry.Size);
+			}
+
+			return entries;
+		}
+
+		private static NPath MaybeSetPermissions(NPath destDir, string entryFileName, int mode)
+		{
+			var fullZipToPath = destDir.Combine(entryFileName);
+			fullZipToPath.EnsureParentDirectoryExists();
+			try
+			{
+				if (NPath.IsUnix)
+				{
+					if (mode == -2115174400)
+					{
+						int fd = Mono.Unix.Native.Syscall.open(fullZipToPath,
+							Mono.Unix.Native.OpenFlags.O_CREAT |
+							Mono.Unix.Native.OpenFlags.O_TRUNC,
+							Mono.Unix.Native.FilePermissions.S_IRWXU |
+							Mono.Unix.Native.FilePermissions.S_IRGRP |
+							Mono.Unix.Native.FilePermissions.S_IXGRP |
+							Mono.Unix.Native.FilePermissions.S_IROTH |
+							Mono.Unix.Native.FilePermissions.S_IXOTH);
+						Mono.Unix.Native.Syscall.close(fd);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				LogHelper.Error(ex, "Error setting file attributes in " + fullZipToPath);
+			}
+
+			return fullZipToPath;
 		}
 	}
 }

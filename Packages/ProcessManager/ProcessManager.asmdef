@@ -1,10 +1,10 @@
 {
-    "name": "Process Manager",
+    "name": "ProcessManager",
     "references": [
         "NiceIO",
         "NiceThreading",
         "SimpleLogging",
-        "Unity Environment",
+        "UnityEnvironment",
         "Utilities"
     ],
     "optionalUnityReferences": [],

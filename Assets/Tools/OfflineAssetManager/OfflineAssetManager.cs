@@ -290,7 +290,7 @@ public class OfflineAssetManager
 
                 var downloader = new Downloader();
                 foreach (var asset in downloadList.Where(x => x.NeedsDownload))
-                    downloader.QueueDownload(asset.Url, asset.LocalPath.Parent, 2);
+                    downloader.QueueDownload(asset.Url, asset.LocalPath.Parent, retryCount: 2);
 
                 downloader.Progress(progress =>
                 {

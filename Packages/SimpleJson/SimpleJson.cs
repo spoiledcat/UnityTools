@@ -1241,7 +1241,7 @@ namespace SpoiledCat.Json
         object DeserializeObject(string strInput, object objInput, Type type);
     }
 
-    static class DateTimeFormatConstants
+    public static class DateTimeFormatConstants
     {
         public const string Iso8601Format = @"yyyy-MM-dd\THH\:mm\:ss.fffzzz";
         public const string Iso8601FormatZ = @"yyyy-MM-dd\THH\:mm\:ss\Z";
