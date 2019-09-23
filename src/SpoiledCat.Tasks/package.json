@@ -1,0 +1,16 @@
+{
+    "name": "com.spoiledcat.tasks",
+    "displayName": "SpoiledCat Tasks",
+    "description": "Premade tasks for use with the SpoiledCat Threading package",
+    "version": "1.0",
+    "dependencies": {
+        "com.spoiledcat.threading": "1.0"
+    },
+    "repository" : {
+        "type" : "git",
+        "url": "ssh://git@github.com/spoiledcat/UnityTools.git"
+    },
+    "publishConfig": {
+        "registry":"https://unity-package-registry.herokuapp.com/"
+    }
+}

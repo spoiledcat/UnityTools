@@ -1,0 +1,20 @@
+{
+    "name": "com.spoiledcat.processmanager",
+    "displayName": "SpoiledCat Process Manager",
+    "description": "A manager that handles running processes and returning their output",
+    "version": "1.0",
+    "dependencies": {
+        "com.spoiledcat.logging": "1.0",
+        "com.spoiledcat.environment": "1.0",
+        "com.spoiledcat.niceio": "1.0",
+        "com.spoiledcat.threading": "1.0",
+        "com.spoiledcat.utilities": "1.0"
+    },
+    "repository" : {
+        "type" : "git",
+        "url": "ssh://git@github.com/spoiledcat/UnityTools.git"
+    },
+    "publishConfig": {
+        "registry":"https://unity-package-registry.herokuapp.com/"
+    }
+}

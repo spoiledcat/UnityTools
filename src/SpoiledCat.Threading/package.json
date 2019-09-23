@@ -1,0 +1,13 @@
+{
+    "name": "com.spoiledcat.threading",
+    "displayName": "SpoiledCat Threading",
+    "description": "A friendly threaded task system for Unity",
+    "version": "1.0",
+    "repository" : {
+        "type" : "git",
+        "url": "ssh://git@github.com/spoiledcat/UnityTools.git"
+    },
+    "publishConfig": {
+        "registry":"https://unity-package-registry.herokuapp.com/"
+    }
+}

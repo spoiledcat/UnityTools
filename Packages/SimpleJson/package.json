@@ -1,6 +1,0 @@
-{
-    "name": "com.spoiledcat.simplejson",
-    "displayName": "Simple Json",
-    "description": "A powerful yet simple json (de)serializer with support for Unity and custom types",
-    "version": "1.0.0"
-}

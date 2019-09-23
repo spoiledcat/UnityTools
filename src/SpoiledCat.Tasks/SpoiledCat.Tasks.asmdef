@@ -1,0 +1,20 @@
+{
+    "name": "SpoiledCat.Tasks",
+    "references": [
+        "com.unity.mono-posix",
+        "SpoiledCat.Logging",
+        "SpoiledCat.NiceIO",
+        "SpoiledCat.Utilities",
+        "SpoiledCat.Threading"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

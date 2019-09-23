@@ -1,0 +1,19 @@
+{
+    "name": "SpoiledCat.Utilities",
+    "references": [
+        "SpoiledCat.NiceIO",
+        "SpoiledCat.Logging",
+        "SpoiledCat.SimpleJson",
+        "SpoiledCat.Environment",
+        "SpoiledCat.SharpZipLib"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

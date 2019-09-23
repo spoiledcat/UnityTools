@@ -1,6 +1,0 @@
-{
-    "name": "com.spoiledcat.ui-framework",
-    "displayName": "UI Framework",
-    "description": "An editor Window subclass that provides the standard IMGUI methods as overrides, with additional logic for managing the life cycle of imgui windows",
-    "version": "1.0.0"
-}

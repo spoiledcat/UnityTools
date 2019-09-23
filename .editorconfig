@@ -12,8 +12,8 @@ indent_size=tab
 
 [*.{config,csproj,json,nuspec,props,resxtargets}]
 indent_style=space
-indent_size=3
-tab_width=3
+indent_size=2
+tab_width=2
 
 [*.cs]
 

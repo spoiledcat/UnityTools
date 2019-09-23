@@ -1,0 +1,19 @@
+{
+    "name": "SpoiledCat.Threading",
+    "references": [
+        "com.unity.mono-posix",
+        "SpoiledCat.Logging",
+        "SpoiledCat.NiceIO",
+        "SpoiledCat.Utilities"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

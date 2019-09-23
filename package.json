@@ -1,9 +1,0 @@
-{
-    "name": "com.unity.template.empty",
-    "displayName": "Empty",
-    "description": "Empty project",
-    "defaultScene": "",
-    "version": "",
-    "category": "ProjectTemplate",
-    "dependencies": {}
-}

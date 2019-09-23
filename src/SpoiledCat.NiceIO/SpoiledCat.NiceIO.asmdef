@@ -1,0 +1,17 @@
+{
+    "name": "SpoiledCat.NiceIO",
+    "references": [
+        "GUID:dc2a5753d14b7404cb174688cfb5f83d"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "Mono.Posix.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

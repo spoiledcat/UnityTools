@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+  <PropertyGroup>
+    <TargetFrameworks>net471</TargetFrameworks>
+    <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\..\</SolutionDir>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\common\configuration.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\SpoiledCat.Environment\SpoiledCat.Environment.csproj" />
+    <ProjectReference Include="..\SpoiledCat.Logging\SpoiledCat.Logging.csproj" />
+    <ProjectReference Include="..\SpoiledCat.NiceIO\SpoiledCat.NiceIO.csproj" />
+    <ProjectReference Include="..\SpoiledCat.SharpZipLib\SpoiledCat.SharpZipLib.csproj" />
+    <ProjectReference Include="..\SpoiledCat.SimpleJson\SpoiledCat.SimpleJson.csproj" />
+  </ItemGroup>
+  <Import Project="$(SolutionDir)\common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
+</Project>

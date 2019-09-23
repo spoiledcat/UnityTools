@@ -1,0 +1,13 @@
+{
+    "name": "com.spoiledcat.utilities",
+    "displayName": "SpoiledCat Utilities",
+    "description": "Handy utilities primitives like string extension methods and unzip tools!",
+    "version": "1.0",
+    "repository" : {
+        "type" : "git",
+        "url": "ssh://git@github.com/spoiledcat/UnityTools.git"
+    },
+    "publishConfig": {
+        "registry":"https://unity-package-registry.herokuapp.com/"
+    }
+}

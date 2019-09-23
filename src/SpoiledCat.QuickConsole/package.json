@@ -1,0 +1,17 @@
+{
+    "name": "com.spoiledcat.quick-console",
+    "displayName": "SpoiledCat Quick Console",
+    "description": "An evaluation console for editor scripts without recompiling the whole project",
+    "version": "1.0",
+    "dependencies": {
+        "com.spoiledcat.niceio": "1.0",
+        "com.spoiledcat.ui": "1.0"
+    },
+    "repository" : {
+        "type" : "git",
+        "url": "ssh://git@github.com/spoiledcat/UnityTools.git"
+    },
+    "publishConfig": {
+        "registry":"https://unity-package-registry.herokuapp.com/"
+    }
+}

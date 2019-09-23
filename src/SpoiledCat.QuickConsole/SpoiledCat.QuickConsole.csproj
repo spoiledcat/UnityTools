@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+  <PropertyGroup>
+    <TargetFrameworks>net471</TargetFrameworks>
+    <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\..\</SolutionDir>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\common\configuration.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\SpoiledCat.NiceIO\SpoiledCat.NiceIO.csproj" />
+    <ProjectReference Include="..\SpoiledCat.SimpleJson\SpoiledCat.SimpleJson.csproj" />
+    <ProjectReference Include="..\SpoiledCat.UI\SpoiledCat.UI.csproj" />
+  </ItemGroup>
+  <Import Project="$(SolutionDir)\common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
+</Project>
