@@ -78,5 +78,17 @@
     <Error Condition="'$(UnityDir)' == ''" Text="$([System.String]::Format('$(UnityDLLsMissingErrorText)', '$(SolutionDir)'))" />
 
   </Target>
-  
+
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)\tasks\FileUpdateTask\FileUpdateTask.csproj">
+      <Private>false</Private>
+      <PrivateAssets>All</PrivateAssets>
+    </ProjectReference>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(SolutionDir)common\publickey.snk</AssemblyOriginatorKeyFile>
+    <NoWarn>8002</NoWarn>
+  </PropertyGroup>
 </Project>

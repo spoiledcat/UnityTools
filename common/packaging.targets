@@ -40,17 +40,27 @@
 
   </Target>
 
+  <PropertyGroup>
+    <MSBuildCommunityTasksLib>$(RepoBinPath)\FileUpdateTask\$(Configuration)\FileUpdateTask.dll</MSBuildCommunityTasksLib>
+  </PropertyGroup>
+  <UsingTask AssemblyFile="$(MSBuildCommunityTasksLib)" TaskName="SpoiledCat.MSBuild.Community.Tasks.FileUpdate" />
+
   <Target Name="StampPackageVersion" AfterTargets="CopySourcesToPackmanPackage">
-    <Message Importance="High" Text="Stamping version $(NuGetPackageVersion)" />
+
     <FileUpdate 
       Files="$(PublishTo)$(PackageName)\package.json" 
       Regex="&quot;version&quot;: &quot;.*&quot;" 
-      ReplacementText="&quot;version&quot;: &quot;$(NuGetPackageVersion)&quot;" />
+      ReplacementText="&quot;version&quot;: &quot;$(NuGetPackageVersion)&quot;">
+      <Output TaskParameter="AllItemsUpdated" PropertyName="FileWasStamped" />
+    </FileUpdate>
 
     <FileUpdate 
       Files="$(PublishTo)$(PackageName)\package.json" 
       Regex="(&quot;com\.spoiledcat\..*&quot;): &quot;.*&quot;" 
       ReplacementText="$1: &quot;$(NuGetPackageVersion)&quot;" />
+
+    <Message Importance="High" Text="Stamping version $(NuGetPackageVersion)" Condition=" '$(FileWasStamped)' == 'true' "/>
+
   </Target>
 
 

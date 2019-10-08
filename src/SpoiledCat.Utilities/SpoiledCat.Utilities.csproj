@@ -11,5 +11,5 @@
     <ProjectReference Include="..\SpoiledCat.SharpZipLib\SpoiledCat.SharpZipLib.csproj" />
     <ProjectReference Include="..\SpoiledCat.SimpleJson\SpoiledCat.SimpleJson.csproj" />
   </ItemGroup>
-  <Import Project="$(SolutionDir)\common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
+  <Import Project="$(SolutionDir)common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
 </Project>
