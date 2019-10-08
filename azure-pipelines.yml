@@ -17,6 +17,16 @@ steps:
   inputs:
     version: '2.2.301'
 
+- task: DownloadSecureFile@1
+  name: deps # The name with which to reference the secure file's path on the agent, like $(mySecureFile.secureFilePath)
+  inputs:
+    secureFile: deps.zip
+
+- task: ExtractFiles@1
+  inputs:
+    archiveFilePatterns: $(deps.secureFilePath) 
+    destinationFolder: lib
+
 - task: DotNetCoreCLI@2
   inputs:
     command: restore
