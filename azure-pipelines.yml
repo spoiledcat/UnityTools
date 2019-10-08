@@ -1,5 +1,5 @@
-# ASP.NET Core (.NET Framework)
-# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# .NET Core (.NET Framework)
+# Build and test .NET Core projects targeting the full .NET Framework.
 # Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
@@ -8,9 +8,6 @@ trigger:
 
 pool:
   vmImage: 'ubuntu-latest'
-
-variables:
-  buildConfiguration: 'Release'
 
 steps:
 - task: DotNetCoreInstaller@0
@@ -30,9 +27,87 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: restore
+    verbosityRestore: minimal
 
 - task: DotNetCoreCLI@2
   displayName: Build
   inputs:
     command: build
     arguments: '--configuration Release' # Update this to match your need
+
+- task: Npm@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    command: 'publish'
+    workingDir: 'build/packages/com.spoiledcat.environment'
+    publishEndpoint: 'registry'
+
+- task: Npm@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    command: 'publish'
+    workingDir: 'build/packages/com.spoiledcat.logging'
+    publishEndpoint: 'registry'
+
+- task: Npm@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    command: 'publish'
+    workingDir: 'build/packages/com.spoiledcat.niceio'
+    publishEndpoint: 'registry'
+
+- task: Npm@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    command: 'publish'
+    workingDir: 'build/packages/com.spoiledcat.processmanager'
+    publishEndpoint: 'registry'
+
+- task: Npm@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    command: 'publish'
+    workingDir: 'build/packages/com.spoiledcat.quickconsole'
+    publishEndpoint: 'registry'
+
+- task: Npm@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    command: 'publish'
+    workingDir: 'build/packages/com.spoiledcat.sharpziplib'
+    publishEndpoint: 'registry'
+
+- task: Npm@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    command: 'publish'
+    workingDir: 'build/packages/com.spoiledcat.simplejson'
+    publishEndpoint: 'registry'
+
+- task: Npm@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    command: 'publish'
+    workingDir: 'build/packages/com.spoiledcat.tasks'
+    publishEndpoint: 'registry'
+
+- task: Npm@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    command: 'publish'
+    workingDir: 'build/packages/com.spoiledcat.threading'
+    publishEndpoint: 'registry'
+
+- task: Npm@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    command: 'publish'
+    workingDir: 'build/packages/com.spoiledcat.ui'
+    publishEndpoint: 'registry'
+
+- task: Npm@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    command: 'publish'
+    workingDir: 'build/packages/com.spoiledcat.utilities'
+    publishEndpoint: 'registry'
