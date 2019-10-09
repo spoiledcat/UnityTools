@@ -79,13 +79,6 @@
 
   </Target>
 
-  <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\tasks\FileUpdateTask\FileUpdateTask.csproj">
-      <Private>false</Private>
-      <PrivateAssets>All</PrivateAssets>
-    </ProjectReference>
-  </ItemGroup>
-
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)common\publickey.snk</AssemblyOriginatorKeyFile>

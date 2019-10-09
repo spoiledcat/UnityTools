@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.ui",
     "displayName": "SpoiledCat UI Framework",
     "description": "An editor Window subclass that provides the standard IMGUI methods as overrides, with additional logic for managing the life cycle of imgui windows",
-    "version": "1.0",
+    "version": "0.0.0-placeholder",
     "repository" : {
         "type" : "git",
         "url": "ssh://git@github.com/spoiledcat/UnityTools.git"

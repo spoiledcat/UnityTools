@@ -2,10 +2,10 @@
     "name": "com.spoiledcat.quick-console",
     "displayName": "SpoiledCat Quick Console",
     "description": "An evaluation console for editor scripts without recompiling the whole project",
-    "version": "1.0",
+    "version": "0.0.0-placeholder",
     "dependencies": {
-        "com.spoiledcat.niceio": "1.0",
-        "com.spoiledcat.ui": "1.0"
+        "com.spoiledcat.niceio": "0.0.0-placeholder",
+        "com.spoiledcat.ui": "0.0.0-placeholder"
     },
     "repository" : {
         "type" : "git",

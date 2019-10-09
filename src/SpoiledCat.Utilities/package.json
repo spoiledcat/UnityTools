@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.utilities",
     "displayName": "SpoiledCat Utilities",
     "description": "Handy utilities primitives like string extension methods and unzip tools!",
-    "version": "1.0",
+    "version": "0.0.0-placeholder",
     "repository" : {
         "type" : "git",
         "url": "ssh://git@github.com/spoiledcat/UnityTools.git"

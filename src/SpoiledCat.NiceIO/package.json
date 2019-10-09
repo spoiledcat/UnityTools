@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.niceio",
     "displayName": "SpoiledCat NiceIO",
     "description": "A nice IO abstraction",
-    "version": "1.0",
+    "version": "0.0.0-placeholder",
     "repository" : {
         "type" : "git",
         "url": "ssh://git@github.com/spoiledcat/UnityTools.git"

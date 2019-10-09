@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFrameworks>net471</TargetFrameworks>
-    <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\..\</SolutionDir>
+    <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\</SolutionDir>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\common\configuration.targets" />
   <Import Project="$(SolutionDir)\common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />

@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.environment",
     "displayName": "SpoiledCat Unity Environment",
     "description": "An environment class encapsulating Unity information",
-    "version": "1.0",
+    "version": "0.0.0-placeholder",
     "repository" : {
         "type" : "git",
         "url": "ssh://git@github.com/spoiledcat/UnityTools.git"

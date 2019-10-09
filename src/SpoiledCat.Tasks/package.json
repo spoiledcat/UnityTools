@@ -2,9 +2,9 @@
     "name": "com.spoiledcat.tasks",
     "displayName": "SpoiledCat Tasks",
     "description": "Premade tasks for use with the SpoiledCat Threading package",
-    "version": "1.0",
+    "version": "0.0.0-placeholder",
     "dependencies": {
-        "com.spoiledcat.threading": "1.0"
+        "com.spoiledcat.threading": "0.0.0-placeholder"
     },
     "repository" : {
         "type" : "git",

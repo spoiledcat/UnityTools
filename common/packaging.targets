@@ -40,11 +40,6 @@
 
   </Target>
 
-  <PropertyGroup>
-    <MSBuildCommunityTasksLib>$(RepoBinPath)\FileUpdateTask\$(Configuration)\FileUpdateTask.dll</MSBuildCommunityTasksLib>
-  </PropertyGroup>
-  <UsingTask AssemblyFile="$(MSBuildCommunityTasksLib)" TaskName="SpoiledCat.MSBuild.Community.Tasks.FileUpdate" />
-
   <Target Name="StampPackageVersion" AfterTargets="CopySourcesToPackmanPackage">
 
     <FileUpdate 

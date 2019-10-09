@@ -2,13 +2,13 @@
     "name": "com.spoiledcat.processmanager",
     "displayName": "SpoiledCat Process Manager",
     "description": "A manager that handles running processes and returning their output",
-    "version": "1.0",
+    "version": "0.0.0-placeholder",
     "dependencies": {
-        "com.spoiledcat.logging": "1.0",
-        "com.spoiledcat.environment": "1.0",
-        "com.spoiledcat.niceio": "1.0",
-        "com.spoiledcat.threading": "1.0",
-        "com.spoiledcat.utilities": "1.0"
+        "com.spoiledcat.logging": "0.0.0-placeholder",
+        "com.spoiledcat.environment": "0.0.0-placeholder",
+        "com.spoiledcat.niceio": "0.0.0-placeholder",
+        "com.spoiledcat.threading": "0.0.0-placeholder",
+        "com.spoiledcat.utilities": "0.0.0-placeholder"
     },
     "repository" : {
         "type" : "git",

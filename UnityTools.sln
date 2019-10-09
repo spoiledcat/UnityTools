@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.705
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29403.142
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.SimpleJson", "src\SpoiledCat.SimpleJson\SpoiledCat.SimpleJson.csproj", "{2A572465-DE6D-42FA-BC88-C846D6931B5F}"
 EndProject
@@ -24,8 +24,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Tasks", "src\SpoiledCat.Tasks\SpoiledCat.Tasks.csproj", "{19E58BF2-1CE5-4906-B8EE-F40CF04B8055}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.UI", "src\SpoiledCat.UI\SpoiledCat.UI.csproj", "{7F58AD75-25A1-4D10-BCD4-52F965AA25D5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileUpdateTask", "tasks\FileUpdateTask\FileUpdateTask.csproj", "{A0D84E39-71B7-422E-88EE-9F3D4285FD94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,10 +75,6 @@ Global
 		{7F58AD75-25A1-4D10-BCD4-52F965AA25D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F58AD75-25A1-4D10-BCD4-52F965AA25D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F58AD75-25A1-4D10-BCD4-52F965AA25D5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A0D84E39-71B7-422E-88EE-9F3D4285FD94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A0D84E39-71B7-422E-88EE-9F3D4285FD94}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A0D84E39-71B7-422E-88EE-9F3D4285FD94}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A0D84E39-71B7-422E-88EE-9F3D4285FD94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
