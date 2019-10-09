@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace SpoiledCat.Threading
 {
-	using Utilities;
+	using Helpers;
 
 	public interface IMainThreadSynchronizationContext
 	{

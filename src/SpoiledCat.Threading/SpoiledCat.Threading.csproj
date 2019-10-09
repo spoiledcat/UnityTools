@@ -7,7 +7,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SpoiledCat.Logging\SpoiledCat.Logging.csproj" />
     <ProjectReference Include="..\SpoiledCat.NiceIO\SpoiledCat.NiceIO.csproj" />
-    <ProjectReference Include="..\SpoiledCat.Utilities\SpoiledCat.Utilities.csproj" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
 </Project>

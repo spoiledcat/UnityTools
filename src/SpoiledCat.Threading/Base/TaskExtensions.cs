@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace SpoiledCat.Threading
 {
 	using Logging;
-	using Utilities;
+	using Helpers;
     public static class TaskExtensions
     {
         public static async Task StartAwait(this ITask source, Action<Exception> handler = null)

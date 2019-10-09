@@ -3,9 +3,6 @@
     "displayName": "SpoiledCat Threading",
     "description": "A friendly threaded task system for Unity",
     "version": "0.0.0-placeholder",
-    "dependencies": {
-        "com.spoiledcat.utilities": "0.0.0-placeholder"
-    },
     "repository" : {
         "type" : "git",
         "url": "ssh://git@github.com/spoiledcat/UnityTools.git"

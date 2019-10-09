@@ -4,7 +4,8 @@
     "description": "Premade tasks for use with the SpoiledCat Threading package",
     "version": "0.0.0-placeholder",
     "dependencies": {
-        "com.spoiledcat.threading": "0.0.0-placeholder"
+        "com.spoiledcat.threading": "0.0.0-placeholder",
+        "com.spoiledcat.utilities": "0.0.0-placeholder"
     },
     "repository" : {
         "type" : "git",

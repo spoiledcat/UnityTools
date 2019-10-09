@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SpoiledCat.Threading
 {
-	using Utilities;
+	using Helpers;
     public static class ThreadingHelper
     {
         public static TaskScheduler MainThreadScheduler { get; set; }

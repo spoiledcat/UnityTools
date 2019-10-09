@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace SpoiledCat.Threading
 {
-	using Utilities;
+	using Helpers;
 
 	public class TaskQueue : TPLTask
     {

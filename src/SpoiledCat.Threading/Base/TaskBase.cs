@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace SpoiledCat.Threading
 {
 	using Logging;
-	using Utilities;
+	using Helpers;
     public enum TaskRunOptions
     {
         OnSuccess,
