@@ -396,3 +396,12 @@ MigrationBackup/
 
 # End of https://www.gitignore.io/api/visualstudio
 
+.suo.meta
+*.tmp.meta
+*.user.meta
+*.userprefs.meta
+*.pidb.meta
+*.booproj.meta
+*.svd.meta
+*.opendb.meta
+*.VC.db.meta

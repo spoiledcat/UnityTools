@@ -9,7 +9,7 @@
     },
     {
       "name": "spoiledcat",
-      "url": "https://unity-package-registry.herokuapp.com/",
+      "url": "https://registry.spoiledcat.com/",
       "scopes": [
         "com.spoiledcat"
       ]
