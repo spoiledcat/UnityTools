@@ -5,16 +5,16 @@
     "com.unity.modules.imgui": "1.0.0",
     "com.unity.modules.jsonserialize": "1.0.0",
     "com.unity.modules.ui": "1.0.0",
-    "com.spoiledcat.environment": "file:../../../src/spoiledcat.environment",
-    "com.spoiledcat.logging": "file:../../../src/spoiledcat.logging",
-    "com.spoiledcat.niceio": "file:../../../src/spoiledcat.niceio",
-    "com.spoiledcat.processmanager": "file:../../../src/spoiledcat.processmanager",
-    "com.spoiledcat.sharpziplib": "file:../../../src/spoiledcat.sharpziplib",
-    "com.spoiledcat.simplejson": "file:../../../src/spoiledcat.simplejson",
-    "com.spoiledcat.tasks": "file:../../../src/spoiledcat.tasks",
-    "com.spoiledcat.threading": "file:../../../src/spoiledcat.threading",
-    "com.spoiledcat.ui": "file:../../../src/spoiledcat.ui",
-    "com.spoiledcat.utilities": "file:../../../src/spoiledcat.utilities",
-    "com.spoiledcat.quick-console": "file:../../../src/spoiledcat.quickconsole"
+    "com.spoiledcat.environment": "file:../../../src/com.spoiledcat.environment",
+    "com.spoiledcat.logging": "file:../../../src/com.spoiledcat.logging",
+    "com.spoiledcat.niceio": "file:../../../src/com.spoiledcat.niceio",
+    "com.spoiledcat.processmanager": "file:../../../src/com.spoiledcat.processmanager",
+    "com.spoiledcat.sharpziplib": "file:../../../src/com.spoiledcat.sharpziplib",
+    "com.spoiledcat.simplejson": "file:../../../src/com.spoiledcat.simplejson",
+    "com.spoiledcat.tasks": "file:../../../src/com.spoiledcat.tasks",
+    "com.spoiledcat.threading": "file:../../../src/com.spoiledcat.threading",
+    "com.spoiledcat.ui": "file:../../../src/com.spoiledcat.ui",
+    "com.spoiledcat.utilities": "file:../../../src/com.spoiledcat.utilities",
+    "com.spoiledcat.quick-console": "file:../../../src/com.spoiledcat.quick-console"
   }
 }

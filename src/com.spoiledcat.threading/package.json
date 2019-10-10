@@ -1,7 +1,7 @@
 {
-    "name": "com.spoiledcat.tasks",
-    "displayName": "SpoiledCat Tasks",
-    "description": "Premade tasks for use with the SpoiledCat Threading package",
+    "name": "com.spoiledcat.threading",
+    "displayName": "SpoiledCat Threading",
+    "description": "A friendly threaded task system for Unity",
     "version": "0.0.0-placeholder",
     "license" : "MIT",
     "author": {
@@ -11,13 +11,13 @@
     "repository" : {
       "type" : "git",
       "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
-      "directory": "src/SpoiledCat.Tasks"
+      "directory": "src/Threading"
     },
     "publishConfig": {
         "registry":"https://registry.spoiledcat.com/"
     },
     "dependencies": {
-        "com.spoiledcat.threading": "0.0.0-placeholder",
-        "com.spoiledcat.utilities": "0.0.0-placeholder"
+        "com.spoiledcat.logging": "0.0.0-placeholder",
+        "com.spoiledcat.niceio": "0.0.0-placeholder"
     }
 }

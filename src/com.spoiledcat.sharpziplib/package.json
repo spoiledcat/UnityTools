@@ -1,7 +1,7 @@
 {
-    "name": "com.spoiledcat.environment",
-    "displayName": "SpoiledCat Unity Environment",
-    "description": "An environment class encapsulating Unity information",
+    "name": "com.spoiledcat.sharpziplib",
+    "displayName": "SpoiledCat SharpZipLib",
+    "description": "Fork of sharpziplib",
     "version": "0.0.0-placeholder",
     "license" : "MIT",
     "author": {
@@ -11,7 +11,7 @@
     "repository" : {
       "type" : "git",
       "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
-      "directory": "src/SpoiledCat.Environment"
+      "directory": "src/SharpZipLib"
     },
     "publishConfig": {
         "registry":"https://registry.spoiledcat.com/"

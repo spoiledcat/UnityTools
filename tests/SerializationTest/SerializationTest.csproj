@@ -1,76 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EB3C1602-5400-493F-B48A-053FF104FA83}</ProjectGuid>
+    <TargetFramework>net471</TargetFramework>
+    <ApplicationIcon />
     <OutputType>Exe</OutputType>
-    <RootNamespace>SerializationTest</RootNamespace>
-    <AssemblyName>SerializationTest</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
+    <StartupObject />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.environment\SpoiledCat.Environment.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.logging\SpoiledCat.Logging.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.niceio\SpoiledCat.NiceIO.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.processmanager\SpoiledCat.ProcessManager.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.sharpziplib\SpoiledCat.SharpZipLib.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.simplejson\SpoiledCat.SimpleJson.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.tasks\SpoiledCat.Tasks.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.threading\SpoiledCat.Threading.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.utilities\SpoiledCat.Utilities.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\NiceIO.csproj">
-      <Project>{01d92443-b99a-d077-6b6a-4ab1a041bd29}</Project>
-      <Name>NiceIO</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\NiceThreading.csproj">
-      <Project>{ccc4db3f-a8c8-b82e-3a0f-2b2f1a5c56c7}</Project>
-      <Name>NiceThreading</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\OfflineAssetManager.csproj">
-      <Project>{4e3ea1ba-7af9-bb2c-8f35-85e1d0c077c4}</Project>
-      <Name>OfflineAssetManager</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\SimpleJson.csproj">
-      <Project>{19105b87-1a06-d602-2f47-db4fc2076be7}</Project>
-      <Name>SimpleJson</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\SimpleLogging.csproj">
-      <Project>{7c70e39e-5f0f-33fc-3325-f4ff3f9c55c2}</Project>
-      <Name>SimpleLogging</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>

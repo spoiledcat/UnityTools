@@ -1,7 +1,7 @@
 {
-    "name": "com.spoiledcat.threading",
-    "displayName": "SpoiledCat Threading",
-    "description": "A friendly threaded task system for Unity",
+    "name": "com.spoiledcat.environment",
+    "displayName": "SpoiledCat Unity Environment",
+    "description": "An environment class encapsulating Unity information",
     "version": "0.0.0-placeholder",
     "license" : "MIT",
     "author": {
@@ -11,13 +11,9 @@
     "repository" : {
       "type" : "git",
       "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
-      "directory": "src/SpoiledCat.Threading"
+      "directory": "src/Environment"
     },
     "publishConfig": {
         "registry":"https://registry.spoiledcat.com/"
-    },
-    "dependencies": {
-        "com.spoiledcat.logging": "0.0.0-placeholder",
-        "com.spoiledcat.niceio": "0.0.0-placeholder"
     }
 }

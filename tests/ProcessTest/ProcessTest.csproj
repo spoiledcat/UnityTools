@@ -8,15 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Git Installer.csproj" />
-    <ProjectReference Include="..\..\NiceIO.csproj" />
-    <ProjectReference Include="..\..\NiceThreading.csproj" />
-    <ProjectReference Include="..\..\ProcessManager.csproj" />
-    <ProjectReference Include="..\..\SharpZipLib.csproj" />
-    <ProjectReference Include="..\..\SimpleJson.csproj" />
-    <ProjectReference Include="..\..\SimpleLogging.csproj" />
-    <ProjectReference Include="..\..\UnityEnvironment.csproj" />
-    <ProjectReference Include="..\..\Utilities.csproj" />
+    <ProjectReference Include="..\..\src\GitInstaller\Git Installer.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.environment\SpoiledCat.Environment.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.logging\SpoiledCat.Logging.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.niceio\SpoiledCat.NiceIO.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.processmanager\SpoiledCat.ProcessManager.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.sharpziplib\SpoiledCat.SharpZipLib.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.simplejson\SpoiledCat.SimpleJson.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.tasks\SpoiledCat.Tasks.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.threading\SpoiledCat.Threading.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.utilities\SpoiledCat.Utilities.csproj" />
   </ItemGroup>
 
 </Project>

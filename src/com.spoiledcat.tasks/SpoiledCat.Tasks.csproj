@@ -5,11 +5,8 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)\common\configuration.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\SpoiledCat.Environment\SpoiledCat.Environment.csproj" />
-    <ProjectReference Include="..\SpoiledCat.Logging\SpoiledCat.Logging.csproj" />
-    <ProjectReference Include="..\SpoiledCat.NiceIO\SpoiledCat.NiceIO.csproj" />
-    <ProjectReference Include="..\SpoiledCat.Threading\SpoiledCat.Threading.csproj" />
-    <ProjectReference Include="..\SpoiledCat.Utilities\SpoiledCat.Utilities.csproj" />
+    <ProjectReference Include="..\com.spoiledcat.threading\SpoiledCat.Threading.csproj" />
+    <ProjectReference Include="..\com.spoiledcat.utilities\SpoiledCat.Utilities.csproj" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
 </Project>

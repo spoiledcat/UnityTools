@@ -1,17 +1,17 @@
 {
-    "name": "com.spoiledcat.niceio",
-    "displayName": "SpoiledCat NiceIO",
-    "description": "A nice IO abstraction",
-    "version": "0.0.0-placeholder",
+    "name": "com.spoiledcat.simplejson",
+    "displayName": "SpoiledCat Simple Json",
+    "description": "A powerful yet simple json (de)serializer with support for Unity and custom types",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
       "email": "shana@spoiledcat.net"
     },
+    "version": "0.0.0-placeholder",
     "repository" : {
       "type" : "git",
       "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
-      "directory": "src/SpoiledCat.NiceIO"
+      "directory": "src/SimpleJson"
     },
     "publishConfig": {
         "registry":"https://registry.spoiledcat.com/"

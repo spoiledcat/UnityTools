@@ -1,7 +1,7 @@
 {
-    "name": "com.spoiledcat.logging",
-    "displayName": "SpoiledCat Logging",
-    "description": "A friendly and simple logging framework with multiple outputs",
+    "name": "com.spoiledcat.niceio",
+    "displayName": "SpoiledCat NiceIO",
+    "description": "A nice IO abstraction",
     "version": "0.0.0-placeholder",
     "license" : "MIT",
     "author": {
@@ -11,7 +11,7 @@
     "repository" : {
       "type" : "git",
       "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
-      "directory": "src/SpoiledCat.Logging"
+      "directory": "src/NiceIO"
     },
     "publishConfig": {
         "registry":"https://registry.spoiledcat.com/"

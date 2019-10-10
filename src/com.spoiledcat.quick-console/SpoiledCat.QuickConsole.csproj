@@ -5,8 +5,9 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)\common\configuration.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\SpoiledCat.Logging\SpoiledCat.Logging.csproj" />
-    <ProjectReference Include="..\SpoiledCat.NiceIO\SpoiledCat.NiceIO.csproj" />
+    <ProjectReference Include="..\com.spoiledcat.niceio\SpoiledCat.NiceIO.csproj" />
+    <ProjectReference Include="..\com.spoiledcat.simplejson\SpoiledCat.SimpleJson.csproj" />
+    <ProjectReference Include="..\com.spoiledcat.ui\SpoiledCat.UI.csproj" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
 </Project>
