@@ -267,10 +267,13 @@ _pkginfo.txt
 # but keep track of directories ending in .cache
 !?*.[Cc]ache/
 
+# files ending in .~ can be ignored
+*~
+# but keep track of directories ending in .~
+!?*~/
+
 # Others
 ClientBin/
-~$*
-*~
 *.dbmdl
 *.dbproj.schemaview
 *.jfm

@@ -9,9 +9,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GitInstaller\Git Installer.csproj" />
-    <ProjectReference Include="..\..\src\com.spoiledcat.environment\SpoiledCat.Environment.csproj" />
-    <ProjectReference Include="..\..\src\com.spoiledcat.logging\SpoiledCat.Logging.csproj" />
-    <ProjectReference Include="..\..\src\com.spoiledcat.niceio\SpoiledCat.NiceIO.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.environment\Runtime\SpoiledCat.Environment.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.logging\Runtime\SpoiledCat.Logging.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.niceio\Runtime\SpoiledCat.NiceIO.csproj" />
     <ProjectReference Include="..\..\src\com.spoiledcat.processmanager\SpoiledCat.ProcessManager.csproj" />
     <ProjectReference Include="..\..\src\com.spoiledcat.sharpziplib\SpoiledCat.SharpZipLib.csproj" />
     <ProjectReference Include="..\..\src\com.spoiledcat.simplejson\SpoiledCat.SimpleJson.csproj" />

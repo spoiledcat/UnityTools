@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+  <PropertyGroup>
+    <TargetFrameworks>net471</TargetFrameworks>
+    <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\..\</SolutionDir>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)common\unityreferences.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\com.spoiledcat.niceio\Runtime\SpoiledCat.Unity.NiceIO.csproj" />
+    <ProjectReference Include="..\..\com.spoiledcat.simplejson\Runtime\SpoiledCat.Unity.SimpleJson.csproj" />
+    <ProjectReference Include="..\..\com.spoiledcat.ui\Editor\SpoiledCat.Unity.UI.csproj" />
+  </ItemGroup>
+  <Import Project="$(SolutionDir)common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
+</Project>

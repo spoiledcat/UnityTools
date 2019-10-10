@@ -35,7 +35,7 @@ namespace SpoiledCat.Unity
 
 	public interface IEnvironment
 	{
-		void Initialize(string unityVersion, NPath extensionInstallPath, NPath unityApplicationPath, NPath unityApplicationContentsPath, NPath assetsPath);
+		void Initialize(NPath assetsPath, NPath extensionInstallPath, string unityVersion = null, NPath unityApplicationPath = default, NPath unityApplicationContentsPath = default);
 		string ExpandEnvironmentVariables(string name);
 		string GetEnvironmentVariable(string v);
 		string GetSpecialFolder(Environment.SpecialFolder folder);
@@ -65,7 +65,11 @@ namespace SpoiledCat.Unity
 
 	public class UnityEnvironment : IEnvironment
 	{
-		private const string DefaultLogFilename = "github-unity.log";
+#if UNITY_EDITOR
+		private const string DefaultLogFilename = "editor.log";
+#else
+		private const string DefaultLogFilename = "player.log";
+#endif
 
 		public UnityEnvironment(string applicationName, string logFile = DefaultLogFilename)
 		{
@@ -78,11 +82,13 @@ namespace SpoiledCat.Unity
 			LogPath.EnsureParentDirectoryExists();
 		}
 
-		public virtual void Initialize(string unityVersion,
+		public virtual void Initialize(
+			NPath Application_dataPath,
 			NPath extensionInstallPath,
-			NPath EditorApplication_applicationPath,
-			NPath EditorApplication_applicationContentsPath,
-			NPath Application_dataPath)
+			string unityVersion = null,
+			NPath EditorApplication_applicationPath = default,
+			NPath EditorApplication_applicationContentsPath = default
+		)
 		{
 			ExtensionInstallPath = extensionInstallPath;
 			UnityApplication = EditorApplication_applicationPath;

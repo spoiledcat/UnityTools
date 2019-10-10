@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
 
-    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</RepoRoot>
+    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))..\</RepoRoot>
     <RepoBuildPath>$(RepoRoot)build\</RepoBuildPath>
     <RepoBinPath>$(RepoBuildPath)bin\</RepoBinPath>
     <RepoObjPath>$(RepoBuildPath)obj\</RepoObjPath>
@@ -18,13 +18,15 @@
     <Owners>Andreia Gaita</Owners>
     <Copyright>2016-2019 Andreia Gaita. All rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/spoiledcat/UnityTools</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
 
     <MicroBuildPackageVersion>2.0.55</MicroBuildPackageVersion>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
 
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
+
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.0.25" PrivateAssets="all" />

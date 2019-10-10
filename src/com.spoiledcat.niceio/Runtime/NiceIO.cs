@@ -49,12 +49,8 @@ namespace SpoiledCat.NiceIO
 {
 	[Serializable]
 	[DebuggerDisplay("{DebuggerDisplay,nq}")]
-#if NICEIO_INTERNAL
-	internal
-#else
-	public
-#endif
-		struct NPath : IEquatable<NPath>, IComparable
+
+	public struct NPath : IEquatable<NPath>, IComparable
 	{
 		public static NPath Default;
 
