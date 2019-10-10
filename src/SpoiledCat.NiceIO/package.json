@@ -3,9 +3,15 @@
     "displayName": "SpoiledCat NiceIO",
     "description": "A nice IO abstraction",
     "version": "0.0.0-placeholder",
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
+    },
     "repository" : {
-        "type" : "git",
-        "url": "ssh://git@github.com/spoiledcat/UnityTools.git"
+      "type" : "git",
+      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+      "directory": "src/SpoiledCat.NiceIO"
     },
     "publishConfig": {
         "registry":"https://registry.spoiledcat.com/"

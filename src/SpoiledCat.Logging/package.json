@@ -3,9 +3,15 @@
     "displayName": "SpoiledCat Logging",
     "description": "A friendly and simple logging framework with multiple outputs",
     "version": "0.0.0-placeholder",
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
+    },
     "repository" : {
-        "type" : "git",
-        "url": "ssh://git@github.com/spoiledcat/UnityTools.git"
+      "type" : "git",
+      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+      "directory": "src/SpoiledCat.Logging"
     },
     "publishConfig": {
         "registry":"https://registry.spoiledcat.com/"

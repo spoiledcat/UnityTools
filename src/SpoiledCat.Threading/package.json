@@ -3,15 +3,21 @@
     "displayName": "SpoiledCat Threading",
     "description": "A friendly threaded task system for Unity",
     "version": "0.0.0-placeholder",
-    "dependencies": {
-        "com.spoiledcat.logging": "0.0.0-placeholder",
-        "com.spoiledcat.niceio": "0.0.0-placeholder"
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
     },
     "repository" : {
-        "type" : "git",
-        "url": "ssh://git@github.com/spoiledcat/UnityTools.git"
+      "type" : "git",
+      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+      "directory": "src/SpoiledCat.Threading"
     },
     "publishConfig": {
         "registry":"https://registry.spoiledcat.com/"
+    },
+    "dependencies": {
+        "com.spoiledcat.logging": "0.0.0-placeholder",
+        "com.spoiledcat.niceio": "0.0.0-placeholder"
     }
 }

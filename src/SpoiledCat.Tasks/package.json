@@ -3,15 +3,21 @@
     "displayName": "SpoiledCat Tasks",
     "description": "Premade tasks for use with the SpoiledCat Threading package",
     "version": "0.0.0-placeholder",
-    "dependencies": {
-        "com.spoiledcat.threading": "0.0.0-placeholder",
-        "com.spoiledcat.utilities": "0.0.0-placeholder"
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
     },
     "repository" : {
-        "type" : "git",
-        "url": "ssh://git@github.com/spoiledcat/UnityTools.git"
+      "type" : "git",
+      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+      "directory": "src/SpoiledCat.Tasks"
     },
     "publishConfig": {
         "registry":"https://registry.spoiledcat.com/"
+    },
+    "dependencies": {
+        "com.spoiledcat.threading": "0.0.0-placeholder",
+        "com.spoiledcat.utilities": "0.0.0-placeholder"
     }
 }
