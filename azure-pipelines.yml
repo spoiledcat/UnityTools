@@ -67,7 +67,7 @@ steps:
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     command: 'publish'
-    workingDir: 'build/packages/com.spoiledcat.quickconsole'
+    workingDir: 'build/packages/com.spoiledcat.quick-console'
     publishEndpoint: 'registry'
 
 - task: Npm@1
