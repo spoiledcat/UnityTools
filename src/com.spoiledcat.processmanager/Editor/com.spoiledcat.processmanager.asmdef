@@ -1,12 +1,16 @@
 {
-    "name": "SpoiledCat.Threading",
+    "name": "com.spoiledcat.processmanager",
     "references": [
-        "SpoiledCat.Logging",
-        "SpoiledCat.NiceIO",
-        "SpoiledCat.Utilities"
+        "com.spoiledcat.environment",
+        "com.spoiledcat.logging",
+        "com.spoiledcat.niceio",
+        "com.spoiledcat.threading",
+        "com.spoiledcat.utilities"
     ],
     "optionalUnityReferences": [],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

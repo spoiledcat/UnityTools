@@ -1,14 +1,16 @@
 {
-    "name": "SpoiledCat.Utilities",
+    "name": "com.spoiledcat.utilities",
     "references": [
-        "SpoiledCat.NiceIO",
-        "SpoiledCat.Logging",
-        "SpoiledCat.SimpleJson",
-        "SpoiledCat.Environment",
-        "SpoiledCat.SharpZipLib"
+        "com.spoiledcat.niceio",
+        "com.spoiledcat.logging",
+        "com.spoiledcat.simplejson",
+        "com.spoiledcat.environment",
+        "com.spoiledcat.sharpziplib"
     ],
     "optionalUnityReferences": [],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

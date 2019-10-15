@@ -1,13 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <TargetFrameworks>net471</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp2.2</TargetFrameworks>
     <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\..\</SolutionDir>
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\unityreferences.targets" />
   <ItemGroup>
+    <ProjectReference Include="..\..\com.spoiledcat.environment\Editor\SpoiledCat.Unity.Environment.csproj" />
+    <ProjectReference Include="..\..\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj" />
+    <ProjectReference Include="..\..\com.spoiledcat.sharpziplib\Editor\SpoiledCat.Unity.SharpZipLib.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.simplejson\Editor\SpoiledCat.Unity.SimpleJson.csproj" />
-    <ProjectReference Include="..\..\com.spoiledcat.ui\Editor\SpoiledCat.Unity.UI.csproj" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
 </Project>

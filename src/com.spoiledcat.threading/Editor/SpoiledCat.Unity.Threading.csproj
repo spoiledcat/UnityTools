@@ -5,8 +5,8 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\unityreferences.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\..\com.spoiledcat.logging\Runtime\SpoiledCat.Unity.Logging.csproj" />
-    <ProjectReference Include="..\..\com.spoiledcat.niceio\Runtime\SpoiledCat.Unity.NiceIO.csproj" />
+    <ProjectReference Include="..\..\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
+    <ProjectReference Include="..\..\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
 </Project>

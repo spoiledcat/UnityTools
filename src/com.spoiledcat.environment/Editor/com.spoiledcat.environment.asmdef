@@ -1,8 +1,14 @@
 {
-    "name": "SpoiledCat.SimpleJson",
-    "references": [],
+    "name": "com.spoiledcat.environment",
+    "references": [
+        "com.spoiledcat.niceio",
+        "com.spoiledcat.logging",
+        "com.spoiledcat.simplejson"
+    ],
     "optionalUnityReferences": [],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

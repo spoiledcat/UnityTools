@@ -1,5 +1,5 @@
 {
-    "name": "SpoiledCat.UI",
+    "name": "com.spoiledcat.logging",
     "references": [],
     "optionalUnityReferences": [],
     "includePlatforms": [
@@ -10,5 +10,6 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": []
 }

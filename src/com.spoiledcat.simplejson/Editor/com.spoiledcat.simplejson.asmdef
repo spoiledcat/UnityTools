@@ -1,16 +1,14 @@
 {
-    "name": "SpoiledCat.NiceIO",
-    "references": [
-        "GUID:dc2a5753d14b7404cb174688cfb5f83d"
-    ],
+    "name": "com.spoiledcat.simplejson",
+    "references": [],
     "optionalUnityReferences": [],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
-    "precompiledReferences": [
-        "Mono.Posix.dll"
-    ],
+    "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": []

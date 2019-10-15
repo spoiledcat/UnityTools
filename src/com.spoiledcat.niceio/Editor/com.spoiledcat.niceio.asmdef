@@ -1,12 +1,16 @@
 {
-    "name": "SpoiledCat.Logging",
+    "name": "com.spoiledcat.niceio",
     "references": [],
     "optionalUnityReferences": [],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "Mono.Posix.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": []

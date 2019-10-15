@@ -1,10 +1,6 @@
 {
-    "name": "SpoiledCat.QuickConsole",
-    "references": [
-        "SpoiledCat.SimpleJson",
-        "SpoiledCat.UI",
-        "SpoiledCat.NiceIO"
-    ],
+    "name": "com.spoiledcat.ui",
+    "references": [],
     "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
@@ -14,5 +10,6 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": []
 }

@@ -3,27 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29403.142
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Environment", "src\com.spoiledcat.environment\Runtime\SpoiledCat.Unity.Environment.csproj", "{11F6F1B7-7E18-4ADA-87A4-2D65100CAE5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Environment", "src\com.spoiledcat.environment\Editor\SpoiledCat.Unity.Environment.csproj", "{11F6F1B7-7E18-4ADA-87A4-2D65100CAE5E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logging", "src\com.spoiledcat.logging\Runtime\SpoiledCat.Unity.Logging.csproj", "{AAE57A75-EC73-4C1A-9095-6B943AA15BC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logging", "src\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj", "{AAE57A75-EC73-4C1A-9095-6B943AA15BC7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NiceIO", "src\com.spoiledcat.niceio\Runtime\SpoiledCat.Unity.NiceIO.csproj", "{BA3EC028-1970-4F51-95B5-2C18C7706924}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NiceIO", "src\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj", "{BA3EC028-1970-4F51-95B5-2C18C7706924}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleJson", "src\com.spoiledcat.simplejson\Runtime\SpoiledCat.Unity.SimpleJson.csproj", "{2A572465-DE6D-42FA-BC88-C846D6931B5F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleJson", "src\com.spoiledcat.simplejson\Editor\SpoiledCat.Unity.SimpleJson.csproj", "{2A572465-DE6D-42FA-BC88-C846D6931B5F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpZipLib", "src\com.spoiledcat.sharpziplib\Runtime\SpoiledCat.Unity.SharpZipLib.csproj", "{E74CD1E7-C4EB-43D3-A843-F520BC712BA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpZipLib", "src\com.spoiledcat.sharpziplib\Editor\SpoiledCat.Unity.SharpZipLib.csproj", "{E74CD1E7-C4EB-43D3-A843-F520BC712BA4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threading", "src\com.spoiledcat.threading\Runtime\SpoiledCat.Unity.Threading.csproj", "{9699A2CF-3009-4272-AE5A-0A0C7AF6BCB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threading", "src\com.spoiledcat.threading\Editor\SpoiledCat.Unity.Threading.csproj", "{9699A2CF-3009-4272-AE5A-0A0C7AF6BCB6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager", "src\com.spoiledcat.processmanager\Runtime\SpoiledCat.Unity.ProcessManager.csproj", "{DE31B55F-80BC-40D5-9A93-276537963DCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager", "src\com.spoiledcat.processmanager\Editor\SpoiledCat.Unity.ProcessManager.csproj", "{DE31B55F-80BC-40D5-9A93-276537963DCC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickConsole", "src\com.spoiledcat.quick-console\Editor\SpoiledCat.Unity.QuickConsole.csproj", "{35B2BEAA-0E79-4360-994C-0108D9E61CA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tasks", "src\com.spoiledcat.tasks\Runtime\SpoiledCat.Unity.Tasks.csproj", "{19E58BF2-1CE5-4906-B8EE-F40CF04B8055}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tasks", "src\com.spoiledcat.tasks\Editor\SpoiledCat.Unity.Tasks.csproj", "{19E58BF2-1CE5-4906-B8EE-F40CF04B8055}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UI", "src\com.spoiledcat.ui\Editor\SpoiledCat.Unity.UI.csproj", "{7F58AD75-25A1-4D10-BCD4-52F965AA25D5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utilities", "src\com.spoiledcat.utilities\Runtime\SpoiledCat.Unity.Utilities.csproj", "{D82E300E-7BD9-4B87-9522-847D4EDAABE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utilities", "src\com.spoiledcat.utilities\Editor\SpoiledCat.Unity.Utilities.csproj", "{D82E300E-7BD9-4B87-9522-847D4EDAABE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

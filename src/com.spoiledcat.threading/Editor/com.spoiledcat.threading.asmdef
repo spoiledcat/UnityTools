@@ -1,13 +1,14 @@
 {
-    "name": "SpoiledCat.Tasks",
+    "name": "com.spoiledcat.threading",
     "references": [
-        "SpoiledCat.Logging",
-        "SpoiledCat.NiceIO",
-        "SpoiledCat.Utilities",
-        "SpoiledCat.Threading"
+        "com.spoiledcat.logging",
+        "com.spoiledcat.niceio",
+        "com.spoiledcat.utilities"
     ],
     "optionalUnityReferences": [],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
