@@ -48,4 +48,4 @@ deploy:
     secure: KNFSKb7s+3+79G+FOMmubE+llHdsyV+3ApSqqgrbia5DM4RCzKDEIXaQGPqip9bf
   skip_symbols: true
   symbol_server:           # remove to push symbols to SymbolSource.org
-  artifact: /.*NiceIO.*\.nupkg/
+  artifact: /.*\.nupkg/
