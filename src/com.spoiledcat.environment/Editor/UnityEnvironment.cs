@@ -55,7 +55,6 @@ namespace SpoiledCat.Unity
 		NPath UserCachePath { get; set; }
 		NPath SystemCachePath { get; set; }
 		NPath LogPath { get; }
-		IFileSystem FileSystem { get; set; }
 		ISettings LocalSettings { get; }
 		ISettings SystemSettings { get; }
 		ISettings UserSettings { get; }
@@ -101,7 +100,7 @@ namespace SpoiledCat.Unity
 			SystemSettings = new SystemSettings(this);
 		}
 
-		public string GetSpecialFolder(Environment.SpecialFolder folder) => FileSystem.GetFolderPath(folder);
+		public string GetSpecialFolder(Environment.SpecialFolder folder) => NPath.FileSystem.GetFolderPath(folder);
 
 		public string ExpandEnvironmentVariables(string name)
 		{
@@ -128,7 +127,6 @@ namespace SpoiledCat.Unity
 
 		public string ApplicationName { get; }
 		public NPath LogPath { get; }
-		public IFileSystem FileSystem { get => NPath.FileSystem; set => NPath.FileSystem = value; }
 		public string UnityVersion { get; set; }
 		public NPath UnityApplication { get; set; }
 		public NPath UnityApplicationContents { get; set; }

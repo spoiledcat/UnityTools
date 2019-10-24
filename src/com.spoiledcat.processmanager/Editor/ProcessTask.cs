@@ -16,7 +16,6 @@ namespace SpoiledCat.ProcessManager
 	using Logging;
 	using NiceIO;
 	using Threading;
-	using Utilities;
 	using Extensions;
 
 	public static class ProcessTaskExtensions

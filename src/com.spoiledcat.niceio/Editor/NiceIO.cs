@@ -34,9 +34,6 @@
 // http://www.opensource.org/licenses/mit-license.php
 //-----------------------------------------------------------------------
 
-// If you get compilation errors with Mono.Unix and you don't want to include the Mono.Posix library, uncomment this line to disable it
-//#undef ENABLE_MONO
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

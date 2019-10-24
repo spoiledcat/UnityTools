@@ -11,7 +11,6 @@ namespace SpoiledCat.ProcessManager
 	using Logging;
 	using NiceIO;
 	using Unity;
-	using Utilities;
 
 	public interface IProcessEnvironment
 	{

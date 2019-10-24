@@ -14,7 +14,6 @@ namespace SpoiledCat.ProcessManager
 	using Logging;
 	using NiceIO;
 	using Unity;
-	using Utilities;
 
 	public class ProcessManager : IProcessManager
 	{
@@ -90,10 +89,10 @@ namespace SpoiledCat.ProcessManager
 
 				var envVars = startInfo.EnvironmentVariables;
 				var scriptContents = new[] {
-						  $"cd \"{envVars["GHU_WORKINGDIR"]}\"",
-						  $"PATH=\"{envVars["GHU_FULLPATH"]}\" /bin/bash"
+						  $"cd \"{envVars["SCU_WORKINGDIR"]}\"",
+						  $"PATH=\"{envVars["SCU_FULLPATH"]}\" /bin/bash"
 					 };
-				environment.FileSystem.WriteAllLines(envVarFile, scriptContents);
+				envVarFile.WriteAllLines(scriptContents);
 				MonoPosixShim.Chmod(envVarFile, 493); // -rwxr-xr-x mode (0755)
 			}
 			else
