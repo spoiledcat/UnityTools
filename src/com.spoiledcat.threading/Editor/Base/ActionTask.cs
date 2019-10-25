@@ -16,11 +16,13 @@ namespace SpoiledCat.Threading
 
 	public class TaskQueue : TPLTask
     {
-        private TaskCompletionSource<bool> aggregateTask = new TaskCompletionSource<bool>();
+        private readonly TaskCompletionSource<bool> aggregateTask = new TaskCompletionSource<bool>();
         private readonly List<ITask> queuedTasks = new List<ITask>();
         private int finishedTaskCount;
 
-        public TaskQueue() : base()
+        protected TaskQueue() {}
+        public TaskQueue(ITaskManager taskManager) : this(taskManager, taskManager.Token) { }
+        public TaskQueue(ITaskManager taskManager, CancellationToken token) : base(taskManager, token)
         {
             Initialize(aggregateTask.Task);
         }
@@ -92,25 +94,44 @@ namespace SpoiledCat.Threading
         }
     }
 
-    public class TaskQueue<TResult> : TaskQueue<TResult, TResult>
-    {
-    }
+	public class TaskQueue<TResult> : TaskQueue<TResult, TResult>
+	{
+		protected TaskQueue() {}
+		public TaskQueue(ITaskManager taskManager) : this(taskManager, taskManager.Token) {}
+		public TaskQueue(ITaskManager taskManager, CancellationToken token) : base(taskManager, token) { }
+	}
 
-    public class TaskQueue<TTaskResult, TResult> : TPLTask<List<TResult>>
+	public class TaskQueue<TTaskResult, TResult> : TPLTask<List<TResult>>
     {
-        private TaskCompletionSource<List<TResult>> aggregateTask = new TaskCompletionSource<List<TResult>>();
+        private readonly TaskCompletionSource<List<TResult>> aggregateTask = new TaskCompletionSource<List<TResult>>();
         private readonly List<ITask<TTaskResult>> queuedTasks = new List<ITask<TTaskResult>>();
+        private readonly Func<ITask<TTaskResult>, TResult> resultConverter;
+        private readonly ProgressReporter progressReporter = new ProgressReporter();
         private int finishedTaskCount;
-        private Func<ITask<TTaskResult>, TResult> resultConverter;
-        private ProgressReporter progressReporter = new ProgressReporter();
 
-        /// <summary>
-        /// If <typeparamref name="TTaskResult"/> is not assignable to <typeparamref name="TResult"/>, you must pass a
-        /// method to convert between the two. Implicit conversions don't count (so even though NPath has an implicit
-        /// conversion to string, you still need to pass in a converter)
-        /// </summary>
-        /// <param name="resultConverter"></param>
-        public TaskQueue(Func<ITask<TTaskResult>, TResult> resultConverter = null) : base()
+		protected TaskQueue() {}
+
+		/// <summary>
+		/// If <typeparamref name="TTaskResult"/> is not assignable to <typeparamref name="TResult"/>, you must pass a
+		/// method to convert between the two. Implicit conversions don't count (so even though NPath has an implicit
+		/// conversion to string, you still need to pass in a converter)
+		/// </summary>
+		/// <param name="taskManager"></param>
+		/// <param name="resultConverter"></param>
+		public TaskQueue(ITaskManager taskManager, Func<ITask<TTaskResult>, TResult> resultConverter = null)
+	        : this(taskManager, taskManager.Token, resultConverter)
+		{}
+
+		/// <summary>
+		/// If <typeparamref name="TTaskResult"/> is not assignable to <typeparamref name="TResult"/>, you must pass a
+		/// method to convert between the two. Implicit conversions don't count (so even though NPath has an implicit
+		/// conversion to string, you still need to pass in a converter)
+		/// </summary>
+		/// <param name="token"></param>
+		/// <param name="resultConverter"></param>
+		/// <param name="taskManager"></param>
+		public TaskQueue(ITaskManager taskManager, CancellationToken token, Func<ITask<TTaskResult>, TResult> resultConverter = null)
+			: base(taskManager, token)
         {
             // this excludes implicit operators - that requires using reflection to figure out if
             // the types are convertible, and I'd rather not do that
@@ -121,7 +142,7 @@ namespace SpoiledCat.Threading
             }
             this.resultConverter = resultConverter;
             Initialize(aggregateTask.Task);
-            progressReporter.OnProgress += this.progress.UpdateProgress;
+            progressReporter.OnProgress += progress.UpdateProgress;
         }
 
         /// <summary>
@@ -133,14 +154,14 @@ namespace SpoiledCat.Threading
         /// <returns></returns>
         public ITask<TTaskResult> Queue(ITask<TTaskResult> task)
         {
-            progressReporter.Message = this.Message;
+            progressReporter.Message = Message;
 
             // if this task fails, both OnEnd and Catch will be called
             // if a task before this one on the chain fails, only Catch will be called
             // so avoid calling TaskFinished twice by ignoring failed OnEnd calls
             task.Progress(progressReporter.UpdateProgress);
             task.OnEnd += InvokeFinishOnlyOnSuccess;
-            task.Catch(e => TaskFinished(default(TTaskResult), false, e));
+            task.Catch(e => TaskFinished(default, false, e));
             queuedTasks.Add(task);
             return task;
         }
@@ -210,18 +231,20 @@ namespace SpoiledCat.Threading
     {
         private Task task;
 
-        protected TPLTask() : base()
-        {}
+        protected TPLTask() { }
+        protected TPLTask(ITaskManager taskManager) : this(taskManager, taskManager.Token) { }
+        protected TPLTask(ITaskManager taskManager, CancellationToken token) : base(taskManager, token) { }
+        public TPLTask(ITaskManager taskManager, Task task) : this(taskManager, taskManager.Token, task) { }
 
-        public TPLTask(Task task)
-            : base()
-        {
+        public TPLTask(ITaskManager taskManager, CancellationToken token, Task task)
+	        : base(taskManager, token)
+		{
             Initialize(task);
         }
 
         protected void Initialize(Task theTask)
         {
-            this.task = theTask;
+            task = theTask;
             Task = new Task(RunSynchronously, Token, TaskCreationOptions.None);
         }
 
@@ -255,18 +278,20 @@ namespace SpoiledCat.Threading
     {
         private Task<T> task;
 
-        protected TPLTask() : base()
-        { }
+        protected TPLTask() {}
+        protected TPLTask(ITaskManager taskManager) : this(taskManager, taskManager.Token) {}
+        protected TPLTask(ITaskManager taskManager, CancellationToken token) : base(taskManager, token) {}
+        public TPLTask(ITaskManager taskManager, Task<T> task) : this(taskManager, taskManager.Token, task) {}
 
-        public TPLTask(Task<T> task)
-            : base()
+		public TPLTask(ITaskManager taskManager, CancellationToken token, Task<T> task)
+            : base(taskManager, token)
         {
             Initialize(task);
         }
 
         protected void Initialize(Task<T> theTask)
         {
-            this.task = theTask;
+            task = theTask;
             Task = new Task<T>(RunSynchronously, Token, TaskCreationOptions.None);
         }
 
@@ -301,27 +326,41 @@ namespace SpoiledCat.Threading
         protected Action<bool> Callback { get; }
         protected Action<bool, Exception> CallbackWithException { get; }
 
-        public ActionTask(CancellationToken token, Action action)
-            : base(token)
+        protected ActionTask() {}
+
+        public ActionTask(ITaskManager taskManager, Action action)
+			: this(taskManager, taskManager.Token, action)
+        {}
+
+		public ActionTask(ITaskManager taskManager, CancellationToken token, Action action)
+            : base(taskManager, token)
         {
             Guard.ArgumentNotNull(action, "action");
-            this.Callback = _ => action();
+            Callback = _ => action();
             Name = "ActionTask";
         }
 
-        public ActionTask(CancellationToken token, Action<bool> action)
-            : base(token)
-        {
+		public ActionTask(ITaskManager taskManager, Action<bool> action)
+            : this(taskManager, taskManager.Token, action)
+		{}
+
+		public ActionTask(ITaskManager taskManager, CancellationToken token, Action<bool> action)
+			: base(taskManager, token)
+		{
             Guard.ArgumentNotNull(action, "action");
-            this.Callback = action;
+            Callback = action;
             Name = "ActionTask";
         }
 
-        public ActionTask(CancellationToken token, Action<bool, Exception> action)
-            : base(token)
-        {
+		public ActionTask(ITaskManager taskManager, Action<bool, Exception> action)
+			: this(taskManager, taskManager.Token, action)
+		{}
+
+		public ActionTask(ITaskManager taskManager, CancellationToken token, Action<bool, Exception> action)
+			: base(taskManager, token)
+		{
             Guard.ArgumentNotNull(action, "action");
-            this.CallbackWithException = action;
+            CallbackWithException = action;
             Name = "ActionTask<Exception>";
         }
 
@@ -352,32 +391,56 @@ namespace SpoiledCat.Threading
         protected Action<bool, T> Callback { get; }
         protected Action<bool, Exception, T> CallbackWithException { get; }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="token"></param>
-        /// <param name="action"></param>
-        /// <param name="getPreviousResult">Method to call that returns the value that this task is going to work with. You can also use the PreviousResult property to set this value</param>
-        public ActionTask(CancellationToken token, Action<bool, T> action, Func<T> getPreviousResult = null)
-            : base(token)
+		protected ActionTask() {}
+
+		/// <summary>
+		/// </summary>
+		/// <param name="taskManager"></param>
+		/// <param name="action"></param>
+		/// <param name="getPreviousResult">Method to call that returns the value that this task is going to work with. You can also use the PreviousResult property to set this value</param>
+		public ActionTask(ITaskManager taskManager, Action<bool, T> action, Func<T> getPreviousResult = null)
+	        : this(taskManager, taskManager.Token, action, getPreviousResult)
+        {}
+
+		/// <summary>
+		/// </summary>
+		/// <param name="taskManager"></param>
+		/// <param name="token"></param>
+		/// <param name="action"></param>
+		/// <param name="getPreviousResult">Method to call that returns the value that this task is going to work with. You can also use the PreviousResult property to set this value</param>
+		public ActionTask(ITaskManager taskManager, CancellationToken token, Action<bool, T> action, Func<T> getPreviousResult = null)
+            : base(taskManager, token)
         {
             Guard.ArgumentNotNull(action, "action");
-            this.Callback = action;
-            this.getPreviousResult = getPreviousResult;
+
+			this.getPreviousResult = getPreviousResult;
+			Callback = action;
             Task = new Task(RunSynchronously, Token, TaskCreationOptions.None);
             Name = $"ActionTask<{typeof(T)}>";
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="token"></param>
-        /// <param name="action"></param>
-        /// <param name="getPreviousResult">Method to call that returns the value that this task is going to work with. You can also use the PreviousResult property to set this value</param>
-        public ActionTask(CancellationToken token, Action<bool, Exception, T> action, Func<T> getPreviousResult = null)
-            : base(token)
-        {
-            Guard.ArgumentNotNull(action, "action");
-            this.CallbackWithException = action;
-            this.getPreviousResult = getPreviousResult;
+		/// <summary>
+		/// </summary>
+		/// <param name="taskManager"></param>
+		/// <param name="action"></param>
+		/// <param name="getPreviousResult">Method to call that returns the value that this task is going to work with. You can also use the PreviousResult property to set this value</param>
+		public ActionTask(ITaskManager taskManager, Action<bool, Exception, T> action, Func<T> getPreviousResult = null)
+			: this(taskManager, taskManager.Token, action, getPreviousResult)
+		{ }
+
+		/// <summary>
+		/// </summary>
+		/// <param name="taskManager"></param>
+		/// <param name="token"></param>
+		/// <param name="action"></param>
+		/// <param name="getPreviousResult">Method to call that returns the value that this task is going to work with. You can also use the PreviousResult property to set this value</param>
+		public ActionTask(ITaskManager taskManager, CancellationToken token, Action<bool, Exception, T> action, Func<T> getPreviousResult = null)
+			: base(taskManager, token)
+		{
+			Guard.ArgumentNotNull(action, "action");
+
+			this.getPreviousResult = getPreviousResult;
+			CallbackWithException = action;
             Task = new Task(RunSynchronously, Token, TaskCreationOptions.None);
             Name = $"ActionTask<Exception, {typeof(T)}>";
         }
@@ -429,32 +492,46 @@ namespace SpoiledCat.Threading
         public T PreviousResult { get; set; } = default(T);
     }
 
-    public partial class FuncTask<T> : TaskBase<T>
-    {
-        protected Func<bool, T> Callback { get; }
-        protected Func<bool, Exception, T> CallbackWithException { get; }
+	public partial class FuncTask<T> : TaskBase<T>
+	{
+		protected Func<bool, T> Callback { get; }
+		protected Func<bool, Exception, T> CallbackWithException { get; }
 
-        public FuncTask(CancellationToken token, Func<T> action)
-            : base(token)
+		protected FuncTask() {}
+
+		public FuncTask(ITaskManager taskManager, Func<T> action)
+        	: this(taskManager, taskManager.Token, action)
+		{}
+
+		public FuncTask(ITaskManager taskManager, CancellationToken token, Func<T> action)
+            : base(taskManager, token)
         {
             Guard.ArgumentNotNull(action, "action");
-            this.Callback = _ => action();
+            Callback = _ => action();
             Name = $"FuncTask<{typeof(T)}>";
         }
 
-        public FuncTask(CancellationToken token, Func<bool, T> action)
-            : base(token)
-        {
+		public FuncTask(ITaskManager taskManager, Func<bool, T> action)
+			: this(taskManager, taskManager.Token, action)
+		{}
+
+		public FuncTask(ITaskManager taskManager, CancellationToken token, Func<bool, T> action)
+			: base(taskManager, token)
+		{
             Guard.ArgumentNotNull(action, "action");
-            this.Callback = action;
+            Callback = action;
             Name = $"FuncTask<{typeof(T)}>";
         }
 
-        public FuncTask(CancellationToken token, Func<bool, Exception, T> action)
-            : base(token)
-        {
+		public FuncTask(ITaskManager taskManager, Func<bool, Exception, T> action)
+			: this(taskManager, taskManager.Token, action)
+		{}
+
+		public FuncTask(ITaskManager taskManager, CancellationToken token, Func<bool, Exception, T> action)
+			: base(taskManager, token)
+		{
             Guard.ArgumentNotNull(action, "action");
-            this.CallbackWithException = action;
+            CallbackWithException = action;
             Name = $"FuncTask<Exception, {typeof(T)}>";
         }
 
@@ -487,19 +564,29 @@ namespace SpoiledCat.Threading
         protected Func<bool, T, TResult> Callback { get; }
         protected Func<bool, Exception, T, TResult> CallbackWithException { get; }
 
-        public FuncTask(CancellationToken token, Func<bool, T, TResult> action, Func<T> getPreviousResult = null)
-            : base(token, getPreviousResult)
+		protected FuncTask() {}
+
+		public FuncTask(ITaskManager taskManager, Func<bool, T, TResult> action, Func<T> getPreviousResult = null)
+			: this(taskManager, taskManager.Token, action, getPreviousResult)
+		{}
+
+		public FuncTask(ITaskManager taskManager, CancellationToken token, Func<bool, T, TResult> action, Func<T> getPreviousResult = null)
+            : base(taskManager, token, getPreviousResult)
         {
             Guard.ArgumentNotNull(action, "action");
-            this.Callback = action;
+            Callback = action;
             Name = $"FuncTask<{typeof(T)}, {typeof(TResult)}>";
         }
 
-        public FuncTask(CancellationToken token, Func<bool, Exception, T, TResult> action, Func<T> getPreviousResult = null)
-            : base(token, getPreviousResult)
-        {
+		public FuncTask(ITaskManager taskManager, Func<bool, Exception, T, TResult> action, Func<T> getPreviousResult = null)
+			: this(taskManager, taskManager.Token, action, getPreviousResult)
+		{}
+
+		public FuncTask(ITaskManager taskManager, CancellationToken token, Func<bool, Exception, T, TResult> action, Func<T> getPreviousResult = null)
+			: base(taskManager, token, getPreviousResult)
+		{
             Guard.ArgumentNotNull(action, "action");
-            this.CallbackWithException = action;
+            CallbackWithException = action;
             Name = $"FuncTask<{typeof(T)}, Exception, {typeof(TResult)}>";
         }
 
@@ -533,25 +620,39 @@ namespace SpoiledCat.Threading
         protected Func<bool, FuncListTask<T>, List<T>> CallbackWithSelf { get; }
         protected Func<bool, Exception, List<T>> CallbackWithException { get; }
 
-        public FuncListTask(CancellationToken token, Func<bool, List<T>> action)
-            : base(token)
-        {
+		protected FuncListTask() {}
+
+		public FuncListTask(ITaskManager taskManager, Func<bool, List<T>> action)
+			: this(taskManager, taskManager.Token, action)
+		{}
+
+		public FuncListTask(ITaskManager taskManager, CancellationToken token, Func<bool, List<T>> action)
+			: base(taskManager, token)
+		{
             Guard.ArgumentNotNull(action, "action");
-            this.Callback = action;
+            Callback = action;
         }
 
-        public FuncListTask(CancellationToken token, Func<bool, Exception, List<T>> action)
-            : base(token)
-        {
-            Guard.ArgumentNotNull(action, "action");
-            this.CallbackWithException = action;
+		public FuncListTask(ITaskManager taskManager, Func<bool, Exception, List<T>> action)
+			: this(taskManager, taskManager.Token, action)
+		{}
+
+		public FuncListTask(ITaskManager taskManager, CancellationToken token, Func<bool, Exception, List<T>> action)
+			: base(taskManager, token)
+		{
+			Guard.ArgumentNotNull(action, "action");
+            CallbackWithException = action;
         }
 
-        public FuncListTask(CancellationToken token, Func<bool, FuncListTask<T>, List<T>> action)
-            : base(token)
-        {
-            Guard.ArgumentNotNull(action, "action");
-            this.CallbackWithSelf = action;
+		public FuncListTask(ITaskManager taskManager, Func<bool, FuncListTask<T>, List<T>> action)
+			: this(taskManager, taskManager.Token, action)
+		{}
+
+		public FuncListTask(ITaskManager taskManager, CancellationToken token, Func<bool, FuncListTask<T>, List<T>> action)
+			: base(taskManager, token)
+		{
+			Guard.ArgumentNotNull(action, "action");
+            CallbackWithSelf = action;
         }
 
         protected override List<T> RunWithReturn(bool success)
@@ -592,18 +693,28 @@ namespace SpoiledCat.Threading
         protected Func<bool, T, List<TResult>> Callback { get; }
         protected Func<bool, Exception, T, List<TResult>> CallbackWithException { get; }
 
-        public FuncListTask(CancellationToken token, Func<bool, T, List<TResult>> action)
-            : base(token)
-        {
+		protected FuncListTask() {}
+
+		public FuncListTask(ITaskManager taskManager, Func<bool, T, List<TResult>> action)
+			: this(taskManager, taskManager.Token, action)
+		{}
+
+		public FuncListTask(ITaskManager taskManager, CancellationToken token, Func<bool, T, List<TResult>> action)
+			: base(taskManager, token)
+		{
             Guard.ArgumentNotNull(action, "action");
-            this.Callback = action;
+            Callback = action;
         }
 
-        public FuncListTask(CancellationToken token, Func<bool, Exception, T, List<TResult>> action)
-            : base(token)
-        {
+		public FuncListTask(ITaskManager taskManager, Func<bool, Exception, T, List<TResult>> action)
+			: this(taskManager, taskManager.Token, action)
+		{}
+
+		public FuncListTask(ITaskManager taskManager, CancellationToken token, Func<bool, Exception, T, List<TResult>> action)
+			: base(taskManager, token)
+		{
             Guard.ArgumentNotNull(action, "action");
-            this.CallbackWithException = action;
+            CallbackWithException = action;
         }
 
         protected override List<TResult> RunWithData(bool success, T previousResult)

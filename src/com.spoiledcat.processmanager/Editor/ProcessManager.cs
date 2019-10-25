@@ -24,12 +24,11 @@ namespace SpoiledCat.ProcessManager
 		public static IProcessManager Instance { get; private set; }
 
 		public ProcessManager(IEnvironment environment,
-			NPath defaultWorkingDirectory,
 			CancellationToken cancellationToken)
 		{
 			Instance = this;
 			this.environment = environment;
-			DefaultProcessEnvironment = new ProcessEnvironment(environment, defaultWorkingDirectory);
+			DefaultProcessEnvironment = new ProcessEnvironment(environment);
 			CancellationToken = cancellationToken;
 		}
 
@@ -133,6 +132,6 @@ namespace SpoiledCat.ProcessManager
 
 		public CancellationToken CancellationToken { get; }
 
-		public static IProcessEnvironment DefaultProcessEnvironment { get; private set;  }
+		public IProcessEnvironment DefaultProcessEnvironment { get; }
 	}
 }

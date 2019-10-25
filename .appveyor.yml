@@ -34,18 +34,18 @@ after_build:
 
 test:
   assemblies:
-    except:
-      - '**\*.TestRunner.dll'
+    only:
+      - '**\*.Tests.dll'
 
 artifacts:
 - path: build\**\*.nupkg
   name: NuGet
 
-deploy:
-  provider: NuGet
-  server:                  # remove to push to NuGet.org
-  api_key:
-    secure: KNFSKb7s+3+79G+FOMmubE+llHdsyV+3ApSqqgrbia5DM4RCzKDEIXaQGPqip9bf
-  skip_symbols: true
-  symbol_server:           # remove to push symbols to SymbolSource.org
-  artifact: /.*\.nupkg/
+# deploy:
+#   provider: NuGet
+#   server:                  # remove to push to NuGet.org
+#   api_key:
+#     secure: KNFSKb7s+3+79G+FOMmubE+llHdsyV+3ApSqqgrbia5DM4RCzKDEIXaQGPqip9bf
+#   skip_symbols: true
+#   symbol_server:           # remove to push symbols to SymbolSource.org
+#   artifact: /.*\.nupkg/

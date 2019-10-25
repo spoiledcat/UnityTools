@@ -18,7 +18,6 @@ namespace SpoiledCat.Threading
 		CancellationToken Token { get; }
 
 		T Schedule<T>(T task) where T : ITask;
-		Task Wait();
 		ITask Run(Action action, string message = null);
 		ITask RunInUI(Action action, string message = null);
 		event Action<IProgress> OnProgress;
@@ -33,46 +32,33 @@ namespace SpoiledCat.Threading
 		/// Call this from the main thread so task manager knows which thread it's in
 		/// </summary>
 		ITaskManager Initialize(TaskScheduler uiTaskScheduler);
-	}
+
+		TaskScheduler GetScheduler(TaskAffinity affinity);
+    }
 
 	public class TaskManager : ITaskManager
 	{
 		private static readonly ILogging logger = LogHelper.GetLogger<TaskManager>();
-
 		private CancellationTokenSource cts;
-		private readonly ConcurrentExclusiveInterleave manager;
+		private readonly ConcurrentExclusiveSchedulerPairCustom manager;
+
 		public TaskScheduler UIScheduler { get; set; }
-		public TaskScheduler ConcurrentScheduler { get { return (TaskScheduler)manager.ConcurrentTaskScheduler; } }
-		public TaskScheduler ExclusiveScheduler { get { return manager.ExclusiveTaskScheduler; } }
-		public CancellationToken Token { get { return cts.Token; } }
+		public TaskScheduler ConcurrentScheduler => manager.ConcurrentScheduler;
+		public TaskScheduler ExclusiveScheduler => manager.ExclusiveScheduler;
+		public CancellationToken Token => cts.Token;
 
-		private static ITaskManager instance;
-		public static ITaskManager Instance
-		{
-			get
-			{
-				if (instance == null)
-				{
-					instance = new TaskManager();
-				}
-
-				return instance;
-			}
-		}
-
-		private ProgressReporter progressReporter = new ProgressReporter();
+		private readonly ProgressReporter progressReporter = new ProgressReporter();
 
 		public event Action<IProgress> OnProgress
 		{
-			add { progressReporter.OnProgress += value; }
-			remove { progressReporter.OnProgress -= value; }
+			add => progressReporter.OnProgress += value;
+			remove => progressReporter.OnProgress -= value;
 		}
 
 		public TaskManager()
 		{
-			instance = this;
 			cts = new CancellationTokenSource();
-			this.manager = new ConcurrentExclusiveInterleave(cts.Token);
+			manager = new ConcurrentExclusiveSchedulerPairCustom(cts.Token);
 		}
 
 		public ITaskManager Initialize(SynchronizationContext synchronizationContext)
@@ -88,33 +74,28 @@ namespace SpoiledCat.Threading
 			return this;
 		}
 
-		public Task Wait()
-		{
-			return manager.Wait();
-		}
-
-		public static TaskScheduler GetScheduler(TaskAffinity affinity)
+		public TaskScheduler GetScheduler(TaskAffinity affinity)
 		{
 			switch (affinity)
 			{
 				case TaskAffinity.Exclusive:
-					return Instance.ExclusiveScheduler;
+					return ExclusiveScheduler;
 				case TaskAffinity.UI:
-					return Instance.UIScheduler;
+					return UIScheduler;
 				case TaskAffinity.Concurrent:
 				default:
-					return Instance.ConcurrentScheduler;
+					return ConcurrentScheduler;
 			}
 		}
 
 		public ITask Run(Action action, string message = null)
 		{
-			return new ActionTask(Token, action) { Message = message }.Start();
+			return new ActionTask(this, action) { Message = message }.Start();
 		}
 
 		public ITask RunInUI(Action action, string message = null)
 		{
-			return new ActionTask(Token, action) { Affinity = TaskAffinity.UI, Message = message }.Start();
+			return new ActionTask(this, action) { Affinity = TaskAffinity.UI, Message = message }.Start();
 		}
 
 		public T Schedule<T>(T task)
@@ -172,7 +153,7 @@ namespace SpoiledCat.Threading
 			}
 
 			task.Progress(progressReporter.UpdateProgress);
-			return (T)task.Start(manager.ExclusiveTaskScheduler);
+			return (T)task.Start(manager.ExclusiveScheduler);
 		}
 
 		private T ScheduleConcurrent<T>(T task, bool setupFaultHandler)
@@ -191,16 +172,17 @@ namespace SpoiledCat.Threading
 			}
 
 			task.Progress(progressReporter.UpdateProgress);
-			return (T)task.Start((TaskScheduler)manager.ConcurrentTaskScheduler);
+			return (T)task.Start((TaskScheduler)manager.ConcurrentScheduler);
 		}
 
-		private void Stop()
+		private async Task Stop()
 		{
 			if (cts == null)
 				throw new ObjectDisposedException(nameof(TaskManager));
+			manager.Complete();
 			cts.Cancel();
-			Wait();
 			cts = null;
+			await manager.Completion;
 		}
 
 		private bool disposed = false;
@@ -210,7 +192,7 @@ namespace SpoiledCat.Threading
 			disposed = true;
 			if (disposing)
 			{
-				Stop();
+				Stop().FireAndForget();
 			}
 		}
 

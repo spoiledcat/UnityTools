@@ -21,13 +21,13 @@ namespace SpoiledCat.Threading
         private ProgressReporter progressReporter = new ProgressReporter();
         private Dictionary<string, TaskData> tasks = new Dictionary<string, TaskData>();
 
-        public UnzipTask(NPath archiveFilePath, NPath extractedPath)
-            : this(TaskManager.Instance.Token, archiveFilePath, extractedPath, null, NPath.FileSystem)
-        { }
+        public UnzipTask(ITaskManager taskManager, NPath archiveFilePath, NPath extractedPath)
+            : this(taskManager, taskManager.Token, archiveFilePath, extractedPath, null, NPath.FileSystem)
+        {}
 
-        public UnzipTask(CancellationToken token, NPath archiveFilePath, NPath extractedPath,
+        public UnzipTask(ITaskManager taskManager, CancellationToken token, NPath archiveFilePath, NPath extractedPath,
             IZipHelper zipHelper, IFileSystem fileSystem)
-            : base(token)
+            : base(taskManager, token)
         {
             this.archiveFilePath = archiveFilePath;
             this.extractedPath = extractedPath;

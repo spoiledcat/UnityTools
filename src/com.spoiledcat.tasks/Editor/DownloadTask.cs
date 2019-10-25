@@ -16,27 +16,25 @@ namespace SpoiledCat.Threading
     using Utilities;
     public class DownloadTask : TaskBase<NPath>
     {
-        protected readonly IFileSystem fileSystem;
+	    public DownloadTask(ITaskManager taskManager, UriString url, NPath targetDirectory, string filename = null, int retryCount = 0)
+             : this(taskManager, taskManager.Token, url, targetDirectory, filename, retryCount)
+        {}
 
-        public DownloadTask(UriString url, NPath targetDirectory, string filename = null, int retryCount = 0)
-             : this(TaskManager.Instance.Token, NPath.FileSystem, url, targetDirectory, filename, retryCount)
-            {}
-
-        public DownloadTask(CancellationToken token,
-            IFileSystem fileSystem,
-            UriString url,
+        public DownloadTask(
+			ITaskManager taskManager,
+			CancellationToken token,
+			UriString url,
             NPath targetDirectory,
             string filename = null,
             int retryCount = 0)
-            : base(token)
+            : base(taskManager, token)
         {
-            this.fileSystem = fileSystem;
-            RetryCount = retryCount;
+	        RetryCount = retryCount;
             Url = url;
             Filename = string.IsNullOrEmpty(filename) ? url.Filename : filename;
             TargetDirectory = targetDirectory;
-            this.Name = $"Download {Url}";
-            this.Message = Filename;
+            Name = $"Download {Url}";
+            Message = Filename;
         }
 
         protected string BaseRunWithReturn(bool success)
@@ -84,7 +82,7 @@ namespace SpoiledCat.Threading
                 {
                     Logger.Trace($"Download of {Url} to {Destination} Attempt {attempts + 1} of {RetryCount + 1}");
 
-                    using (var destinationStream = fileSystem.OpenWrite(partialFile, FileMode.Append))
+                    using (var destinationStream = partialFile.OpenWrite(FileMode.Append))
                     {
                         result = Downloader.Download(Logger, Url, destinationStream,
                              (value, total) => {
@@ -125,7 +123,7 @@ namespace SpoiledCat.Threading
 
         public string Filename { get; }
 
-        public NPath Destination { get { return TargetDirectory.Combine(Filename); } }
+        public NPath Destination => TargetDirectory.Combine(Filename);
 
         protected int RetryCount { get; }
     }
@@ -165,8 +163,8 @@ namespace SpoiledCat.Threading
         public NPath File { get; }
         public DownloadData(UriString url, NPath file)
         {
-            this.Url = url;
-            this.File = file;
+            Url = url;
+            File = file;
         }
     }
 
@@ -176,22 +174,25 @@ namespace SpoiledCat.Threading
         public event Action<UriString, NPath> OnDownloadComplete;
         public event Action<UriString, Exception> OnDownloadFailed;
 
-        private readonly IFileSystem fileSystem;
-        public Downloader(IFileSystem fileSystem = null)
-             : base(t => {
+        public Downloader(ITaskManager taskManager)
+	        : this(taskManager, taskManager.Token)
+        {
+        }
+
+		public Downloader(ITaskManager taskManager, CancellationToken token)
+             : base(taskManager, t => {
                 var dt = t as DownloadTask;
                 var destinationFile = dt.TargetDirectory.Combine(dt.Url.Filename);
                 return new DownloadData(dt.Url, destinationFile);
             })
         {
-            this.fileSystem = fileSystem ?? NPath.FileSystem;
             Name = "Downloader";
             Message = "Downloading...";
         }
 
         public void QueueDownload(UriString url, NPath targetDirectory, string filename = null, int retryCount = 0)
         {
-            var download = new DownloadTask(Token, fileSystem, url, targetDirectory, filename, retryCount);
+            var download = new DownloadTask(TaskManager, url, targetDirectory, filename, retryCount);
             download.OnStart += t => OnDownloadStart?.Invoke(((DownloadTask)t).Url);
             download.OnEnd += (t, res, s, ex) => {
                 if (s)

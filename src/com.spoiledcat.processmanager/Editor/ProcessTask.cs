@@ -53,11 +53,14 @@ namespace SpoiledCat.ProcessManager
 	{
 		private readonly string taskName;
 		private readonly IOutputProcessor outputProcessor;
+		private readonly RaiseAndDiscardOutputProcessor longRunningOutputProcessor;
 		private readonly Action onStart;
 		private readonly Action onEnd;
 		private readonly Action<Exception, string> onError;
 		private readonly CancellationToken token;
+		private readonly bool longRunning;
 		private readonly List<string> errors = new List<string>();
+		private readonly ManualResetEventSlim stopEvent = new ManualResetEventSlim(false);
 
 		public Process Process { get; }
 		public StreamWriter Input { get; private set; }
@@ -78,6 +81,21 @@ namespace SpoiledCat.ProcessManager
 			this.Process = process;
 		}
 
+		public ProcessWrapper(string taskName, Process process,
+			 Action onStart, Action onEnd, Action<Exception, string> onError,
+			 CancellationToken token)
+		{
+			longRunning = true;
+			outputProcessor = longRunningOutputProcessor = new RaiseAndDiscardOutputProcessor();
+
+			this.taskName = taskName;
+			this.onStart = onStart;
+			this.onEnd = onEnd;
+			this.onError = onError;
+			this.token = token;
+			this.Process = process;
+		}
+
 		public void Run()
 		{
 			DateTimeOffset lastOutput = DateTimeOffset.UtcNow;
@@ -85,14 +103,13 @@ namespace SpoiledCat.ProcessManager
 			var gotOutput = new AutoResetEvent(false);
 			if (Process.StartInfo.RedirectStandardError)
 			{
-				Process.ErrorDataReceived += (s, e) =>
-				{
-						 //if (e.Data != null)
-						 //{
-						 //    Logger.Trace("ErrorData \"" + (e.Data == null ? "'null'" : e.Data) + "\"");
-						 //}
+				Process.ErrorDataReceived += (s, e) => {
+					//if (e.Data != null)
+					//{
+					//    Logger.Trace("ErrorData \"" + (e.Data == null ? "'null'" : e.Data) + "\"");
+					//}
 
-						 lastOutput = DateTimeOffset.UtcNow;
+					lastOutput = DateTimeOffset.UtcNow;
 					gotOutput.Set();
 					if (e.Data != null)
 					{
@@ -105,19 +122,20 @@ namespace SpoiledCat.ProcessManager
 
 			if (Process.StartInfo.RedirectStandardOutput)
 			{
-				Process.OutputDataReceived += (s, e) =>
-				{
+				Process.OutputDataReceived += (s, e) => {
 					try
 					{
 						lastOutput = DateTimeOffset.UtcNow;
 						gotOutput.Set();
 						if (e.Data != null)
 						{
-							var line = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(e.Data));
-							outputProcessor.Process(line.TrimEnd('\r', '\n'));
+							var line = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(e.Data)).TrimEnd('\r', '\n');
+							outputProcessor.Process(line);
 						}
 						else
+						{
 							outputProcessor.Process(null);
+						}
 					}
 					catch (Exception ex)
 					{
@@ -144,6 +162,11 @@ namespace SpoiledCat.ProcessManager
 
 				if (Process.StartInfo.CreateNoWindow)
 				{
+					if (longRunning)
+					{
+						stopEvent.Wait(token);
+					}
+
 					bool done = false;
 					while (!done)
 					{
@@ -197,6 +220,18 @@ namespace SpoiledCat.ProcessManager
 			onEnd?.Invoke();
 		}
 
+		public void StartCommandToLongRunningProcess(IEnumerable<string> input, IOutputProcessor outputProcessor)
+		{
+			longRunningOutputProcessor.OnEntry += outputProcessor.Process;
+			foreach (var line in input)
+				Process.StandardInput.WriteLine(line);
+		}
+
+		public void FinishCommandToLongRunningProcess(IOutputProcessor outputProcessor)
+		{
+			longRunningOutputProcessor.OnEntry -= outputProcessor.Process;
+		}
+
 		public void Stop(bool dontWait = false)
 		{
 			try
@@ -207,6 +242,7 @@ namespace SpoiledCat.ProcessManager
 					Process.CancelOutputRead();
 				if (!Process.HasExited && Process.StartInfo.RedirectStandardInput)
 					Input.WriteLine("\x3");
+				stopEvent.Set();
 			}
 			catch
 			{ }
@@ -265,23 +301,43 @@ namespace SpoiledCat.ProcessManager
 
 		private Exception thrownException = null;
 
+		protected ProcessTask() {}
+
+		/// <summary>
+		/// Runs a Process with the passed arguments
+		/// </summary>
+		/// <param name="executable"></param>
+		/// <param name="arguments"></param>
+		/// <param name="outputProcessor"></param>
+		/// <param name="taskManager"></param>
+		/// <param name="processEnvironment"></param>
+		public ProcessTask(ITaskManager taskManager,
+			IProcessEnvironment processEnvironment,
+			string executable = null,
+			string arguments = null,
+			IOutputProcessor<T> outputProcessor = null
+			)
+			 : this(taskManager, taskManager.Token, processEnvironment, executable, arguments, outputProcessor)
+		{}
+
 		/// <summary>
 		/// Runs a Process with the passed arguments
 		/// </summary>
 		/// <param name="token"></param>
+		/// <param name="executable"></param>
 		/// <param name="arguments"></param>
 		/// <param name="outputProcessor"></param>
-		public ProcessTask(CancellationToken token,
+		public ProcessTask(ITaskManager taskManager,
+			CancellationToken token,
+			IProcessEnvironment processEnvironment,
 			string executable = null,
 			string arguments = null,
-			IOutputProcessor<T> outputProcessor = null,
-			IProcessEnvironment processEnvironment = null)
-			 : base(token)
+			IOutputProcessor<T> outputProcessor = null
+			)
+			 : base(taskManager, token)
 		{
-			Guard.ArgumentNotNull(token, nameof(token));
-
 			this.outputProcessor = outputProcessor;
-			ProcessEnvironment = processEnvironment ?? ProcessManager.DefaultProcessEnvironment;
+			ProcessEnvironment = processEnvironment;
 			ProcessArguments = arguments;
 			ProcessName = executable;
 		}
@@ -344,8 +400,7 @@ namespace SpoiledCat.ProcessManager
 
 			wrapper = new ProcessWrapper(Name, Process, outputProcessor,
 				 () => OnStartProcess?.Invoke(this),
-				 () =>
-				 {
+				 () => {
 					 try
 					 {
 						 if (outputProcessor != null)
@@ -368,8 +423,7 @@ namespace SpoiledCat.ProcessManager
 					 if (thrownException != null && !RaiseFaultHandlers(thrownException))
 						 ThrownException.Rethrow();
 				 },
-				 (ex, error) =>
-				 {
+				 (ex, error) => {
 					 thrownException = ex;
 					 Errors = error;
 				 },
@@ -387,9 +441,9 @@ namespace SpoiledCat.ProcessManager
 
 		public IProcessEnvironment ProcessEnvironment { get; private set; }
 		public Process Process { get; set; }
-		public int ProcessId { get { return Process.Id; } }
-		public override bool Successful { get { return base.Successful && Process.ExitCode == 0; } }
-		public StreamWriter StandardInput { get { return wrapper?.Input; } }
+		public int ProcessId => Process.Id;
+		public override bool Successful => base.Successful && Process.ExitCode == 0;
+		public StreamWriter StandardInput => wrapper?.Input;
 		public virtual string ProcessName { get; protected set; }
 		public virtual string ProcessArguments { get; }
 	}
@@ -397,6 +451,7 @@ namespace SpoiledCat.ProcessManager
 	public class ProcessTaskWithListOutput<T> : DataTaskBase<T, List<T>>, IProcessTask<T, List<T>>
 	{
 		private IOutputProcessor<T, List<T>> outputProcessor;
+		private readonly bool longRunning;
 		private Exception thrownException = null;
 		private ProcessWrapper wrapper;
 
@@ -404,18 +459,31 @@ namespace SpoiledCat.ProcessManager
 		public event Action<IProcess> OnStartProcess;
 		public event Action<IProcess> OnEndProcess;
 
-		public ProcessTaskWithListOutput(CancellationToken token,
+		protected ProcessTaskWithListOutput() {}
+
+		public ProcessTaskWithListOutput(
+			ITaskManager taskManager,
+			IProcessEnvironment processEnvironment,
 			string executable = null,
 			string arguments = null,
 			IOutputProcessor<T, List<T>> outputProcessor = null,
-			IProcessEnvironment processEnvironment = null)
-			 : base(token)
+			bool longRunning = false)
+			 : this(taskManager, taskManager.Token, processEnvironment, executable, arguments, outputProcessor, longRunning)
+		{}
+
+		public ProcessTaskWithListOutput(
+			ITaskManager taskManager,
+			CancellationToken token,
+			IProcessEnvironment processEnvironment,
+			string executable = null,
+			string arguments = null,
+			IOutputProcessor<T, List<T>> outputProcessor = null,
+			bool longRunning = false)
+			 : base(taskManager, token)
 		{
-
-			Guard.ArgumentNotNull(token, nameof(token));
-
 			this.outputProcessor = outputProcessor;
-			ProcessEnvironment = processEnvironment ?? ProcessManager.DefaultProcessEnvironment;
+			ProcessEnvironment = processEnvironment;
+			this.longRunning = longRunning;
 			ProcessArguments = arguments;
 			ProcessName = executable;
 		}
@@ -478,9 +546,8 @@ namespace SpoiledCat.ProcessManager
 			var result = base.RunWithReturn(success);
 
 			wrapper = new ProcessWrapper(Name, Process, outputProcessor,
-				 () => OnStartProcess?.Invoke(this),
-				 () =>
-				 {
+				 onStart: () => OnStartProcess?.Invoke(this),
+				 onEnd: () => {
 					 try
 					 {
 						 if (outputProcessor != null)
@@ -502,12 +569,11 @@ namespace SpoiledCat.ProcessManager
 					 if (thrownException != null && !RaiseFaultHandlers(thrownException))
 						 ThrownException.Rethrow();
 				 },
-				 (ex, error) =>
-				 {
+				 onError: (ex, error) => {
 					 thrownException = ex;
 					 Errors = error;
 				 },
-				 Token);
+				 token: Token);
 			wrapper.Run();
 
 			return result;
@@ -520,76 +586,178 @@ namespace SpoiledCat.ProcessManager
 
 		public IProcessEnvironment ProcessEnvironment { get; private set; }
 		public Process Process { get; set; }
-		public int ProcessId { get { return Process.Id; } }
-		public override bool Successful { get { return base.Successful && Process.ExitCode == 0; } }
-		public StreamWriter StandardInput { get { return wrapper?.Input; } }
+		public int ProcessId => Process.Id;
+		public override bool Successful => base.Successful && Process.ExitCode == 0;
+		public StreamWriter StandardInput => wrapper?.Input;
 		public virtual string ProcessName { get; protected set; }
 		public virtual string ProcessArguments { get; }
 	}
 
+
+	public class ProcessTaskLongRunning : TaskBase, IProcessTask
+	{
+		private Exception thrownException = null;
+		private ProcessWrapper wrapper;
+
+		public event Action<string> OnErrorData;
+		public event Action<IProcess> OnStartProcess;
+		public event Action<IProcess> OnEndProcess;
+
+		protected ProcessTaskLongRunning() {}
+
+		public ProcessTaskLongRunning(
+			ITaskManager taskManager,
+			IProcessEnvironment processEnvironment,
+			string executable = null,
+			string arguments = null)
+			 : this(taskManager, taskManager.Token, processEnvironment, executable, arguments)
+		{}
+
+		public ProcessTaskLongRunning(
+			ITaskManager taskManager,
+			CancellationToken token,
+			IProcessEnvironment processEnvironment,
+			string executable = null,
+			string arguments = null)
+			 : base(taskManager, token)
+		{
+			ProcessEnvironment = processEnvironment;
+			ProcessArguments = arguments;
+			ProcessName = executable;
+		}
+
+		public virtual void Configure(ProcessStartInfo psi)
+		{
+			Guard.ArgumentNotNull(psi, "psi");
+
+			Process = new Process { StartInfo = psi, EnableRaisingEvents = true };
+			ProcessName = psi.FileName;
+		}
+
+		public void Configure(Process existingProcess)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void Stop()
+		{
+			wrapper?.Stop();
+		}
+
+		protected override void RaiseOnEnd()
+		{
+			base.RaiseOnEnd();
+			OnEndProcess?.Invoke(this);
+		}
+
+		protected override void Run(bool success)
+		{
+			wrapper = new ProcessWrapper(Name, Process,
+				 onStart: () => OnStartProcess?.Invoke(this),
+				 onEnd: () => {
+					 try
+					 {
+						 if (!string.IsNullOrEmpty(Errors))
+							 OnErrorData?.Invoke(Errors);
+					 }
+					 catch (Exception ex)
+					 {
+						 if (thrownException == null)
+							 thrownException = new ProcessException(ex.Message, ex);
+						 else
+							 thrownException = new ProcessException(thrownException.GetExceptionMessage(), ex);
+					 }
+
+					 if (thrownException != null && !RaiseFaultHandlers(thrownException))
+						 ThrownException.Rethrow();
+				 },
+				 onError: (ex, error) => {
+					 thrownException = ex;
+					 Errors = error;
+				 },
+				 token: Token);
+			wrapper.Run();
+		}
+
+		public override string ToString()
+		{
+			return $"{Task?.Id ?? -1} {Name} {GetType()} {ProcessName} {ProcessArguments}";
+		}
+
+		public IProcessEnvironment ProcessEnvironment { get; private set; }
+		public Process Process { get; set; }
+		public int ProcessId => Process.Id;
+		public override bool Successful => base.Successful && Process.ExitCode == 0;
+		public StreamWriter StandardInput => wrapper?.Input;
+		public virtual string ProcessName { get; protected set; }
+		public virtual string ProcessArguments { get; }
+	}
+
+
 	public class FirstNonNullLineProcessTask : ProcessTask<string>
 	{
 		public FirstNonNullLineProcessTask(
-			string executable, string arguments, NPath? workingDirectory = null,
-			IProcessManager processManager = null,
-			CancellationToken? token = null
+			ITaskManager taskManager, IProcessManager processManager,
+			string executable, string arguments, NPath? workingDirectory = null
 		)
-			: base((token ?? TaskManager.Instance.Token), executable, arguments, new FirstNonNullLineOutputProcessor<string>())
+			: base(taskManager, taskManager.Token, processManager.DefaultProcessEnvironment, executable, arguments, new FirstNonNullLineOutputProcessor<string>())
 		{
-			(processManager ?? ProcessManager.Instance).Configure(this, workingDirectory);
+			processManager.Configure(this, workingDirectory);
 		}
 	}
 
 	public class SimpleProcessTask : ProcessTask<string>
 	{
 		public SimpleProcessTask(
+			ITaskManager taskManager, IProcessManager processManager,
 			string executable, string arguments, NPath? workingDirectory = null,
-			IOutputProcessor<string> processor = null,
-			IProcessManager processManager = null,
-			CancellationToken? token = null
+			IOutputProcessor<string> processor = null
 			)
-			 : base((token ?? TaskManager.Instance.Token), executable, arguments,
+			 : base(taskManager, taskManager.Token,
+				 processManager.DefaultProcessEnvironment,
+				 executable, arguments,
 					processor ?? new SimpleOutputProcessor())
 		{
-			(processManager ?? ProcessManager.Instance).Configure(this, workingDirectory);
+			processManager.Configure(this, workingDirectory);
 		}
 	}
 
 	public class SimpleProcessTask<T> : ProcessTask<T>
 	{
 		public SimpleProcessTask(
+			ITaskManager taskManager, IProcessManager processManager,
 			string executable, string arguments,
 			Func<string, T> processor,
-			NPath? workingDirectory = null,
-			IProcessManager processManager = null,
-			CancellationToken? token = null
+			NPath? workingDirectory = null
 		)
-			 : base((token ?? TaskManager.Instance.Token),
-					executable, arguments,
-					new BaseOutputProcessor<T>((string line, out T result) => {
-						result = default(T);
-						if (line == null) return false;
-						result = processor(line);
-						return true;
-					})
+			 : base(taskManager, taskManager.Token,
+				processManager.DefaultProcessEnvironment,
+				executable, arguments,
+				new BaseOutputProcessor<T>((string line, out T result) => {
+					result = default(T);
+					if (line == null) return false;
+					result = processor(line);
+					return true;
+				})
 		)
 		{
-			(processManager ?? ProcessManager.Instance).Configure(this, workingDirectory);
+			processManager.Configure(this, workingDirectory);
 		}
 	}
 
 	public class SimpleListProcessTask : ProcessTaskWithListOutput<string>
 	{
 		public SimpleListProcessTask(
+			ITaskManager taskManager, IProcessManager processManager,
 			string executable, string arguments, NPath? workingDirectory = null,
-			IOutputProcessor<string, List<string>> processor = null,
-			IProcessManager processManager = null,
-			CancellationToken? token = null
+			IOutputProcessor<string, List<string>> processor = null
 		)
-			 : base((token ?? TaskManager.Instance.Token), executable, arguments,
-					processor ?? new SimpleListOutputProcessor())
+			 : base(taskManager, taskManager.Token,
+				processManager.DefaultProcessEnvironment,
+				executable, arguments,
+				processor ?? new SimpleListOutputProcessor())
 		{
-			(processManager ?? ProcessManager.Instance).Configure(this, workingDirectory);
+			processManager.Configure(this, workingDirectory);
 		}
 	}
 }

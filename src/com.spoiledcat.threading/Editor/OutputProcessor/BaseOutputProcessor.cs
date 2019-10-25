@@ -96,6 +96,20 @@ namespace SpoiledCat.Threading
 		}
 	}
 
+	/// <summary>
+	/// Takes a string, raises an event with it, discards the result
+	/// </summary>
+	public class RaiseAndDiscardOutputProcessor : BaseOutputProcessor<string>
+	{
+		public override void LineReceived(string line)
+		{
+			if (line == null)
+				return;
+			RaiseOnEntry(line);
+		}
+		public override string Result => string.Empty;
+	}
+
 	public class SimpleOutputProcessor : BaseOutputProcessor<string>
 	{
 		private readonly StringBuilder sb = new StringBuilder();

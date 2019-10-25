@@ -317,7 +317,7 @@ namespace SpoiledCat.NiceIO
 		public bool DirectoryExists()
 		{
 			ThrowIfNotInitialized();
-			return FileSystem.DirectoryExists(ToProcessDirectory());
+			return FileSystem.DirectoryExists(MakeAbsolute());
 		}
 
 		public bool DirectoryExists(string append)
@@ -333,13 +333,13 @@ namespace SpoiledCat.NiceIO
 			ThrowIfNotInitialized();
 			if (!append.IsInitialized)
 				return DirectoryExists();
-			return FileSystem.DirectoryExists(Combine(append).ToProcessDirectory());
+			return FileSystem.DirectoryExists(Combine(append).MakeAbsolute());
 		}
 
 		public bool FileExists()
 		{
 			ThrowIfNotInitialized();
-			return FileSystem.FileExists(ToProcessDirectory());
+			return FileSystem.FileExists(MakeAbsolute());
 		}
 
 		public bool FileExists(string append)
@@ -355,7 +355,7 @@ namespace SpoiledCat.NiceIO
 			ThrowIfNotInitialized();
 			if (!append.IsInitialized)
 				return FileExists();
-			return FileSystem.FileExists(Combine(append).ToProcessDirectory());
+			return FileSystem.FileExists(Combine(append).MakeAbsolute());
 		}
 
 		public string ExtensionWithDot {
@@ -538,7 +538,7 @@ namespace SpoiledCat.NiceIO
 		public IEnumerable<NPath> Files(string filter, bool recurse = false)
 		{
 			return FileSystem
-				.GetFiles(ToProcessDirectory(), filter,
+				.GetFiles(MakeAbsolute(), filter,
 					recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).Select(s => new NPath(s));
 		}
 
@@ -559,7 +559,7 @@ namespace SpoiledCat.NiceIO
 
 		public IEnumerable<NPath> Directories(string filter, bool recurse = false)
 		{
-			return FileSystem.GetDirectories(ToProcessDirectory(), filter,
+			return FileSystem.GetDirectories(MakeAbsolute(), filter,
 				recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).Select(s => new NPath(s));
 		}
 
@@ -578,7 +578,7 @@ namespace SpoiledCat.NiceIO
 			ThrowIfRelative();
 			ThrowIfRoot();
 			EnsureParentDirectoryExists();
-			FileSystem.WriteAllBytes(ToProcessDirectory(), new byte[0]);
+			FileSystem.WriteAllBytes(MakeAbsolute(), new byte[0]);
 			return this;
 		}
 
@@ -606,7 +606,7 @@ namespace SpoiledCat.NiceIO
 					"CreateDirectory is not supported on a root level directory because it would be dangerous:" +
 					ToString());
 
-			FileSystem.DirectoryCreate(ToProcessDirectory());
+			FileSystem.DirectoryCreate(MakeAbsolute());
 			return this;
 		}
 
@@ -675,7 +675,7 @@ namespace SpoiledCat.NiceIO
 
 				absoluteDestination.EnsureParentDirectoryExists();
 
-				FileSystem.FileCopy(ToProcessDirectory(), absoluteDestination.ToProcessDirectory(), true);
+				FileSystem.FileCopy(MakeAbsolute(), absoluteDestination.MakeAbsolute(), true);
 				return absoluteDestination;
 			}
 
@@ -709,11 +709,11 @@ namespace SpoiledCat.NiceIO
 			{
 				if (isFile)
 				{
-					FileSystem.FileDelete(ToProcessDirectory());
+					FileSystem.FileDelete(MakeAbsolute());
 				}
 				else
 				{
-					FileSystem.DirectoryDelete(ToProcessDirectory(), true);
+					FileSystem.DirectoryDelete(MakeAbsolute(), true);
 				}
 			}
 			catch (IOException)
@@ -814,53 +814,53 @@ namespace SpoiledCat.NiceIO
 			{
 				dest.DeleteIfExists();
 				dest.EnsureParentDirectoryExists();
-				FileSystem.FileMove(ToProcessDirectory(), dest.ToProcessDirectory());
+				FileSystem.FileMove(MakeAbsolute(), dest.MakeAbsolute());
 				return dest;
 			}
 
 			if (DirectoryExists())
 			{
-				FileSystem.DirectoryMove(ToProcessDirectory(), dest.ToProcessDirectory());
+				FileSystem.DirectoryMove(MakeAbsolute(), dest.MakeAbsolute());
 				return dest;
 			}
 
 			throw new ArgumentException(
-				"Move() called on a path that doesn't exist: " + ToProcessDirectory().ToString());
+				"Move() called on a path that doesn't exist: " + MakeAbsolute().ToString());
 		}
 
 		public NPath WriteAllText(string contents)
 		{
 			ThrowIfNotInitialized();
 			EnsureParentDirectoryExists();
-			FileSystem.WriteAllText(ToProcessDirectory(), contents);
+			FileSystem.WriteAllText(MakeAbsolute(), contents);
 			return this;
 		}
 
 		public string ReadAllText()
 		{
 			ThrowIfNotInitialized();
-			return FileSystem.ReadAllText(ToProcessDirectory());
+			return FileSystem.ReadAllText(MakeAbsolute());
 		}
 
 		public NPath WriteAllText(string contents, Encoding encoding)
 		{
 			ThrowIfNotInitialized();
 			EnsureParentDirectoryExists();
-			FileSystem.WriteAllText(ToProcessDirectory(), contents, encoding);
+			FileSystem.WriteAllText(MakeAbsolute(), contents, encoding);
 			return this;
 		}
 
 		public string ReadAllText(Encoding encoding)
 		{
 			ThrowIfNotInitialized();
-			return FileSystem.ReadAllText(ToProcessDirectory(), encoding);
+			return FileSystem.ReadAllText(MakeAbsolute(), encoding);
 		}
 
 		public NPath WriteLines(string[] contents)
 		{
 			ThrowIfNotInitialized();
 			EnsureParentDirectoryExists();
-			FileSystem.WriteLines(ToProcessDirectory(), contents);
+			FileSystem.WriteLines(MakeAbsolute(), contents);
 			return this;
 		}
 
@@ -868,28 +868,40 @@ namespace SpoiledCat.NiceIO
 		{
 			ThrowIfNotInitialized();
 			EnsureParentDirectoryExists();
-			FileSystem.WriteAllLines(ToProcessDirectory(), contents);
+			FileSystem.WriteAllLines(MakeAbsolute(), contents);
 			return this;
 		}
 
 		public string[] ReadAllLines()
 		{
 			ThrowIfNotInitialized();
-			return FileSystem.ReadAllLines(ToProcessDirectory());
+			return FileSystem.ReadAllLines(MakeAbsolute());
 		}
 
 		public NPath WriteAllBytes(byte[] contents)
 		{
 			ThrowIfNotInitialized();
 			EnsureParentDirectoryExists();
-			FileSystem.WriteAllBytes(ToProcessDirectory(), contents);
+			FileSystem.WriteAllBytes(MakeAbsolute(), contents);
 			return this;
 		}
 
 		public byte[] ReadAllBytes()
 		{
 			ThrowIfNotInitialized();
-			return FileSystem.ReadAllBytes(ToProcessDirectory());
+			return FileSystem.ReadAllBytes(MakeAbsolute());
+		}
+
+		public Stream OpenRead()
+		{
+			ThrowIfNotInitialized();
+			return FileSystem.OpenRead(MakeAbsolute());
+		}
+
+		public Stream OpenWrite(FileMode mode)
+		{
+			ThrowIfNotInitialized();
+			return FileSystem.OpenWrite(MakeAbsolute(), mode);
 		}
 
 
@@ -929,15 +941,6 @@ namespace SpoiledCat.NiceIO
 				if (!currentDirectory.IsInitialized)
 					currentDirectory = new NPath(FileSystem.CurrentDirectory);
 				return currentDirectory;
-			}
-		}
-
-		private static NPath processDirectory;
-		public static NPath ProcessDirectory {
-			get {
-				if (!processDirectory.IsInitialized)
-					processDirectory = new NPath(FileSystem.CurrentDirectory);
-				return processDirectory;
 			}
 		}
 
@@ -1003,14 +1006,6 @@ namespace SpoiledCat.NiceIO
 		{
 			path.ThrowIfNotInitialized();
 		}
-
-		public NPath ToProcessDirectory()
-		{
-			if (!IsRelative)
-				return this;
-			return NPath.ProcessDirectory.Combine(this);
-		}
-
 
 		public NPath EnsureDirectoryExists(string append = "")
 		{
@@ -1313,7 +1308,6 @@ namespace SpoiledCat.NiceIO
 		char DirectorySeparatorChar { get; }
 
 		string TempPath { get; }
-		string ProcessDirectory { get; set; }
 		string CurrentDirectory { get; set; }
 		string HomeDirectory { get; set; }
 		string LocalAppData { get; set; }
@@ -1359,17 +1353,6 @@ namespace SpoiledCat.NiceIO
 				if (!Path.IsPathRooted(value))
 					throw new ArgumentException("SetCurrentDirectory requires a rooted path", "directory");
 				currentDirectory = value;
-			}
-		}
-
-		public string ProcessDirectory
-		{
-			get => processDirectory ?? Directory.GetCurrentDirectory();
-			set
-			{
-				if (!Path.IsPathRooted(value))
-					throw new ArgumentException("SetProcessDirectory requires a rooted path", "directory");
-				processDirectory = value;
 			}
 		}
 

@@ -1,5 +1,3 @@
-using System.Threading;
-
 namespace SpoiledCat.Threading
 {
 	using NiceIO;
@@ -8,17 +6,18 @@ namespace SpoiledCat.Threading
 
 	public class FindExecTask : ProcessTask<NPath>
 	{
-		private readonly string arguments;
-
-		public FindExecTask(string executable, IEnvironment environment, CancellationToken token)
-			 : base(token, outputProcessor: new FirstNonNullLineOutputProcessor<NPath>(line => new NPath(line)))
+		public FindExecTask(ITaskManager taskManager, IProcessManager processManager,
+			string executable, IEnvironment environment)
+			 : base(taskManager, taskManager.Token, processManager.DefaultProcessEnvironment,
+				 outputProcessor: new FirstNonNullLineOutputProcessor<NPath>(line => new NPath(line)))
 		{
 			Name = environment.IsWindows ? "where" : "which";
-			arguments = executable;
+			ProcessArguments = executable;
+			processManager.Configure(this);
 		}
 
 		public override string ProcessName => Name;
-		public override string ProcessArguments => arguments;
+		public override string ProcessArguments { get; }
 		public override TaskAffinity Affinity => TaskAffinity.Concurrent;
 	}
 }

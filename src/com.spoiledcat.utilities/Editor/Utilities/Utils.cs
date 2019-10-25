@@ -9,15 +9,17 @@ using System.IO;
 
 namespace SpoiledCat.Utilities
 {
+	using Extensions;
 	using NiceIO;
 
 	public static class Utils
 	{
-		public static bool Copy(Stream source, Stream destination,
-			 long totalSize = 0,
-			 int chunkSize = 8192,
-			 Func<long, long, bool> progress = null,
-			 int progressUpdateRate = 100)
+		public static bool Copy(Stream source,
+			Stream destination,
+			long totalSize = 0,
+			int chunkSize = 8192,
+			Func<long, long, bool> progress = null,
+			int progressUpdateRate = 100)
 		{
 			byte[] buffer = new byte[chunkSize];
 			int bytesRead = 0;
@@ -62,10 +64,10 @@ namespace SpoiledCat.Utilities
 							lastSpeed = readLastSecond;
 							readLastSecond = 0;
 							averageSpeed = averageSpeed < 0f
-								 ? lastSpeed
-								 : smoothing * lastSpeed + (1f - smoothing) * averageSpeed;
+								? lastSpeed
+								: smoothing * lastSpeed + (1f - smoothing) * averageSpeed;
 							timeToFinish = Math.Max(1L,
-								 (long)((totalSize - totalRead) / (averageSpeed / progressUpdateRate)));
+								(long)((totalSize - totalRead) / (averageSpeed / progressUpdateRate)));
 
 							success = progress(totalRead, timeToFinish);
 							if (!success)
@@ -86,6 +88,7 @@ namespace SpoiledCat.Utilities
 
 			return success;
 		}
+
 		public static bool VerifyFileIntegrity(NPath file, string hash)
 		{
 			if (!file.IsInitialized || !file.FileExists())
@@ -96,34 +99,6 @@ namespace SpoiledCat.Utilities
 			else
 				actual = file.ToSha256();
 			return hash.Equals(actual, StringComparison.InvariantCultureIgnoreCase);
-		}
-
-		private static string ToMD5(this NPath path)
-		{
-			byte[] computeHash;
-			using (var hash = System.Security.Cryptography.MD5.Create())
-			{
-				using (var stream = NPath.FileSystem.OpenRead(path))
-				{
-					computeHash = hash.ComputeHash(stream);
-				}
-			}
-
-			return BitConverter.ToString(computeHash).Replace("-", string.Empty).ToLower();
-		}
-
-		private static string ToSha256(this NPath path)
-		{
-			byte[] computeHash;
-			using (var hash = System.Security.Cryptography.SHA256.Create())
-			{
-				using (var stream = NPath.FileSystem.OpenRead(path))
-				{
-					computeHash = hash.ComputeHash(stream);
-				}
-			}
-
-			return BitConverter.ToString(computeHash).Replace("-", string.Empty).ToLower();
 		}
 
 	}

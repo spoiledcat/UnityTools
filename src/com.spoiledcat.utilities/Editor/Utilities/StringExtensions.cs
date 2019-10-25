@@ -9,7 +9,19 @@ using System.Linq;
 
 namespace SpoiledCat.Extensions
 {
-    public static class DateTimeOffsetExtensions
+	public static class ArrayExtensions
+	{
+		public static string Join<T>(this T[] arr, string separator)
+		{
+			return string.Join(separator, arr);
+		}
+		public static string Join<T>(this IEnumerable<T> arr, string separator)
+		{
+			return string.Join(separator, arr);
+		}
+	}
+
+	public static class DateTimeOffsetExtensions
     {
         private const string Today = "Today";
         private const string Yesterday = "Yesterday";

@@ -60,6 +60,7 @@ namespace SpoiledCat.Unity
 		ISettings UserSettings { get; }
 		string ApplicationName { get; }
 		string GetEnvironmentVariableKey(string name);
+		NPath WorkingDirectory { get; }
 	}
 
 	public class UnityEnvironment : IEnvironment
@@ -98,6 +99,12 @@ namespace SpoiledCat.Unity
 			UserSettings = new UserSettings(this);
 			LocalSettings = new LocalSettings(this);
 			SystemSettings = new SystemSettings(this);
+			WorkingDirectory = NPath.CurrentDirectory;
+		}
+
+		public void SetWorkingDirectory(NPath workingDirectory)
+		{
+			WorkingDirectory = workingDirectory;
 		}
 
 		public string GetSpecialFolder(Environment.SpecialFolder folder) => NPath.FileSystem.GetFolderPath(folder);
@@ -135,6 +142,8 @@ namespace SpoiledCat.Unity
 		public NPath ExtensionInstallPath { get; set; }
 		public NPath UserCachePath { get; set; }
 		public NPath SystemCachePath { get; set; }
+		public NPath WorkingDirectory { get; private set; }
+
 		public string Path { get; set; } = Environment.GetEnvironmentVariable(GetEnvironmentVariableKeyInternal("PATH"));
 
 		public string NewLine => Environment.NewLine;

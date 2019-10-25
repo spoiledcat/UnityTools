@@ -3,7 +3,6 @@
 // This work is licensed under the terms of the MIT license.
 // For a copy, see <https://opensource.org/licenses/MIT>.
 
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace SpoiledCat.ProcessManager
@@ -15,7 +14,6 @@ namespace SpoiledCat.ProcessManager
 	public interface IProcessEnvironment
 	{
 		IEnvironment Environment { get; }
-		NPath DefaultWorkingDirectory { get; }
 		void Configure(ProcessStartInfo psi, NPath? workingDirectory = null);
 	}
 
@@ -23,19 +21,17 @@ namespace SpoiledCat.ProcessManager
 	{
 		public IEnvironment Environment { get; private set; }
 		protected ILogging Logger { get; private set; }
-		public NPath DefaultWorkingDirectory { get; private set; }
 
-		public ProcessEnvironment(IEnvironment environment, NPath defaultWorkingDirectory)
+		public ProcessEnvironment(IEnvironment environment)
 		{
 			Logger = LogHelper.GetLogger(GetType());
 			Environment = environment;
-			DefaultWorkingDirectory = defaultWorkingDirectory;
 		}
 
 		public virtual void Configure(ProcessStartInfo psi, NPath? workingDirectory = null)
 		{
 			Guard.ArgumentNotNull(psi, "psi");
-			workingDirectory = workingDirectory ?? DefaultWorkingDirectory;
+			workingDirectory = workingDirectory ?? Environment.WorkingDirectory;
 
 			psi.WorkingDirectory = workingDirectory;
 			psi.EnvironmentVariables["HOME"] = NPath.HomeDirectory;

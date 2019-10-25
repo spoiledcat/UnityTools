@@ -57,6 +57,7 @@ namespace SpoiledCat.Threading
         string Name { get; }
         TaskAffinity Affinity { get; set; }
         CancellationToken Token { get; }
+		ITaskManager TaskManager { get; }
         TaskBase DependsOn { get; }
         event Action<ITask> OnStart;
         event Action<ITask, bool, Exception> OnEnd;
@@ -102,10 +103,10 @@ namespace SpoiledCat.Threading
 
         public TaskData(string name, long total)
         {
-            this.Message = name;
-            this.Name = name;
-            this.progress = new Progress(this);
-            this.progress.Total = total;
+            Message = name;
+            Name = name;
+            progress = new Progress(this);
+            progress.Total = total;
         }
 
         public string Message { get; set; }
@@ -126,6 +127,8 @@ namespace SpoiledCat.Threading
 
         CancellationToken ITask.Token => throw new NotImplementedException();
 
+		ITaskManager ITask.TaskManager => throw new NotImplementedException();
+
         TaskBase ITask.DependsOn => throw new NotImplementedException();
 
         Exception ITask.Exception => throw new NotImplementedException();
@@ -140,99 +143,46 @@ namespace SpoiledCat.Threading
 
         event Action<ITask> ITask.OnStart
         {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
+            add => throw new NotImplementedException();
+            remove => throw new NotImplementedException();
         }
 
         event Action<ITask, bool, Exception> ITask.OnEnd
         {
-            add
-            {
-                throw new NotImplementedException();
-            }
+			add => throw new NotImplementedException();
+			remove => throw new NotImplementedException();
+		}
 
-            remove
-            {
-                throw new NotImplementedException();
-            }
-        }
+		ITask ITask.Catch(Action<Exception> handler) => throw new NotImplementedException();
 
-        ITask ITask.Catch(Action<Exception> handler)
-        {
-            throw new NotImplementedException();
-        }
+		ITask ITask.Catch(Func<Exception, bool> handler) => throw new NotImplementedException();
 
-        ITask ITask.Catch(Func<Exception, bool> handler)
-        {
-            throw new NotImplementedException();
-        }
+		ITask ITask.Finally(Action<bool> handler) => throw new NotImplementedException();
 
-        ITask ITask.Finally(Action<bool> handler)
-        {
-            throw new NotImplementedException();
-        }
+		ITask ITask.Finally(Action<bool, Exception> actionToContinueWith, TaskAffinity affinity) => throw new NotImplementedException();
 
-        ITask ITask.Finally(Action<bool, Exception> actionToContinueWith, TaskAffinity affinity)
-        {
-            throw new NotImplementedException();
-        }
+		T ITask.Finally<T>(T taskToContinueWith) => throw new NotImplementedException();
 
-        T ITask.Finally<T>(T taskToContinueWith)
-        {
-            throw new NotImplementedException();
-        }
+		ITask ITask.GetEndOfChain() => throw new NotImplementedException();
 
-        ITask ITask.GetEndOfChain()
-        {
-            throw new NotImplementedException();
-        }
+		ITask ITask.GetTopOfChain(bool onlyCreated) => throw new NotImplementedException();
 
-        ITask ITask.GetTopOfChain(bool onlyCreated)
-        {
-            throw new NotImplementedException();
-        }
+		bool ITask.IsChainExclusive() => throw new NotImplementedException();
 
-        bool ITask.IsChainExclusive()
-        {
-            throw new NotImplementedException();
-        }
+		ITask ITask.Progress(Action<IProgress> progressHandler) => throw new NotImplementedException();
 
-        ITask ITask.Progress(Action<IProgress> progressHandler)
-        {
-            throw new NotImplementedException();
-        }
+		void ITask.RunSynchronously() => throw new NotImplementedException();
 
-        void ITask.RunSynchronously()
-        {
-            throw new NotImplementedException();
-        }
+		ITask ITask.Start() => throw new NotImplementedException();
 
-        ITask ITask.Start()
-        {
-            throw new NotImplementedException();
-        }
+		ITask ITask.Start(TaskScheduler scheduler) => throw new NotImplementedException();
 
-        ITask ITask.Start(TaskScheduler scheduler)
-        {
-            throw new NotImplementedException();
-        }
-
-        T ITask.Then<T>(T continuation, TaskRunOptions runOptions, bool taskIsTopOfChain)
-        {
-            throw new NotImplementedException();
-        }
-    }
+		T ITask.Then<T>(T continuation, TaskRunOptions runOptions, bool taskIsTopOfChain) => throw new NotImplementedException();
+	}
 
     public class TaskBase : ITask
     {
-        public static ITask Default = new TaskBase { Name = "Global", Task = TaskHelpers.GetCompletedTask() };
+	    public static ITask Default = new TaskBase { Name = "Global", Task = TaskHelpers.GetCompletedTask() };
 
         protected const TaskContinuationOptions runAlwaysOptions = TaskContinuationOptions.None;
         protected const TaskContinuationOptions runOnSuccessOptions = TaskContinuationOptions.OnlyOnRanToCompletion;
@@ -257,18 +207,20 @@ namespace SpoiledCat.Threading
 
         protected Progress progress;
 
-        protected TaskBase(CancellationToken token)
-            : this()
+        protected TaskBase() {}
+
+		protected TaskBase(ITaskManager taskManager)
+			: this(taskManager, taskManager.Token)
+		{}
+
+		protected TaskBase(ITaskManager taskManager, CancellationToken token)
         {
             Guard.ArgumentNotNull(token, "token");
 
-            Token = token;
+			TaskManager = taskManager;
+			Token = token;
+			progress = new Progress(this);
             Task = new Task(RunSynchronously, Token, TaskCreationOptions.None);
-        }
-
-        protected TaskBase()
-        {
-            this.progress = new Progress(this);
         }
 
         public virtual T Then<T>(T nextTask, TaskRunOptions runOptions = TaskRunOptions.OnSuccess, bool taskIsTopOfChain = false)
@@ -286,7 +238,7 @@ namespace SpoiledCat.Threading
 
             if (runOptions == TaskRunOptions.OnSuccess)
             {
-                this.continuationOnSuccess = nextTaskBase;
+                continuationOnSuccess = nextTaskBase;
 
                 // if there are fault handlers in the chain we're appending, propagate them
                 // up this chain as well
@@ -301,12 +253,12 @@ namespace SpoiledCat.Threading
             }
             else if (runOptions == TaskRunOptions.OnFailure)
             {
-                this.continuationOnFailure = nextTaskBase;
+                continuationOnFailure = nextTaskBase;
                 DependsOn?.Then(nextTaskBase, TaskRunOptions.OnFailure, true);
             }
             else
             {
-                this.continuationOnAlways = nextTaskBase;
+                continuationOnAlways = nextTaskBase;
                 DependsOn?.SetFaultHandler(nextTaskBase);
             }
 
@@ -373,7 +325,7 @@ namespace SpoiledCat.Threading
         public ITask Finally(Action<bool, Exception> actionToContinueWith, TaskAffinity affinity = TaskAffinity.Concurrent)
         {
             Guard.ArgumentNotNull(actionToContinueWith, nameof(actionToContinueWith));
-            return Then(new ActionTask(Token, (s, ex) =>
+            return Then(new ActionTask(TaskManager, Token, (s, ex) =>
                 {
                     actionToContinueWith(s, ex);
                     if (!s)
@@ -447,7 +399,7 @@ namespace SpoiledCat.Threading
         {
             if (Task.Status == TaskStatus.Created)
             {
-                TaskManager.Instance.Schedule(this);
+                TaskManager.Schedule(this);
             }
         }
 
@@ -661,7 +613,7 @@ namespace SpoiledCat.Threading
 
         public void UpdateProgress(long value, long total, string message = null)
         {
-            progress.UpdateProgress(value, total, message ?? this.Message);
+            progress.UpdateProgress(value, total, message ?? Message);
         }
 
         public override string ToString()
@@ -684,7 +636,8 @@ namespace SpoiledCat.Threading
         protected ILogging Logger { get { return logger = logger ?? LogHelper.GetLogger(GetType()); } }
         public TaskBase DependsOn { get; private set; }
         public CancellationToken Token { get; }
-        public virtual string Message { get; set; }
+		public ITaskManager TaskManager { get; }
+		public virtual string Message { get; set; }
     }
 
     public class TaskBase<TResult> : TaskBase, ITask<TResult>
@@ -697,13 +650,15 @@ namespace SpoiledCat.Threading
         public new event Action<ITask<TResult>, TResult, bool, Exception> OnEnd;
         private TResult result;
 
-        protected TaskBase()
-            : base()
+		protected TaskBase() {}
+
+        protected TaskBase(ITaskManager taskManager)
+            : base(taskManager)
         {
         }
 
-        protected TaskBase(CancellationToken token)
-            : base(token)
+        protected TaskBase(ITaskManager taskManager, CancellationToken token)
+            : base(taskManager, token)
         {
             Task = new Task<TResult>(RunSynchronously, Token, TaskCreationOptions.None);
         }
@@ -770,7 +725,7 @@ namespace SpoiledCat.Threading
         public ITask<TResult> Finally(Func<bool, Exception, TResult, TResult> continuation, TaskAffinity affinity = TaskAffinity.Concurrent)
         {
             Guard.ArgumentNotNull(continuation, "continuation");
-            return Then(new FuncTask<TResult, TResult>(Token, continuation) { Affinity = affinity, Name = "Finally" }, TaskRunOptions.OnAlways);
+            return Then(new FuncTask<TResult, TResult>(TaskManager, Token, continuation) { Affinity = affinity, Name = "Finally" }, TaskRunOptions.OnAlways);
         }
 
         /// <summary>
@@ -779,7 +734,7 @@ namespace SpoiledCat.Threading
         public ITask Finally(Action<bool, Exception, TResult> continuation, TaskAffinity affinity = TaskAffinity.Concurrent)
         {
             Guard.ArgumentNotNull(continuation, "continuation");
-            return Then(new ActionTask<TResult>(Token, (s, ex, res) =>
+            return Then(new ActionTask<TResult>(TaskManager, Token, (s, ex, res) =>
                 {
                     continuation(s, ex, res);
                     if (!s)
@@ -821,7 +776,7 @@ namespace SpoiledCat.Threading
             RaiseOnStart();
             Token.ThrowIfCancellationRequested();
             var previousIsSuccessful = previousSuccess.HasValue ? previousSuccess.Value : (DependsOn?.Successful ?? true);
-            TResult ret = default(TResult);
+            TResult ret = default;
             try
             {
                 ret = RunWithReturn(previousIsSuccessful);
@@ -843,7 +798,7 @@ namespace SpoiledCat.Threading
 
         protected virtual void RaiseOnEnd(TResult data)
         {
-            this.result = data;
+            result = data;
             hasRun = true;
             OnEnd?.Invoke(this, result, !taskFailed, ThrownException);
             RaiseOnEndInternal();
@@ -858,19 +813,25 @@ namespace SpoiledCat.Threading
         }
 
         public new Task<TResult> Task
-        {
-            get { return base.Task as Task<TResult>; }
-            set { base.Task = value; }
-        }
-        public TResult Result { get { return result; } }
+		{
+			get => base.Task as Task<TResult>;
+			set => base.Task = value;
+		}
+		public TResult Result { get { return result; } }
     }
 
     public abstract class TaskBase<T, TResult> : TaskBase<TResult>
     {
         private readonly Func<T> getPreviousResult;
 
-        public TaskBase(CancellationToken token, Func<T> getPreviousResult = null)
-            : base(token)
+        protected TaskBase() {}
+
+		public TaskBase(ITaskManager taskManager, Func<T> getPreviousResult = null)
+			: this(taskManager, taskManager.Token, getPreviousResult)
+		{}
+
+		public TaskBase(ITaskManager taskManager, CancellationToken token, Func<T> getPreviousResult = null)
+            : base(taskManager, token)
         {
             Task = new Task<TResult>(RunSynchronously, Token, TaskCreationOptions.None);
             this.getPreviousResult = getPreviousResult;
@@ -891,7 +852,7 @@ namespace SpoiledCat.Threading
             else if (getPreviousResult != null)
                 prevResult = getPreviousResult();
 
-            TResult ret = default(TResult);
+            TResult ret = default;
             try
             {
                 ret = RunWithData(previousIsSuccessful, prevResult);
@@ -914,8 +875,15 @@ namespace SpoiledCat.Threading
 
     public abstract class DataTaskBase<TData, TResult> : TaskBase<TResult>, ITask<TData, TResult>
     {
-        public DataTaskBase(CancellationToken token)
-            : base(token)
+        protected DataTaskBase()
+		{}
+
+		public DataTaskBase(ITaskManager taskManager)
+	        : this(taskManager, taskManager.Token)
+		{}
+
+		public DataTaskBase(ITaskManager taskManager, CancellationToken token)
+            : base(taskManager, token)
         {}
 
         public event Action<TData> OnData;
@@ -927,11 +895,18 @@ namespace SpoiledCat.Threading
 
     public abstract class DataTaskBase<T, TData, TResult> : TaskBase<T, TResult>, ITask<TData, TResult>
     {
-        public DataTaskBase(CancellationToken token)
-            : base(token)
-        {}
+		protected DataTaskBase()
+		{}
 
-        public event Action<TData> OnData;
+		public DataTaskBase(ITaskManager taskManager)
+			: this(taskManager, taskManager.Token)
+		{}
+
+		public DataTaskBase(ITaskManager taskManager, CancellationToken token)
+			: base(taskManager, token)
+		{}
+
+		public event Action<TData> OnData;
         protected void RaiseOnData(TData data)
         {
             OnData?.Invoke(data);

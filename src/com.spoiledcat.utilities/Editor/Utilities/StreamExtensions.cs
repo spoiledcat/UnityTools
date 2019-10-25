@@ -7,7 +7,10 @@ using System.IO;
 
 namespace SpoiledCat.Extensions
 {
-    public static class StreamExtensions
+	using System;
+	using NiceIO;
+
+	public static class StreamExtensions
     {
         public static byte[] ToByteArray(this Stream input)
         {
@@ -23,5 +26,37 @@ namespace SpoiledCat.Extensions
                 return ms.ToArray();
             }
         }
+    }
+
+    public static class NPathExtensions
+    {
+	    public static string ToMD5(this NPath path)
+	    {
+		    byte[] computeHash;
+		    using (var hash = System.Security.Cryptography.MD5.Create())
+		    {
+			    using (var stream = NPath.FileSystem.OpenRead(path))
+			    {
+				    computeHash = hash.ComputeHash(stream);
+			    }
+		    }
+
+		    return BitConverter.ToString(computeHash).Replace("-", string.Empty).ToLower();
+	    }
+
+	    public static string ToSha256(this NPath path)
+	    {
+		    byte[] computeHash;
+		    using (var hash = System.Security.Cryptography.SHA256.Create())
+		    {
+			    using (var stream = NPath.FileSystem.OpenRead(path))
+			    {
+				    computeHash = hash.ComputeHash(stream);
+			    }
+		    }
+
+		    return BitConverter.ToString(computeHash).Replace("-", string.Empty).ToLower();
+	    }
+
     }
 }

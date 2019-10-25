@@ -32,6 +32,7 @@ namespace SpoiledCat.ProcessManager
 
 		IProcess Reconnect(IProcess processTask, int i);
 		CancellationToken CancellationToken { get; }
+		IProcessEnvironment DefaultProcessEnvironment { get; }
 		void RunCommandLineWindow(NPath workingDirectory);
 		void Stop();
 	}

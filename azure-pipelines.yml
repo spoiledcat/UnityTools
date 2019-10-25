@@ -35,79 +35,79 @@ steps:
     command: build
     arguments: '--configuration Release' # Update this to match your need
 
-- task: Npm@1
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  inputs:
-    command: 'publish'
-    workingDir: 'build/packages/com.spoiledcat.environment'
-    publishEndpoint: 'registry'
+# - task: Npm@1
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   inputs:
+#     command: 'publish'
+#     workingDir: 'build/packages/com.spoiledcat.environment'
+#     publishEndpoint: 'registry'
 
-- task: Npm@1
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  inputs:
-    command: 'publish'
-    workingDir: 'build/packages/com.spoiledcat.logging'
-    publishEndpoint: 'registry'
+# - task: Npm@1
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   inputs:
+#     command: 'publish'
+#     workingDir: 'build/packages/com.spoiledcat.logging'
+#     publishEndpoint: 'registry'
 
-- task: Npm@1
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  inputs:
-    command: 'publish'
-    workingDir: 'build/packages/com.spoiledcat.niceio'
-    publishEndpoint: 'registry'
+# - task: Npm@1
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   inputs:
+#     command: 'publish'
+#     workingDir: 'build/packages/com.spoiledcat.niceio'
+#     publishEndpoint: 'registry'
 
-- task: Npm@1
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  inputs:
-    command: 'publish'
-    workingDir: 'build/packages/com.spoiledcat.processmanager'
-    publishEndpoint: 'registry'
+# - task: Npm@1
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   inputs:
+#     command: 'publish'
+#     workingDir: 'build/packages/com.spoiledcat.processmanager'
+#     publishEndpoint: 'registry'
 
-- task: Npm@1
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  inputs:
-    command: 'publish'
-    workingDir: 'build/packages/com.spoiledcat.quick-console'
-    publishEndpoint: 'registry'
+# - task: Npm@1
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   inputs:
+#     command: 'publish'
+#     workingDir: 'build/packages/com.spoiledcat.quick-console'
+#     publishEndpoint: 'registry'
 
-- task: Npm@1
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  inputs:
-    command: 'publish'
-    workingDir: 'build/packages/com.spoiledcat.sharpziplib'
-    publishEndpoint: 'registry'
+# - task: Npm@1
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   inputs:
+#     command: 'publish'
+#     workingDir: 'build/packages/com.spoiledcat.sharpziplib'
+#     publishEndpoint: 'registry'
 
-- task: Npm@1
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  inputs:
-    command: 'publish'
-    workingDir: 'build/packages/com.spoiledcat.simplejson'
-    publishEndpoint: 'registry'
+# - task: Npm@1
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   inputs:
+#     command: 'publish'
+#     workingDir: 'build/packages/com.spoiledcat.simplejson'
+#     publishEndpoint: 'registry'
 
-- task: Npm@1
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  inputs:
-    command: 'publish'
-    workingDir: 'build/packages/com.spoiledcat.tasks'
-    publishEndpoint: 'registry'
+# - task: Npm@1
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   inputs:
+#     command: 'publish'
+#     workingDir: 'build/packages/com.spoiledcat.tasks'
+#     publishEndpoint: 'registry'
 
-- task: Npm@1
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  inputs:
-    command: 'publish'
-    workingDir: 'build/packages/com.spoiledcat.threading'
-    publishEndpoint: 'registry'
+# - task: Npm@1
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   inputs:
+#     command: 'publish'
+#     workingDir: 'build/packages/com.spoiledcat.threading'
+#     publishEndpoint: 'registry'
 
-- task: Npm@1
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  inputs:
-    command: 'publish'
-    workingDir: 'build/packages/com.spoiledcat.ui'
-    publishEndpoint: 'registry'
+# - task: Npm@1
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   inputs:
+#     command: 'publish'
+#     workingDir: 'build/packages/com.spoiledcat.ui'
+#     publishEndpoint: 'registry'
 
-- task: Npm@1
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  inputs:
-    command: 'publish'
-    workingDir: 'build/packages/com.spoiledcat.utilities'
-    publishEndpoint: 'registry'
+# - task: Npm@1
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   inputs:
+#     command: 'publish'
+#     workingDir: 'build/packages/com.spoiledcat.utilities'
+#     publishEndpoint: 'registry'

@@ -42,39 +42,42 @@ namespace SpoiledCat.Threading
             }
         }
 
-        public static ITask Then(this ITask task, Action continuation, TaskAffinity affinity = TaskAffinity.Concurrent, TaskRunOptions runOptions = TaskRunOptions.OnSuccess)
+		public static void FireAndForget(this Task _)
+		{ }
+
+		public static ITask Then(this ITask task, Action continuation, TaskAffinity affinity = TaskAffinity.Concurrent, TaskRunOptions runOptions = TaskRunOptions.OnSuccess)
         {
             Guard.ArgumentNotNull(continuation, "continuation");
-            return task.Then(new ActionTask(task.Token, _ => continuation()) { Affinity = affinity, Name = "Then" }, runOptions);
+            return task.Then(new ActionTask(task.TaskManager, task.Token, _ => continuation()) { Affinity = affinity, Name = "Then" }, runOptions);
         }
 
         public static ITask Then(this ITask task, Action<bool> continuation, TaskAffinity affinity = TaskAffinity.Concurrent, TaskRunOptions runOptions = TaskRunOptions.OnSuccess)
         {
             Guard.ArgumentNotNull(continuation, "continuation");
-            return task.Then(new ActionTask(task.Token, continuation) { Affinity = affinity, Name = "Then" }, runOptions);
+            return task.Then(new ActionTask(task.TaskManager, task.Token, continuation) { Affinity = affinity, Name = "Then" }, runOptions);
         }
 
         public static ITask Then<T>(this ITask<T> task, Action<bool, T> continuation, TaskAffinity affinity = TaskAffinity.Concurrent, TaskRunOptions runOptions = TaskRunOptions.OnSuccess)
         {
             Guard.ArgumentNotNull(continuation, "continuation");
-            return task.Then(new ActionTask<T>(task.Token, continuation) { Affinity = affinity, Name = $"Then<{typeof(T)}>" }, runOptions);
+            return task.Then(new ActionTask<T>(task.TaskManager, task.Token, continuation) { Affinity = affinity, Name = $"Then<{typeof(T)}>" }, runOptions);
         }
 
         public static ITask<T> Then<T>(this ITask task, Func<bool, T> continuation, TaskAffinity affinity = TaskAffinity.Concurrent, TaskRunOptions runOptions = TaskRunOptions.OnSuccess)
         {
             Guard.ArgumentNotNull(continuation, "continuation");
-            return task.Then(new FuncTask<T>(task.Token, continuation) { Affinity = affinity, Name = $"Then<{typeof(T)}>" }, runOptions);
+            return task.Then(new FuncTask<T>(task.TaskManager, task.Token, continuation) { Affinity = affinity, Name = $"Then<{typeof(T)}>" }, runOptions);
         }
 
         public static ITask<TRet> Then<T, TRet>(this ITask<T> task, Func<bool, T, TRet> continuation, TaskAffinity affinity = TaskAffinity.Concurrent, TaskRunOptions runOptions = TaskRunOptions.OnSuccess)
         {
             Guard.ArgumentNotNull(continuation, "continuation");
-            return task.Then(new FuncTask<T, TRet>(task.Token, continuation) { Affinity = affinity, Name = $"Then<{typeof(T)}, {typeof(TRet)}>" }, runOptions);
+            return task.Then(new FuncTask<T, TRet>(task.TaskManager, task.Token, continuation) { Affinity = affinity, Name = $"Then<{typeof(T)}, {typeof(TRet)}>" }, runOptions);
         }
 
         public static ITask<T> Then<T>(this ITask task, Task<T> continuation, TaskAffinity affinity = TaskAffinity.Concurrent, TaskRunOptions runOptions = TaskRunOptions.OnSuccess)
         {
-            var cont = new TPLTask<T>(continuation) { Affinity = affinity, Name = $"ThenAsync<{typeof(T)}>" };
+            var cont = new TPLTask<T>(task.TaskManager, continuation) { Affinity = affinity, Name = $"ThenAsync<{typeof(T)}>" };
             return task.Then(cont, runOptions);
         }
 
