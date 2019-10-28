@@ -19,13 +19,13 @@ before_build:
 build_script:
 - dotnet build -c %CONFIGURATION%
 
-after_build:
-- dotnet pack -c %CONFIGURATION%
-
 test:
   assemblies:
     only:
       - '**\*.Tests.dll'
+
+after_test:
+- dotnet pack -c %CONFIGURATION%
 
 artifacts:
 - path: build\**\*.nupkg
