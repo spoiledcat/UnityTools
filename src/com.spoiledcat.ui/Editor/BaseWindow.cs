@@ -11,13 +11,14 @@ using UnityEngine;
 namespace SpoiledCat.UI
 {
 	using Extensions;
+	using Threading;
 
 	class ApplicationState : ScriptableSingleton<ApplicationState>
     {
         [SerializeField] private bool firstRun = true;
         [SerializeField] public string firstRunAtString;
-        [SerializeField] private bool initialized = false;
 
+		[NonSerialized] private bool initialized = false;
         [NonSerialized] private Guid? instanceId;
         [NonSerialized] private bool? firstRunValue;
         [NonSerialized] public DateTimeOffset? firstRunAtValue;
@@ -77,7 +78,7 @@ namespace SpoiledCat.UI
         }
     }
 
-    public abstract class BaseWindow : EditorWindow
+	public abstract class BaseWindow : EditorWindow
     {
         [NonSerialized] private bool firstRepaint = true;
 
@@ -86,7 +87,7 @@ namespace SpoiledCat.UI
             if (!ApplicationState.Instance.Initialized)
             {
                 ApplicationState.Instance.Initialized = true;
-                Initialize();
+                InternalInitialize();
                 if (requiresRedraw)
                     Redraw();
             }
@@ -96,7 +97,17 @@ namespace SpoiledCat.UI
         {
         }
 
-        public virtual void Initialize()
+		private void InternalInitialize()
+		{
+			Initialize(ApplicationState.Instance.FirstRun);
+			if (TaskManager == null)
+			{
+				TaskManager = new TaskManager();
+				TaskManager.Initialize();
+			}
+		}
+
+        public virtual void Initialize(bool firstRun)
         {
         }
 
@@ -204,5 +215,7 @@ namespace SpoiledCat.UI
         protected bool InRepaint => Event.current.type == EventType.Repaint;
 
         public bool NeedsRefresh { get; set; }
+
+		public ITaskManager TaskManager { get; set; }
     }
 }

@@ -11,6 +11,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="CommandLine.csproj.DotSettings" />
+    <None Remove="CommandLine.v3.ncrunchproject" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\src\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
     <ProjectReference Include="..\..\src\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj" />
     <ProjectReference Include="..\..\src\com.spoiledcat.tasks\Editor\SpoiledCat.Unity.Tasks.csproj" />

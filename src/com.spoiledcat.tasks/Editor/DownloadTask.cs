@@ -17,7 +17,7 @@ namespace SpoiledCat.Threading
     public class DownloadTask : TaskBase<NPath>
     {
 	    public DownloadTask(ITaskManager taskManager, UriString url, NPath targetDirectory, string filename = null, int retryCount = 0)
-             : this(taskManager, taskManager.Token, url, targetDirectory, filename, retryCount)
+             : this(taskManager, taskManager?.Token ?? default, url, targetDirectory, filename, retryCount)
         {}
 
         public DownloadTask(
@@ -175,7 +175,7 @@ namespace SpoiledCat.Threading
         public event Action<UriString, Exception> OnDownloadFailed;
 
         public Downloader(ITaskManager taskManager)
-	        : this(taskManager, taskManager.Token)
+	        : this(taskManager, taskManager?.Token ?? default)
         {
         }
 

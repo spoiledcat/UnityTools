@@ -130,16 +130,15 @@ namespace SpoiledCat
             GetWindow<QuickConsole>().Show();
         }
 
-        public override void OnEnable()
-        {
-            base.Initialize();
-            EndEditingActiveTextField = () => EndEditingActiveTextField_method.Invoke(null, null);
-            compiler = new Compiler();
-            scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-            if (context == null) context = new List<UnityReference>();
-        }
+		public override void Initialize(bool firstRun)
+		{
+			EndEditingActiveTextField = () => EndEditingActiveTextField_method.Invoke(null, null);
+			compiler = new Compiler();
+			scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+			if (context == null) context = new List<UnityReference>();
+		}
 
-        public override void OnUI()
+		public override void OnUI()
         {
             using (new EditorGUILayout.VerticalScope())
             {

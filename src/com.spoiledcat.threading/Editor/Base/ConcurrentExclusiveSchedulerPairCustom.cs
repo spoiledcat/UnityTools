@@ -481,7 +481,7 @@ namespace SpoiledCat.Threading
 		/// </summary>
 		[DebuggerDisplay("Count={CountForDebugger}, MaxConcurrencyLevel={m_maxConcurrencyLevel}, Id={Id}")]
 		[DebuggerTypeProxy(typeof(ConcurrentExclusiveTaskScheduler.DebugView))]
-		private sealed class ConcurrentExclusiveTaskScheduler : TaskScheduler
+		private sealed class ConcurrentExclusiveTaskScheduler : TaskScheduler, ITaskScheduler
 		{
 			/// <summary>Cached delegate for invoking TryExecuteTaskShim.</summary>
 			private static readonly Func<object, bool> s_tryExecuteTaskShim = new Func<object, bool>(TryExecuteTaskShim);
@@ -650,6 +650,7 @@ namespace SpoiledCat.Threading
 			/// <returns>An enumerable of the tasks queued.</returns>
 			[SecurityCritical]
 			protected override IEnumerable<Task> GetScheduledTasks() { return m_tasks; }
+			public IEnumerable<Task> Tasks => m_tasks;
 
 			/// <summary>Gets the number of tasks queued to this scheduler.</summary>
 			[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]

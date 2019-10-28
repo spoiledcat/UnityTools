@@ -9,42 +9,46 @@
     <PackageSubFolder>$([System.IO.Path]::GetFileName($(MSBuildProjectDirectory)))</PackageSubFolder>
     <PackageSubFolder Condition="'$(PackageSubFolder)' == '$(PackageName)'">\</PackageSubFolder>
     <PackageSubFolder Condition="'$(PackageSubFolder)' != '$(PackageName)'">\$(PackageSubFolder)\</PackageSubFolder>
+    <PackageTestName>$(PackageName).tests</PackageTestName>
   </PropertyGroup>
 
   <ItemGroup>
     <VersionFiles Include="$(IntermediateOutputPath)\$(AssemblyName).Version$(DefaultLanguageSourceExtension)" />
   </ItemGroup>
 
-  <Target Name="EnumeratePackageFiles" Returns="@(FilesToCopy)">
-    <CreateItem Include="$(PackageSourceRoot)**\*.*;$(SolutionDir)\extras\$(PackageName)\**\*.*" Exclude="$(PackageSourceRoot)**\*.csproj*;$(PackageSourceRoot)**\*.ncrunch*;$(PackageSourceRoot)**\obj\**">
-      <Output TaskParameter="Include" ItemName="FilesToCopy" />
+  <!-- Assemble all sources into a folder called (PackageName) -->
+  <Target Name="EnumeratePackageFiles" Returns="@(SourcesToCopy)">
+    <CreateItem
+      Include="$(PackageSourceRootFull)**\*.*;$(SolutionDir)\extras\$(PackageName)\**\*.*"
+      Exclude="$(PackageSourceRootFull)**\*.csproj*;$(PackageSourceRootFull)**\*.ncrunch*;$(PackageSourceRootFull)**\obj\**;$(PackageSourceRootFull)version.json*;$(PackageSourceRootFull)Tests\**;$(SolutionDir)\extras\$(PackageName)\Tests\**">
+      <Output TaskParameter="Include" ItemName="SourcesToCopy" />
     </CreateItem>
   </Target>
 
   <Target Name="CopySourcesToPackmanPackage"
     DependsOnTargets="EnumeratePackageFiles"
     AfterTargets="AfterBuild"
-    Inputs="@(FilesToCopy);@(VersionFiles)"
-    Outputs="@(FilesToCopy->'$(PublishTo)$(PackageName)\%(RecursiveDir)%(Filename)%(Extension)');@(VersionFiles->'$(PublishTo)$(PackageName)$(PackageSubFolder)%(Filename)%(Extension)')"
+    Inputs="@(SourcesToCopy);@(VersionFiles)"
+    Outputs="@(SourcesToCopy->'$(PublishTo)$(PackageName)\%(RecursiveDir)%(Filename)%(Extension)');@(VersionFiles->'$(PublishTo)$(PackageName)$(PackageSubFolder)Version%(Extension)')"
     >
 
     <MakeDir Directories="$(PublishTo)$(PackageName)" />
 
     <Copy
-      SourceFiles="@(FilesToCopy)"
-      DestinationFiles="@(FilesToCopy->'$(PublishTo)$(PackageName)\%(RecursiveDir)%(Filename)%(Extension)')"
+      SourceFiles="@(SourcesToCopy)"
+      DestinationFiles="@(SourcesToCopy->'$(PublishTo)$(PackageName)\%(RecursiveDir)%(Filename)%(Extension)')"
       SkipUnchangedFiles="true">
       <Output TaskParameter="CopiedFiles" ItemName="FilesCopied" />
     </Copy>
 
     <Copy
       SourceFiles="@(VersionFiles)"
-      DestinationFiles="@(VersionFiles->'$(PublishTo)$(PackageName)$(PackageSubFolder)%(Filename)%(Extension)')"
+      DestinationFiles="@(VersionFiles->'$(PublishTo)$(PackageName)$(PackageSubFolder)Version%(Extension)')"
       SkipUnchangedFiles="true" />
 
   </Target>
 
-  <Target Name="StampPackageVersion" AfterTargets="CopySourcesToPackmanPackage">
+    <Target Name="StampPackageVersion" AfterTargets="CopySourcesToPackmanPackage">
 
     <FileUpdate 
       Files="$(PublishTo)$(PackageName)\package.json" 
@@ -58,11 +62,85 @@
       Regex="(&quot;com\.spoiledcat\..*&quot;): &quot;.*&quot;" 
       ReplacementText="$1: &quot;$(NuGetPackageVersion)&quot;" />
 
+    <FileUpdate 
+      Files="$(PublishTo)$(PackageName)\package.json" 
+      Regex="(&quot;com\.spoiledcat\..*&quot;): &quot;.*&quot;" 
+      ReplacementText="$1: &quot;$(NuGetPackageVersion)&quot;">
+      <Output TaskParameter="AllItemsUpdated" PropertyName="FileWasStamped" />
+    </FileUpdate>
+
     <Message Importance="High" Text="Stamping version $(NuGetPackageVersion)" Condition=" '$(FileWasStamped)' == 'true' "/>
 
   </Target>
 
 
+  <!-- 
+    PACKAGE TESTS
+  -->
+
+  <!-- Assemble all test files in a Tests folder into a package called (PackageName).tests -->
+  <Target Name="EnumeratePackageTestFiles" Returns="@(TestsToCopy)">
+    <CreateItem
+      Include="$(PackageSourceRootFull)\Tests\**\*.*;$(SolutionDir)\extras\$(PackageName)\Tests\**\*.*"
+      Exclude="$(PackageSourceRootFull)**\*.csproj*;$(PackageSourceRootFull)**\*.ncrunch*;$(PackageSourceRootFull)**\obj\**">
+      <Output TaskParameter="Include" ItemName="TestsToCopy" />
+    </CreateItem>
+  </Target>
+
+  <Target Name="CopyTestsToPackmanPackage"
+    Condition="Exists('$(PackageSourceRootFull)\Tests')"
+    DependsOnTargets="EnumeratePackageTestFiles"
+    AfterTargets="AfterBuild"
+    Inputs="@(TestsToCopy);@(VersionFiles)"
+    Outputs="@(TestsToCopy->'$(PublishTo)$(PackageTestName)\%(RecursiveDir)%(Filename)%(Extension)');@(VersionFiles->'$(PublishTo)$(PackageTestName)$(PackageSubFolder)Version%(Extension)')"
+    >
+
+    <MakeDir Directories="$(PublishTo)$(PackageTestName)" />
+
+    <Copy
+      SourceFiles="@(TestsToCopy)"
+      DestinationFiles="@(TestsToCopy->'$(PublishTo)$(PackageTestName)\%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true">
+      <Output TaskParameter="CopiedFiles" ItemName="FilesCopied" />
+    </Copy>
+
+    <Copy
+      SourceFiles="@(VersionFiles)"
+      DestinationFiles="@(VersionFiles->'$(PublishTo)$(PackageTestName)$(PackageSubFolder)Version%(Extension)')"
+      SkipUnchangedFiles="true" />
+
+  </Target>
+    
+  <Target Name="StampPackageTestVersion"
+    AfterTargets="CopyTestsToPackmanPackage"
+    Condition="Exists('$(PackageSourceRoot)\Tests')">
+
+    <FileUpdate 
+      Files="$(PublishTo)$(PackageTestName)\package.json" 
+      Regex="&quot;version&quot;: &quot;.*&quot;" 
+      ReplacementText="&quot;version&quot;: &quot;$(NuGetPackageVersion)&quot;">
+      <Output TaskParameter="AllItemsUpdated" PropertyName="FileWasStamped" />
+    </FileUpdate>
+
+    <FileUpdate 
+      Files="$(PublishTo)$(PackageTestName)\package.json" 
+      Regex="(&quot;com\.spoiledcat\..*&quot;): &quot;.*&quot;" 
+      ReplacementText="$1: &quot;$(NuGetPackageVersion)&quot;" />
+
+    <FileUpdate 
+      Files="$(PublishTo)$(PackageTestName)\package.json" 
+      Regex="(&quot;com\.spoiledcat\..*&quot;): &quot;.*&quot;" 
+      ReplacementText="$1: &quot;$(NuGetPackageVersion)&quot;">
+      <Output TaskParameter="AllItemsUpdated" PropertyName="FileWasStamped" />
+    </FileUpdate>
+
+    <Message Importance="High" Text="Stamping version $(NuGetPackageVersion)" Condition=" '$(FileWasStamped)' == 'true' "/>
+
+  </Target>
+
+
+
+  <!-- Helper to get the updated version from the Nerdbank.GitVersioning nuget task -->
   <Target Name="CheckIfVersionChanged" BeforeTargets="GenerateAssemblyVersionInfo" AfterTargets="GetBuildVersion" Returns="$(VersionHasChanged)">
     <PropertyGroup>
       <VersionSourceFile>$(IntermediateOutputPath)\$(AssemblyName).Version$(DefaultLanguageSourceExtension)</VersionSourceFile>

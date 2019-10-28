@@ -595,6 +595,7 @@ namespace SpoiledCat.Threading.Tests
 			Assert.AreSame(task1, top);
 		}
 
+		[Test]
 		public async Task GetFirstStartableTask_ReturnsNullWhenItsAlreadyStarted()
 		{
 			var task1 = new ActionTask(TaskManager, () => {});
@@ -605,9 +606,10 @@ namespace SpoiledCat.Threading.Tests
 			task1.Then(task2).Then(task3);
 
 			var top = task3.Test_GetFirstStartableTask();
-			Assert.AreSame(task2, top);
+			Assert.AreSame(null, top);
 		}
 
+		[Test]
 		public void GetFirstStartableTask_ReturnsTopTaskWhenNotStarted()
 		{
 			var task1 = new ActionTask(TaskManager, () => {});
@@ -744,12 +746,10 @@ namespace SpoiledCat.Threading.Tests
 	}
 
 	[TestFixture]
-	// for some reason these two are failing in appveyor, suspect nunit is doing something stupid
-	[Category("DoNotRunOnAppVeyor")]
 	class DependencyTests : BaseTest
 	{
 		[Test]
-		public async Task RunningDifferentTasksDependingOnPreviousResult()
+		public void RunningDifferentTasksDependingOnPreviousResult()
 		{
 			var callOrder = new List<string>();
 
@@ -770,8 +770,7 @@ namespace SpoiledCat.Threading.Tests
 			taskStart.Then(new ActionTask(TaskManager, () => { callOrder.Add("on success"); }) { Name = "On Success" },
 				runOptions: TaskRunOptions.OnSuccess).Then(taskEnd, taskIsTopOfChain: true);
 
-			await final.StartAndSwallowException();
-
+			final.StartAndSwallowException().Wait();
 
 			Assert.AreEqual(new string[] { "chain start", "failing", "on failure", "chain completed" }.Join(","), callOrder.Join(","));
 		}

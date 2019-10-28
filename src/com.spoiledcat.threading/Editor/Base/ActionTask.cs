@@ -21,7 +21,11 @@ namespace SpoiledCat.Threading
         private int finishedTaskCount;
 
         protected TaskQueue() {}
-        public TaskQueue(ITaskManager taskManager) : this(taskManager, taskManager.Token) { }
+        public TaskQueue(ITaskManager taskManager) : base(taskManager)
+		{
+			Initialize(aggregateTask.Task);
+		}
+
         public TaskQueue(ITaskManager taskManager, CancellationToken token) : base(taskManager, token)
         {
             Initialize(aggregateTask.Task);
@@ -97,7 +101,7 @@ namespace SpoiledCat.Threading
 	public class TaskQueue<TResult> : TaskQueue<TResult, TResult>
 	{
 		protected TaskQueue() {}
-		public TaskQueue(ITaskManager taskManager) : this(taskManager, taskManager.Token) {}
+		public TaskQueue(ITaskManager taskManager) : base(taskManager) {}
 		public TaskQueue(ITaskManager taskManager, CancellationToken token) : base(taskManager, token) { }
 	}
 
@@ -119,7 +123,7 @@ namespace SpoiledCat.Threading
 		/// <param name="taskManager"></param>
 		/// <param name="resultConverter"></param>
 		public TaskQueue(ITaskManager taskManager, Func<ITask<TTaskResult>, TResult> resultConverter = null)
-	        : this(taskManager, taskManager.Token, resultConverter)
+	        : this(taskManager, taskManager?.Token ?? default, resultConverter)
 		{}
 
 		/// <summary>
@@ -232,9 +236,9 @@ namespace SpoiledCat.Threading
         private Task task;
 
         protected TPLTask() { }
-        protected TPLTask(ITaskManager taskManager) : this(taskManager, taskManager.Token) { }
+        protected TPLTask(ITaskManager taskManager) : base(taskManager) { }
         protected TPLTask(ITaskManager taskManager, CancellationToken token) : base(taskManager, token) { }
-        public TPLTask(ITaskManager taskManager, Task task) : this(taskManager, taskManager.Token, task) { }
+        public TPLTask(ITaskManager taskManager, Task task) : this(taskManager, taskManager?.Token ?? default, task) { }
 
         public TPLTask(ITaskManager taskManager, CancellationToken token, Task task)
 	        : base(taskManager, token)
@@ -279,9 +283,9 @@ namespace SpoiledCat.Threading
         private Task<T> task;
 
         protected TPLTask() {}
-        protected TPLTask(ITaskManager taskManager) : this(taskManager, taskManager.Token) {}
+        protected TPLTask(ITaskManager taskManager) : this(taskManager, taskManager?.Token ?? default) {}
         protected TPLTask(ITaskManager taskManager, CancellationToken token) : base(taskManager, token) {}
-        public TPLTask(ITaskManager taskManager, Task<T> task) : this(taskManager, taskManager.Token, task) {}
+        public TPLTask(ITaskManager taskManager, Task<T> task) : this(taskManager, taskManager?.Token ?? default, task) {}
 
 		public TPLTask(ITaskManager taskManager, CancellationToken token, Task<T> task)
             : base(taskManager, token)
@@ -329,7 +333,7 @@ namespace SpoiledCat.Threading
         protected ActionTask() {}
 
         public ActionTask(ITaskManager taskManager, Action action)
-			: this(taskManager, taskManager.Token, action)
+			: this(taskManager, taskManager?.Token ?? default, action)
         {}
 
 		public ActionTask(ITaskManager taskManager, CancellationToken token, Action action)
@@ -341,7 +345,7 @@ namespace SpoiledCat.Threading
         }
 
 		public ActionTask(ITaskManager taskManager, Action<bool> action)
-            : this(taskManager, taskManager.Token, action)
+            : this(taskManager, taskManager?.Token ?? default, action)
 		{}
 
 		public ActionTask(ITaskManager taskManager, CancellationToken token, Action<bool> action)
@@ -353,7 +357,7 @@ namespace SpoiledCat.Threading
         }
 
 		public ActionTask(ITaskManager taskManager, Action<bool, Exception> action)
-			: this(taskManager, taskManager.Token, action)
+			: this(taskManager, taskManager?.Token ?? default, action)
 		{}
 
 		public ActionTask(ITaskManager taskManager, CancellationToken token, Action<bool, Exception> action)
@@ -399,7 +403,7 @@ namespace SpoiledCat.Threading
 		/// <param name="action"></param>
 		/// <param name="getPreviousResult">Method to call that returns the value that this task is going to work with. You can also use the PreviousResult property to set this value</param>
 		public ActionTask(ITaskManager taskManager, Action<bool, T> action, Func<T> getPreviousResult = null)
-	        : this(taskManager, taskManager.Token, action, getPreviousResult)
+	        : this(taskManager, taskManager?.Token ?? default, action, getPreviousResult)
         {}
 
 		/// <summary>
@@ -425,7 +429,7 @@ namespace SpoiledCat.Threading
 		/// <param name="action"></param>
 		/// <param name="getPreviousResult">Method to call that returns the value that this task is going to work with. You can also use the PreviousResult property to set this value</param>
 		public ActionTask(ITaskManager taskManager, Action<bool, Exception, T> action, Func<T> getPreviousResult = null)
-			: this(taskManager, taskManager.Token, action, getPreviousResult)
+			: this(taskManager, taskManager?.Token ?? default, action, getPreviousResult)
 		{ }
 
 		/// <summary>
@@ -500,7 +504,7 @@ namespace SpoiledCat.Threading
 		protected FuncTask() {}
 
 		public FuncTask(ITaskManager taskManager, Func<T> action)
-        	: this(taskManager, taskManager.Token, action)
+        	: this(taskManager, taskManager?.Token ?? default, action)
 		{}
 
 		public FuncTask(ITaskManager taskManager, CancellationToken token, Func<T> action)
@@ -512,7 +516,7 @@ namespace SpoiledCat.Threading
         }
 
 		public FuncTask(ITaskManager taskManager, Func<bool, T> action)
-			: this(taskManager, taskManager.Token, action)
+			: this(taskManager, taskManager?.Token ?? default, action)
 		{}
 
 		public FuncTask(ITaskManager taskManager, CancellationToken token, Func<bool, T> action)
@@ -524,7 +528,7 @@ namespace SpoiledCat.Threading
         }
 
 		public FuncTask(ITaskManager taskManager, Func<bool, Exception, T> action)
-			: this(taskManager, taskManager.Token, action)
+			: this(taskManager, taskManager?.Token ?? default, action)
 		{}
 
 		public FuncTask(ITaskManager taskManager, CancellationToken token, Func<bool, Exception, T> action)
@@ -567,7 +571,7 @@ namespace SpoiledCat.Threading
 		protected FuncTask() {}
 
 		public FuncTask(ITaskManager taskManager, Func<bool, T, TResult> action, Func<T> getPreviousResult = null)
-			: this(taskManager, taskManager.Token, action, getPreviousResult)
+			: this(taskManager, taskManager?.Token ?? default, action, getPreviousResult)
 		{}
 
 		public FuncTask(ITaskManager taskManager, CancellationToken token, Func<bool, T, TResult> action, Func<T> getPreviousResult = null)
@@ -579,7 +583,7 @@ namespace SpoiledCat.Threading
         }
 
 		public FuncTask(ITaskManager taskManager, Func<bool, Exception, T, TResult> action, Func<T> getPreviousResult = null)
-			: this(taskManager, taskManager.Token, action, getPreviousResult)
+			: this(taskManager, taskManager?.Token ?? default, action, getPreviousResult)
 		{}
 
 		public FuncTask(ITaskManager taskManager, CancellationToken token, Func<bool, Exception, T, TResult> action, Func<T> getPreviousResult = null)
@@ -623,7 +627,7 @@ namespace SpoiledCat.Threading
 		protected FuncListTask() {}
 
 		public FuncListTask(ITaskManager taskManager, Func<bool, List<T>> action)
-			: this(taskManager, taskManager.Token, action)
+			: this(taskManager, taskManager?.Token ?? default, action)
 		{}
 
 		public FuncListTask(ITaskManager taskManager, CancellationToken token, Func<bool, List<T>> action)
@@ -634,7 +638,7 @@ namespace SpoiledCat.Threading
         }
 
 		public FuncListTask(ITaskManager taskManager, Func<bool, Exception, List<T>> action)
-			: this(taskManager, taskManager.Token, action)
+			: this(taskManager, taskManager?.Token ?? default, action)
 		{}
 
 		public FuncListTask(ITaskManager taskManager, CancellationToken token, Func<bool, Exception, List<T>> action)
@@ -645,7 +649,7 @@ namespace SpoiledCat.Threading
         }
 
 		public FuncListTask(ITaskManager taskManager, Func<bool, FuncListTask<T>, List<T>> action)
-			: this(taskManager, taskManager.Token, action)
+			: this(taskManager, taskManager?.Token ?? default, action)
 		{}
 
 		public FuncListTask(ITaskManager taskManager, CancellationToken token, Func<bool, FuncListTask<T>, List<T>> action)
@@ -696,7 +700,7 @@ namespace SpoiledCat.Threading
 		protected FuncListTask() {}
 
 		public FuncListTask(ITaskManager taskManager, Func<bool, T, List<TResult>> action)
-			: this(taskManager, taskManager.Token, action)
+			: this(taskManager, taskManager?.Token ?? default, action)
 		{}
 
 		public FuncListTask(ITaskManager taskManager, CancellationToken token, Func<bool, T, List<TResult>> action)
@@ -707,7 +711,7 @@ namespace SpoiledCat.Threading
         }
 
 		public FuncListTask(ITaskManager taskManager, Func<bool, Exception, T, List<TResult>> action)
-			: this(taskManager, taskManager.Token, action)
+			: this(taskManager, taskManager?.Token ?? default, action)
 		{}
 
 		public FuncListTask(ITaskManager taskManager, CancellationToken token, Func<bool, Exception, T, List<TResult>> action)

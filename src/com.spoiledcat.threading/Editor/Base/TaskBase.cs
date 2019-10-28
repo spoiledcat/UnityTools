@@ -210,12 +210,12 @@ namespace SpoiledCat.Threading
         protected TaskBase() {}
 
 		protected TaskBase(ITaskManager taskManager)
-			: this(taskManager, taskManager.Token)
+			: this(taskManager, taskManager?.Token ?? default)
 		{}
 
 		protected TaskBase(ITaskManager taskManager, CancellationToken token)
         {
-            Guard.ArgumentNotNull(token, "token");
+			Guard.ArgumentNotNull(taskManager, nameof(taskManager));
 
 			TaskManager = taskManager;
 			Token = token;
@@ -485,7 +485,7 @@ namespace SpoiledCat.Threading
             return GetTopMostTask(null, true, true);
         }
 
-        protected TaskBase GetTopMostCreatedTask()
+		protected TaskBase GetTopMostCreatedTask()
         {
             return GetTopMostTask(null, true, false);
         }
@@ -621,15 +621,15 @@ namespace SpoiledCat.Threading
             return $"{Task?.Id ?? -1} {Name} {GetType()}";
         }
 
-        public virtual bool Successful { get { return hasRun && !taskFailed; } }
-        public bool IsCompleted { get { return hasRun; } }
+        public virtual bool Successful => hasRun && !taskFailed;
+        public bool IsCompleted => hasRun;
         public Exception Exception => ThrownException ?? GetThrownException();
 
         public string Errors { get; protected set; }
         public Task Task { get; protected set; }
-        public WaitHandle AsyncWaitHandle { get { return (Task as IAsyncResult).AsyncWaitHandle; } }
-        public object AsyncState { get { return (Task as IAsyncResult).AsyncState; } }
-        public bool CompletedSynchronously { get { return (Task as IAsyncResult).CompletedSynchronously; } }
+        public WaitHandle AsyncWaitHandle => (Task as IAsyncResult).AsyncWaitHandle;
+        public object AsyncState => (Task as IAsyncResult).AsyncState;
+        public bool CompletedSynchronously => (Task as IAsyncResult).CompletedSynchronously;
         public string Name { get; set; }
         public virtual TaskAffinity Affinity { get; set; }
         private ILogging logger;
@@ -651,11 +651,7 @@ namespace SpoiledCat.Threading
         private TResult result;
 
 		protected TaskBase() {}
-
-        protected TaskBase(ITaskManager taskManager)
-            : base(taskManager)
-        {
-        }
+        protected TaskBase(ITaskManager taskManager) : this(taskManager, taskManager?.Token ?? default) {}
 
         protected TaskBase(ITaskManager taskManager, CancellationToken token)
             : base(taskManager, token)
@@ -827,7 +823,7 @@ namespace SpoiledCat.Threading
         protected TaskBase() {}
 
 		public TaskBase(ITaskManager taskManager, Func<T> getPreviousResult = null)
-			: this(taskManager, taskManager.Token, getPreviousResult)
+			: this(taskManager, taskManager?.Token ?? default, getPreviousResult)
 		{}
 
 		public TaskBase(ITaskManager taskManager, CancellationToken token, Func<T> getPreviousResult = null)
@@ -875,16 +871,10 @@ namespace SpoiledCat.Threading
 
     public abstract class DataTaskBase<TData, TResult> : TaskBase<TResult>, ITask<TData, TResult>
     {
-        protected DataTaskBase()
-		{}
+        protected DataTaskBase() {}
 
-		public DataTaskBase(ITaskManager taskManager)
-	        : this(taskManager, taskManager.Token)
-		{}
-
-		public DataTaskBase(ITaskManager taskManager, CancellationToken token)
-            : base(taskManager, token)
-        {}
+		public DataTaskBase(ITaskManager taskManager) : base(taskManager) {}
+		public DataTaskBase(ITaskManager taskManager, CancellationToken token) : base(taskManager, token) {}
 
         public event Action<TData> OnData;
         protected void RaiseOnData(TData data)
@@ -895,16 +885,9 @@ namespace SpoiledCat.Threading
 
     public abstract class DataTaskBase<T, TData, TResult> : TaskBase<T, TResult>, ITask<TData, TResult>
     {
-		protected DataTaskBase()
-		{}
-
-		public DataTaskBase(ITaskManager taskManager)
-			: this(taskManager, taskManager.Token)
-		{}
-
-		public DataTaskBase(ITaskManager taskManager, CancellationToken token)
-			: base(taskManager, token)
-		{}
+		protected DataTaskBase() {}
+		public DataTaskBase(ITaskManager taskManager) : base(taskManager) {}
+		public DataTaskBase(ITaskManager taskManager, CancellationToken token) : base(taskManager, token) {}
 
 		public event Action<TData> OnData;
         protected void RaiseOnData(TData data)
@@ -917,6 +900,7 @@ namespace SpoiledCat.Threading
     {
         Concurrent,
         Exclusive,
-        UI
+        UI,
+		LongRunning
     }
 }

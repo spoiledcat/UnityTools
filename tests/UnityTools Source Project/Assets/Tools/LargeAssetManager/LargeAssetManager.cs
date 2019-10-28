@@ -1,5 +1,4 @@
 ﻿using SpoiledCat.Json;
-using SpoiledCat.LocalTools;
 using SpoiledCat.Logging;
 using SpoiledCat.NiceIO;
 using SpoiledCat.Threading;
@@ -8,8 +7,10 @@ using SpoiledCat.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using LocalTools;
+using System;
 
-namespace SpoiledCat.LocalTools
+namespace LocalTools
 {
     public static class Extensions
     {
@@ -56,7 +57,7 @@ namespace SpoiledCat.LocalTools
         [NotSerialized]
         public NPath LocalPath { get; set; }
         [NotSerialized]
-        public string Filename => url.Filename;
+        public string Filename => url?.Filename ?? "";
         [NotSerialized]
         public bool NeedsDownload { get; set; }
     }
@@ -65,7 +66,7 @@ namespace SpoiledCat.LocalTools
     {
         private List<Asset> assets;
         [NotSerialized]
-        public List<Asset> Assets { get { if (assets == null) assets = new List<Asset>(); return assets; } }
+		public List<Asset> Assets => assets ?? (assets = new List<Asset>());
         public Index(IEnumerable<Asset> assets)
         {
             this.assets = assets.ToList();
@@ -84,34 +85,67 @@ namespace SpoiledCat.LocalTools
     }
 }
 
-public class OfflineAssetManagerWindow : BaseWindow
+public class LargeAssetManagerWindow : BaseWindow
 {
     [MenuItem("Tools/Unlock")]
     static void Menu_Unlock()
     {
-        EditorApplication.UnlockReloadAssemblies();
+		LargeAssetManager.UnlockEditor();
     }
 
     [MenuItem("Tools/Download assets")]
     static void Menu_DownloadAssets()
     {
-        OfflineAssetManager.DownloadAndUnzip();
+		GetWindowDontShow<LargeAssetManagerWindow>().DownloadAndUnzip();
     }
 
     [MenuItem("Tools/Unzip assets")]
     static void Menu_UnzipAssets()
     {
-        OfflineAssetManager.JustUnzip();
+		GetWindowDontShow<LargeAssetManagerWindow>().JustUnzip();
     }
+
+	[MenuItem("Tools/Create Index")]
+	static void Menu_CreateIndex()
+	{
+		GetWindowDontShow<LargeAssetManagerWindow>().CreateIndex();
+	}
+
+	private void DownloadAndUnzip()
+	{
+		LargeAssetManager.TaskManager = TaskManager;
+		LargeAssetManager.DownloadAndUnzip();
+	}
+
+	private void JustUnzip()
+	{
+		LargeAssetManager.TaskManager = TaskManager;
+		LargeAssetManager.JustUnzip();
+	}
+
+	private void CreateIndex()
+	{
+		LargeAssetManager.TaskManager = TaskManager;
+		string folder = EditorUtility.OpenFolderPanel("Select Folder with zip files to add to the index", "../TestWebServer/files/assets", "");
+		if (!string.IsNullOrEmpty(folder))
+		{
+			LargeAssetManager.UpdateIndexFromFilesInFolder("index-template.json".ToNPath(), "index.json".ToNPath(), folder.ToNPath());
+		}
+	}
 }
 
-public class OfflineAssetManager
+public class LargeAssetManager
 {
-    private static ILogging logger = LogHelper.GetLogger<OfflineAssetManager>();
-    static OfflineAssetManager() {
+	public static ITaskManager TaskManager;
+
+	public static int DefaultWebServerPort = 58392;
+	public static string DefaultWebServerUrl = "http://localhost";
+
+    private static ILogging logger = LogHelper.GetLogger<LargeAssetManager>();
+    static LargeAssetManager() {
         PocoJsonSerializerStrategy.RegisterCustomTypeHandler<NPath>(
-            value => (value.ToString(), true),
-            (value, type) => {
+			value => (((NPath)value).ToString(SlashMode.Forward), true),
+			(value, type) => {
                 string str = value as string;
                 if (!string.IsNullOrEmpty(str))
                 {
@@ -122,52 +156,125 @@ public class OfflineAssetManager
 
         PocoJsonSerializerStrategy.RegisterCustomTypeHandler<UriString>(value => (value.ToString(), true), (value, type) => (new UriString(value as string), true));
 
-        var i = TaskManager.Instance; // ensure this is set up on the main thread
-        LogHelper.LogAdapter = new MultipleLogAdapter(new UnityLogAdapter());
+		LogHelper.LogAdapter = new MultipleLogAdapter(new UnityLogAdapter());
     }
 
-    public static void UpdateIndexFromFilesInFolder(NPath template, NPath indexPath, NPath path)
-    {
-        var index = Index.Load(template);
-        path = path.MakeAbsolute();
-        TaskQueue<Asset> t = new TaskQueue<Asset>() { Message = "Calculating hashes..." };
-        foreach(var asset in index.Assets)
-        {
-            t.Queue(new FuncTask<Asset>(() => {
-                return new Asset {
-                    Hash = path.Combine(asset.Filename).ToMD5(),
-                    Path = asset.Path,
-                    Url = asset.Url,
-                    NeedsUnzip = asset.NeedsUnzip
-                };
-            }) { Message = asset.Filename });
-        }
-        
-        t.Progress(progress => ShowProgress(progress.Message, progress.InnerProgress?.Message, progress.Percentage));
-        
-        TaskManager.Instance.RunInUI(LockEditor, "Lock editor")
-            .Then(t)
-            .Then((success, list) =>
-            {
-                index.Assets.Clear();
-                index.Assets.AddRange(list);
-                index.Save(indexPath);
-            })
-            .FinallyInUI((success, ex) => {
-                if (!success)
-                    logger.Error(ex);
-                UnlockEditor();
-                logger.Info($"Index updated with result: {success}");
-            })
-            .Start();
 
-    }
+	public static void LockEditor()
+	{
+		var autoRefresh = EditorPrefs.GetBool("kAutoRefresh");
+		EditorPrefs.SetBool("kAutoRefresh_backup", autoRefresh);
+		EditorPrefs.SetBool("kAutoRefresh", false);
+		EditorApplication.LockReloadAssemblies();
+		EditorUtility.ClearProgressBar();
+	}
 
-    public static void DownloadAndUnzip()
+	public static void UnlockEditor()
+	{
+		EditorUtility.ClearProgressBar();
+		EditorApplication.UnlockReloadAssemblies();
+		var autoRefresh = EditorPrefs.GetBool("kAutoRefresh_backup");
+		EditorPrefs.DeleteKey("kAutoRefresh_backup");
+		EditorPrefs.SetBool("kAutoRefresh", autoRefresh);
+		AssetDatabase.Refresh();
+	}
+
+	private static void ShowProgress(string title, string message, float pct)
+	{
+		TaskManager.RunInUI(() => EditorUtility.DisplayProgressBar(title, message, pct), "Updating progress");
+	}
+
+	private static void ClearProgress()
+	{
+		TaskManager.RunInUI(() => EditorUtility.ClearProgressBar(), "Clearing progress");
+	}
+
+
+	public static void UpdateIndexFromFilesInFolder(NPath template, NPath indexPath, NPath path)
+	{
+		var runTask = UpdateIndexFromFilesInFolderTask(path, indexPath, template);
+
+		runTask
+			.FinallyInUI((success, ex) => {
+				if (!success)
+					logger.Error(ex);
+				logger.Info($"Index updated with result: {success}");
+				EditorUtility.ClearProgressBar();
+			})
+			.Start();
+	}
+
+	public static ITask UpdateIndexFromFilesInFolderTask(NPath folderWithFiles, NPath indexFileToGenerate, NPath? indexTemplate = null)
+	{
+		Index? templateIndex = null;
+		if (indexTemplate.HasValue && indexTemplate.Value.FileExists())
+			templateIndex = Index.Load(indexTemplate);
+		folderWithFiles = folderWithFiles.MakeAbsolute();
+		var dt = DateTimeOffset.Now.Date.ToString("yyyyMMdd");
+		TaskQueue<Asset> hashTask = new TaskQueue<Asset>(TaskManager) { Message = "Calculating hashes..." };
+		foreach (var file in folderWithFiles.Files())
+		{
+			var asset = new Asset { Hash = file.ToMD5(), };
+
+			if ((templateIndex?.Assets.Any(x => x.Filename == file.FileName)) ?? false)
+			{
+				var templateAsset = templateIndex.Value.Assets.First(x => x.Filename == file.FileName);
+				asset.Path = templateAsset.Path;
+				asset.Url = templateAsset.Url.Combine("assets")
+				                         .Combine(dt)
+				                         .Combine(file.FileName);
+				asset.NeedsUnzip = templateAsset.NeedsUnzip;
+			}
+			else
+			{
+				asset.Path = file.FileNameWithoutExtension.ToNPath();
+				asset.NeedsUnzip = file.ExtensionWithDot == ".zip" ? true : false;
+				asset.Url = $"{DefaultWebServerUrl}:{DefaultWebServerPort}/assets/{dt}/{file.FileName}";
+			}
+
+			hashTask.Queue(new FuncTask<Asset>(TaskManager, () => asset) { Message = file.FileName });
+		}
+
+		hashTask.Progress(progress => ShowProgress(progress.Message, progress.InnerProgress?.Message, progress.Percentage));
+
+		var runTask = hashTask
+			.Then((success, list) => {
+				Index newIndex = default;
+				if (indexFileToGenerate.FileExists())
+				{
+					newIndex = Index.Load(indexFileToGenerate);
+					foreach (var newAsset in list)
+					{
+						if (newIndex.Assets.Any(x => x.Filename == newAsset.Filename))
+						{
+							var originalAsset = newIndex.Assets.First(x => x.Filename == newAsset.Filename);
+							if (originalAsset.Hash != newAsset.Hash || originalAsset.Url != newAsset.Url)
+							{
+								newIndex.Assets.Remove(originalAsset);
+								newIndex.Assets.Add(newAsset);
+							}
+						}
+						else
+						{
+							newIndex.Assets.Add(newAsset);
+						}
+					}
+				}
+				else
+				{
+					newIndex.Assets.AddRange(list);
+				}
+				newIndex.Save(indexFileToGenerate);
+			});
+		return runTask;
+	}
+
+	public static void DownloadAndUnzip()
     {
         var index = Index.Load("index.json");
 
-        ITask task = TaskManager.Instance.RunInUI(LockEditor, "Lock editor")
+        ITask task = TaskManager
+			.RunInUI(LockEditor, "Lock editor")
             .Then(DownloadIfNeeded(index))
             .Then(RunUnzip)
             .FinallyInUI((success, ex) => {
@@ -194,7 +301,8 @@ public class OfflineAssetManager
         }
 
 
-        ITask task = TaskManager.Instance.RunInUI(LockEditor, "Lock editor")
+        ITask task = TaskManager
+			.RunInUI(LockEditor, "Lock editor")
             .Then(Unzip(assetList))
             .FinallyInUI((success, ex) => {
                 if (!success)
@@ -206,44 +314,15 @@ public class OfflineAssetManager
         task.Start();
     }
 
-    private static void LockEditor()
-    {
-        var autoRefresh = EditorPrefs.GetBool("kAutoRefresh");
-        EditorPrefs.SetBool("kAutoRefresh_backup", autoRefresh);
-        EditorPrefs.SetBool("kAutoRefresh", false);
-        EditorApplication.LockReloadAssemblies();
-        EditorUtility.ClearProgressBar();
-    }
-
-    private static void UnlockEditor()
-    {
-        EditorUtility.ClearProgressBar();
-        EditorApplication.UnlockReloadAssemblies();
-        var autoRefresh = EditorPrefs.GetBool("kAutoRefresh_backup");
-        EditorPrefs.DeleteKey("kAutoRefresh_backup");
-        EditorPrefs.SetBool("kAutoRefresh", autoRefresh);
-        AssetDatabase.Refresh();
-    }
-
-    private static void ShowProgress(string title, string message, float pct)
-    {
-        TaskManager.Instance.RunInUI(() => EditorUtility.DisplayProgressBar(title, message, pct), "Updating progress");
-    }
-
-    private static void ClearProgress()
-    {
-        TaskManager.Instance.RunInUI(() => EditorUtility.ClearProgressBar(), "Clearing progress");
-    }
-
     private static TaskQueue<Asset> CalculateWhatNeedsToBeDownloaded(Index index)
     {
         var downloads = "Downloads".ToNPath().MakeAbsolute();
         List<Asset> downloadList = new List<Asset>();
 
-        TaskQueue<Asset> t = new TaskQueue<Asset>() { Message = "Calculating hashes..." };
+        TaskQueue<Asset> t = new TaskQueue<Asset>(TaskManager) { Message = "Calculating hashes..." };
         foreach (var entry in index.Assets)
         {
-            t.Queue(new FuncTask<Asset, Asset>((_, asset) => {
+            t.Queue(new FuncTask<Asset, Asset>(TaskManager, (_, asset) => {
                 NPath file;
                 if (asset.NeedsUnzip) {
                     file = downloads.Combine(asset.Filename);
@@ -277,7 +356,7 @@ public class OfflineAssetManager
                     return downloadList;
                 }
 
-                var downloader = new Downloader();
+                var downloader = new Downloader(TaskManager);
                 foreach (var asset in downloadList.Where(x => x.NeedsDownload))
                     downloader.QueueDownload(asset.Url, asset.LocalPath.Parent, retryCount: 2);
 
@@ -296,13 +375,13 @@ public class OfflineAssetManager
 
     public static TaskQueue<NPath> Unzip(List<Asset> assetList)
     {
-        var unzipper = new TaskQueue<NPath>();
+        var unzipper = new TaskQueue<NPath>(TaskManager);
         foreach (var asset in assetList.Where(x => x.NeedsUnzip))
         {
             var unzipStamp = asset.LocalPath.Parent.Combine($".{asset.Filename}");
             if (unzipStamp.FileExists() && unzipStamp.ReadAllText() == asset.Hash)
                 continue;
-            var task = new UnzipTask(asset.LocalPath, asset.Path.MakeAbsolute());
+            var task = new UnzipTask(TaskManager, asset.LocalPath, asset.Path.MakeAbsolute());
             task.OnEnd += (t, extractedPath, success, exception) =>
             {
                 if (success)

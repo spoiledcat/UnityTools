@@ -1,5 +1,5 @@
 {
-    "name": "OfflineAssetManager",
+    "name": "LargeAssetManager",
     "references": [
         "com.spoiledcat.niceio",
         "com.spoiledcat.simplejson",

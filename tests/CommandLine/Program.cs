@@ -81,8 +81,9 @@ namespace SpoiledCat.Tests.CommandLine
             string msg = null;
             string host = null;
             bool runUsage = false;
+			bool block = false;
 
-            var arguments = new List<string>(args);
+			var arguments = new List<string>(args);
             if (arguments.Contains("usage"))
             {
                 runUsage = true;
@@ -109,7 +110,9 @@ namespace SpoiledCat.Tests.CommandLine
                 .Add("readVersion=", v => readVersion = v)
                 .Add("o=|outfile=", v => outfile = v.ToNPath().MakeAbsolute())
                 .Add("h=", "Host", v => host = v)
-                .Add("help", v => p.WriteOptionDescriptions(Console.Out));
+                .Add("help", v => p.WriteOptionDescriptions(Console.Out))
+				.Add("b|block", v => block = true)
+				;
 
             var extra = p.Parse(arguments);
             if (runUsage)
@@ -197,17 +200,28 @@ namespace SpoiledCat.Tests.CommandLine
                 return 0;
             }
 
-            if (readInputToEof)
-            {
-                string line;
-                while ((line = Console.ReadLine()) != null)
-                {
-                    lines.Add(line);
-                }
-            }
+			if (sleepms > 0)
+				Thread.Sleep(sleepms);
 
-            if (sleepms > 0)
-                Thread.Sleep(sleepms);
+			if (block)
+			{
+				while (true)
+				{
+					if (readInputToEof)
+					{
+						Console.WriteLine(Console.ReadLine());
+					}
+				}
+			}
+
+			if (readInputToEof)
+			{
+				string line;
+				while ((line = Console.ReadLine()) != null)
+				{
+					lines.Add(line);
+				}
+			}
 
             if (!String.IsNullOrEmpty(data))
                 Console.WriteLine(data);

@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\</SolutionDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="5.9.0" />
+    <PackageReference Include="NSubstitute" Version="4.2.1" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit.Console" Version="3.10.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.processmanager\Editor\SpoiledCat.Unity.ProcessManager.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.tasks\Editor\SpoiledCat.Unity.Tasks.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.threading\Editor\SpoiledCat.Unity.Threading.csproj" />
+    <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
+  </ItemGroup>
+</Project>

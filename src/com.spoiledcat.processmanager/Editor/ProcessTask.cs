@@ -317,7 +317,7 @@ namespace SpoiledCat.ProcessManager
 			string arguments = null,
 			IOutputProcessor<T> outputProcessor = null
 			)
-			 : this(taskManager, taskManager.Token, processEnvironment, executable, arguments, outputProcessor)
+			 : this(taskManager, taskManager?.Token ?? default, processEnvironment, executable, arguments, outputProcessor)
 		{}
 
 		/// <summary>
@@ -468,7 +468,7 @@ namespace SpoiledCat.ProcessManager
 			string arguments = null,
 			IOutputProcessor<T, List<T>> outputProcessor = null,
 			bool longRunning = false)
-			 : this(taskManager, taskManager.Token, processEnvironment, executable, arguments, outputProcessor, longRunning)
+			 : this(taskManager, taskManager?.Token ?? default, processEnvironment, executable, arguments, outputProcessor, longRunning)
 		{}
 
 		public ProcessTaskWithListOutput(
@@ -610,7 +610,7 @@ namespace SpoiledCat.ProcessManager
 			IProcessEnvironment processEnvironment,
 			string executable = null,
 			string arguments = null)
-			 : this(taskManager, taskManager.Token, processEnvironment, executable, arguments)
+			 : this(taskManager, taskManager?.Token ?? default, processEnvironment, executable, arguments)
 		{}
 
 		public ProcessTaskLongRunning(
@@ -691,73 +691,5 @@ namespace SpoiledCat.ProcessManager
 		public StreamWriter StandardInput => wrapper?.Input;
 		public virtual string ProcessName { get; protected set; }
 		public virtual string ProcessArguments { get; }
-	}
-
-
-	public class FirstNonNullLineProcessTask : ProcessTask<string>
-	{
-		public FirstNonNullLineProcessTask(
-			ITaskManager taskManager, IProcessManager processManager,
-			string executable, string arguments, NPath? workingDirectory = null
-		)
-			: base(taskManager, taskManager.Token, processManager.DefaultProcessEnvironment, executable, arguments, new FirstNonNullLineOutputProcessor<string>())
-		{
-			processManager.Configure(this, workingDirectory);
-		}
-	}
-
-	public class SimpleProcessTask : ProcessTask<string>
-	{
-		public SimpleProcessTask(
-			ITaskManager taskManager, IProcessManager processManager,
-			string executable, string arguments, NPath? workingDirectory = null,
-			IOutputProcessor<string> processor = null
-			)
-			 : base(taskManager, taskManager.Token,
-				 processManager.DefaultProcessEnvironment,
-				 executable, arguments,
-					processor ?? new SimpleOutputProcessor())
-		{
-			processManager.Configure(this, workingDirectory);
-		}
-	}
-
-	public class SimpleProcessTask<T> : ProcessTask<T>
-	{
-		public SimpleProcessTask(
-			ITaskManager taskManager, IProcessManager processManager,
-			string executable, string arguments,
-			Func<string, T> processor,
-			NPath? workingDirectory = null
-		)
-			 : base(taskManager, taskManager.Token,
-				processManager.DefaultProcessEnvironment,
-				executable, arguments,
-				new BaseOutputProcessor<T>((string line, out T result) => {
-					result = default(T);
-					if (line == null) return false;
-					result = processor(line);
-					return true;
-				})
-		)
-		{
-			processManager.Configure(this, workingDirectory);
-		}
-	}
-
-	public class SimpleListProcessTask : ProcessTaskWithListOutput<string>
-	{
-		public SimpleListProcessTask(
-			ITaskManager taskManager, IProcessManager processManager,
-			string executable, string arguments, NPath? workingDirectory = null,
-			IOutputProcessor<string, List<string>> processor = null
-		)
-			 : base(taskManager, taskManager.Token,
-				processManager.DefaultProcessEnvironment,
-				executable, arguments,
-				processor ?? new SimpleListOutputProcessor())
-		{
-			processManager.Configure(this, workingDirectory);
-		}
 	}
 }

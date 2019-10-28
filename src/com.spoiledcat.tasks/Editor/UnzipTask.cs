@@ -22,7 +22,7 @@ namespace SpoiledCat.Threading
         private Dictionary<string, TaskData> tasks = new Dictionary<string, TaskData>();
 
         public UnzipTask(ITaskManager taskManager, NPath archiveFilePath, NPath extractedPath)
-            : this(taskManager, taskManager.Token, archiveFilePath, extractedPath, null, NPath.FileSystem)
+            : this(taskManager, taskManager?.Token ?? default, archiveFilePath, extractedPath, null, NPath.FileSystem)
         {}
 
         public UnzipTask(ITaskManager taskManager, CancellationToken token, NPath archiveFilePath, NPath extractedPath,

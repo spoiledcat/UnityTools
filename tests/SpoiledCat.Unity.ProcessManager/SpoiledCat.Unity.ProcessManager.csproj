@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\</SolutionDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\com.spoiledcat.environment\Editor\SpoiledCat.Unity.Environment.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.threading\Editor\SpoiledCat.Unity.Threading.csproj" />
+  </ItemGroup>
+</Project>
