@@ -8,18 +8,12 @@ namespace SpoiledCat.Base.Tests
 	{
 		public static Task<T> StartAndSwallowException<T>(this ITask<T> task)
 		{
-			var tcs = new TaskCompletionSource<T>();
-			task.Then((success, result) => { tcs.SetResult(result); }, TaskAffinity.Concurrent);
-			task.Start();
-			return tcs.Task;
+			return task.StartAwait(handler => default(T));
 		}
 
 		public static Task StartAndSwallowException(this ITask task)
 		{
-			var tcs = new TaskCompletionSource<bool>();
-			task.Then(s => { tcs.SetResult(s); });
-			task.Start();
-			return tcs.Task;
+			return task.StartAwait(handler => { });
 		}
 	}
 

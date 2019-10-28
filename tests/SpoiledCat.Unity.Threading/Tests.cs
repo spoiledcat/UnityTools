@@ -749,28 +749,49 @@ namespace SpoiledCat.Threading.Tests
 	class DependencyTests : BaseTest
 	{
 		[Test]
-		public void RunningDifferentTasksDependingOnPreviousResult()
+		public void RunningDifferentTasksDependingOnSuccessOrFailure()
 		{
 			var callOrder = new List<string>();
 
-			var taskEnd = new ActionTask(TaskManager, () => callOrder.Add("chain completed")) { Name = "Chain Completed" };
-			var final = taskEnd.Finally((_, __) => {}, TaskAffinity.Exclusive);
-
-			var taskStart = new FuncTask<bool>(TaskManager, _ => {
+			ITask taskStart = new FuncTask<bool>(TaskManager, _ => {
 				callOrder.Add("chain start");
 				return false;
-			}) { Name = "Chain Start" }.Then(new ActionTask<bool>(TaskManager, (_, __) => {
-				callOrder.Add("failing");
-				throw new InvalidOperationException();
-			}) { Name = "Failing" });
+			}) { Name = "Chain Start" };
 
-			taskStart.Then(new ActionTask(TaskManager, () => { callOrder.Add("on failure"); }) { Name = "On Failure" },
-				runOptions: TaskRunOptions.OnFailure).Then(taskEnd, taskIsTopOfChain: true);
+			// this runs because we're forcing a failure up the chain
+			ITask taskOnFailure = new ActionTask(TaskManager, () => {
+				callOrder.Add("on failure");
+			}) { Name = "On Failure" };
 
-			taskStart.Then(new ActionTask(TaskManager, () => { callOrder.Add("on success"); }) { Name = "On Success" },
-				runOptions: TaskRunOptions.OnSuccess).Then(taskEnd, taskIsTopOfChain: true);
+			// if success - this never runs because we're forcing a failure before it
+			ITask taskOnSuccess = new ActionTask(TaskManager, () => {
+				callOrder.Add("on success");
+			}) { Name = "On Success" };
 
-			final.StartAndSwallowException().Wait();
+			// this will always run because we're adding it after explicit fail/success tasks
+			var taskEnd = new ActionTask(TaskManager, () => {
+				callOrder.Add("chain completed");
+			}) { Name = "Chain Completed" };
+
+			// start + forced failure
+			taskStart = taskStart
+				.Then(new ActionTask<bool>(TaskManager, (_, __) => {
+					callOrder.Add("failing");
+					throw new InvalidOperationException();
+				}) { Name = "Failing" });
+
+			// add the failure chain
+			taskStart
+				.Then(taskOnFailure, runOptions: TaskRunOptions.OnFailure)
+				.Then(taskEnd, taskIsTopOfChain: true);
+
+			// add the success chain
+			taskStart
+				.Then(taskOnSuccess, runOptions: TaskRunOptions.OnSuccess)
+				.Then(taskEnd, taskIsTopOfChain: true);
+
+			// taskEnd is added to both chains but only runs once
+			taskEnd.StartAndSwallowException().Wait();
 
 			Assert.AreEqual(new string[] { "chain start", "failing", "on failure", "chain completed" }.Join(","), callOrder.Join(","));
 		}
