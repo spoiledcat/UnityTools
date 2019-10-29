@@ -11,7 +11,7 @@ namespace SpoiledCat.Threading
 {
     static class TaskHelpers
     {
-        public static Task<T> GetCompletedTask<T>(T result)
+	    public static Task<T> GetCompletedTask<T>(T result)
         {
 #if NET35
             return TaskEx.FromResult(result);
@@ -20,12 +20,12 @@ namespace SpoiledCat.Threading
 #endif
         }
 
-        public static Task GetCompletedTask()
+	    public static Task GetCompletedTask()
         {
             return Task.CompletedTask;
         }
 
-        public static Task<T> ToTask<T>(this Exception exception)
+	    public static Task<T> ToTask<T>(this Exception exception)
         {
             TaskCompletionSource<T> completionSource = new TaskCompletionSource<T>();
             completionSource.TrySetException(exception);
@@ -36,13 +36,16 @@ namespace SpoiledCat.Threading
     [Serializable]
     public class NotReadyException : Exception
     {
-        public NotReadyException() : base()
+	    public NotReadyException() : base()
         { }
-        public NotReadyException(string message) : base(message)
+
+	    public NotReadyException(string message) : base(message)
         { }
-        public NotReadyException(string message, Exception innerException) : base(message, innerException)
+
+	    public NotReadyException(string message, Exception innerException) : base(message, innerException)
         { }
-        protected NotReadyException(SerializationInfo info, StreamingContext context) : base(info, context)
+
+	    protected NotReadyException(SerializationInfo info, StreamingContext context) : base(info, context)
         { }
     }
 }

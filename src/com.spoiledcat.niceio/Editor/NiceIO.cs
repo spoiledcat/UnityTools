@@ -1235,7 +1235,6 @@ namespace SpoiledCat.NiceIO
 					return candidate.CreateDirectory();
 			}
 		}
-
 	}
 
 #if NICEIO_INTERNAL
@@ -1325,13 +1324,16 @@ namespace SpoiledCat.NiceIO
 #endif
 		class FileSystem : IFileSystem
 	{
-		private string currentDirectory;
-		private string processDirectory;
-		private string localAppData;
+		private static Func<string, string> getCompleteRealPathFunc = null;
 		private string commonAppData;
-		private bool? isMac;
+		private string currentDirectory;
+
+		private string homeDirectory;
 		private bool? isLinux;
+		private bool? isMac;
 		private bool? isWindows;
+		private string localAppData;
+		private string processDirectory;
 
 		public FileSystem()
 		{}
@@ -1343,81 +1345,6 @@ namespace SpoiledCat.NiceIO
 		public FileSystem(string directory)
 		{
 			currentDirectory = directory;
-		}
-
-		public string CurrentDirectory
-		{
-			get => currentDirectory ?? Directory.GetCurrentDirectory();
-			set
-			{
-				if (!Path.IsPathRooted(value))
-					throw new ArgumentException("SetCurrentDirectory requires a rooted path", "directory");
-				currentDirectory = value;
-			}
-		}
-
-		public bool IsWindows
-		{
-			get
-			{
-				if (isWindows.HasValue)
-					return isWindows.Value;
-				return Environment.OSVersion.Platform != PlatformID.Unix && Environment.OSVersion.Platform != PlatformID.MacOSX;
-			}
-			set => isWindows = value;
-		}
-
-		public bool IsLinux
-		{
-			get
-			{
-				if (isLinux.HasValue)
-					return isLinux.Value;
-				return Environment.OSVersion.Platform == PlatformID.Unix && Directory.Exists("/proc");
-			}
-			set => isLinux = value;
-		}
-
-		public bool IsMac
-		{
-			get
-			{
-				if (isMac.HasValue)
-					return isMac.Value;
-				// most likely it'll return the proper id but just to be on the safe side, have a fallback
-				return Environment.OSVersion.Platform == PlatformID.MacOSX ||
-						(Environment.OSVersion.Platform == PlatformID.Unix && !Directory.Exists("/proc"));
-			}
-			set => isMac = value;
-		}
-
-		private string homeDirectory;
-		public string HomeDirectory
-		{
-			get
-			{
-				if (homeDirectory == null)
-				{
-					if (NPath.IsUnix)
-						homeDirectory = new NPath(Environment.GetEnvironmentVariable("HOME"));
-					else
-						homeDirectory = new NPath(Environment.GetEnvironmentVariable("USERPROFILE"));
-				}
-				return homeDirectory;
-			}
-			set => homeDirectory = value;
-		}
-
-		public string LocalAppData
-		{
-			get => localAppData ?? (localAppData = GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
-			set => localAppData = value;
-		}
-
-		public string CommonAppData
-		{
-			get => commonAppData ?? (localAppData = GetFolderPath(Environment.SpecialFolder.CommonApplicationData));
-			set => commonAppData = value;
 		}
 
 		public string GetFolderPath(Environment.SpecialFolder folder)
@@ -1449,8 +1376,6 @@ namespace SpoiledCat.NiceIO
 					return "";
 			}
 		}
-
-		public string TempPath => Path.GetTempPath();
 
 		public bool FileExists(string filename)
 		{
@@ -1528,41 +1453,6 @@ namespace SpoiledCat.NiceIO
 			if (!Path.IsPathRooted(path))
 				throw new ArgumentException("GetFiles requires a rooted path", "path");
 			return Directory.GetFiles(path, pattern);
-		}
-
-		private static Func<string, string> getCompleteRealPathFunc = null;
-		private static Func<string, string> GetCompleteRealPath
-		{
-			get
-			{
-				if (getCompleteRealPathFunc == null)
-				{
-					var asm = AppDomain.CurrentDomain.GetAssemblies()
-									.FirstOrDefault(x => x.FullName.StartsWith("Mono.Posix"));
-					if (asm != null)
-					{
-						var type = asm.GetType("Mono.Unity.UnixPath");
-						if (type != null)
-						{
-							var method = type.GetMethod("GetCompleteRealPath",
-								BindingFlags.Static | BindingFlags.Public);
-							if (method != null)
-							{
-								getCompleteRealPathFunc = (p) => {
-									var ret = method.Invoke(null, new object[] { p.ToString() });
-									if (ret != null)
-										return ret.ToString();
-									return p;
-								};
-							}
-						}
-					}
-
-					if (getCompleteRealPathFunc == null)
-						getCompleteRealPathFunc = p => p;
-				}
-				return getCompleteRealPathFunc;
-			}
 		}
 
 		public string Resolve(string path)
@@ -1743,6 +1633,116 @@ namespace SpoiledCat.NiceIO
 			if (!Path.IsPathRooted(path))
 				throw new ArgumentException("OpenWrite requires a rooted path", "path");
 			return new FileStream(path, mode);
+		}
+
+		public string CurrentDirectory
+		{
+			get => currentDirectory ?? Directory.GetCurrentDirectory();
+			set
+			{
+				if (!Path.IsPathRooted(value))
+					throw new ArgumentException("SetCurrentDirectory requires a rooted path", "directory");
+				currentDirectory = value;
+			}
+		}
+
+		public bool IsWindows
+		{
+			get
+			{
+				if (isWindows.HasValue)
+					return isWindows.Value;
+				return Environment.OSVersion.Platform != PlatformID.Unix && Environment.OSVersion.Platform != PlatformID.MacOSX;
+			}
+			set => isWindows = value;
+		}
+
+		public bool IsLinux
+		{
+			get
+			{
+				if (isLinux.HasValue)
+					return isLinux.Value;
+				return Environment.OSVersion.Platform == PlatformID.Unix && Directory.Exists("/proc");
+			}
+			set => isLinux = value;
+		}
+
+		public bool IsMac
+		{
+			get
+			{
+				if (isMac.HasValue)
+					return isMac.Value;
+				// most likely it'll return the proper id but just to be on the safe side, have a fallback
+				return Environment.OSVersion.Platform == PlatformID.MacOSX ||
+						(Environment.OSVersion.Platform == PlatformID.Unix && !Directory.Exists("/proc"));
+			}
+			set => isMac = value;
+		}
+
+		public string HomeDirectory
+		{
+			get
+			{
+				if (homeDirectory == null)
+				{
+					if (NPath.IsUnix)
+						homeDirectory = new NPath(Environment.GetEnvironmentVariable("HOME"));
+					else
+						homeDirectory = new NPath(Environment.GetEnvironmentVariable("USERPROFILE"));
+				}
+				return homeDirectory;
+			}
+			set => homeDirectory = value;
+		}
+
+		public string LocalAppData
+		{
+			get => localAppData ?? (localAppData = GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+			set => localAppData = value;
+		}
+
+		public string CommonAppData
+		{
+			get => commonAppData ?? (localAppData = GetFolderPath(Environment.SpecialFolder.CommonApplicationData));
+			set => commonAppData = value;
+		}
+
+		public string TempPath => Path.GetTempPath();
+
+		private static Func<string, string> GetCompleteRealPath
+		{
+			get
+			{
+				if (getCompleteRealPathFunc == null)
+				{
+					var asm = AppDomain.CurrentDomain.GetAssemblies()
+									.FirstOrDefault(x => x.FullName.StartsWith("Mono.Posix"));
+					if (asm != null)
+					{
+						var type = asm.GetType("Mono.Unity.UnixPath");
+						if (type != null)
+						{
+							var method = type.GetMethod("GetCompleteRealPath",
+								BindingFlags.Static | BindingFlags.Public);
+							if (method != null)
+							{
+								getCompleteRealPathFunc = (p) => {
+									var ret = method.Invoke(null, new object[] { p.ToString() });
+									if (ret != null)
+										return ret.ToString();
+									return p;
+								};
+							}
+						}
+					}
+
+					if (getCompleteRealPathFunc == null)
+						getCompleteRealPathFunc = p => p;
+				}
+				return getCompleteRealPathFunc;
+			}
 		}
 
 		public char DirectorySeparatorChar {

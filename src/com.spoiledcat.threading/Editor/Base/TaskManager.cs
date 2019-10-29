@@ -12,52 +12,43 @@ namespace SpoiledCat.Threading
 	using Logging;
     public interface ITaskManager : IDisposable
     {
-		TaskScheduler ConcurrentScheduler { get; }
-		TaskScheduler ExclusiveScheduler { get; }
-		TaskScheduler LongRunningScheduler { get; }
-		TaskScheduler UIScheduler { get; set; }
-		CancellationToken Token { get; }
+	    event Action<IProgress> OnProgress;
 
-		T Schedule<T>(T task) where T : ITask;
-		ITask Run(Action action, string message = null);
-		ITask RunInUI(Action action, string message = null);
-		event Action<IProgress> OnProgress;
+	    T Schedule<T>(T task) where T : ITask;
+	    ITask Run(Action action, string message = null);
+	    ITask RunInUI(Action action, string message = null);
 
-
-		/// <summary>
+	    /// <summary>
 		/// Call this from the main thread so task manager knows which thread is the main thread
 		/// It uses the current synchronization context to queue tasks to the main thread
 		/// </summary>
 		ITaskManager Initialize();
 
-		/// <summary>
-		/// Call this from the main thread so task manager knows which thread and
-		/// synchronization context should be used
-		/// </summary>
+	    /// <summary>
+		/// Call this from a thread different from the the main thread. This will call
+		/// synchronizationContext.Send() in order to set up the task manager on the
+		/// thread of the synchronizationContext.
+	    /// </summary>
 		ITaskManager Initialize(SynchronizationContext synchronizationContext);
 
-		/// <summary>
-		/// Call this from the main thread so task manager knows which thread it's in
-		/// </summary>
-		ITaskManager Initialize(TaskScheduler uiTaskScheduler);
-
-
-		TaskScheduler GetScheduler(TaskAffinity affinity);
+	    TaskScheduler GetScheduler(TaskAffinity affinity);
+	    TaskScheduler ConcurrentScheduler { get; }
+	    TaskScheduler ExclusiveScheduler { get; }
+	    TaskScheduler LongRunningScheduler { get; }
+	    TaskScheduler UIScheduler { get; set; }
+	    CancellationToken Token { get; }
+		bool InUIThread { get; }
+		int UIThread { get; }
     }
 
 	public class TaskManager : ITaskManager
 	{
 		private static readonly ILogging logger = LogHelper.GetLogger<TaskManager>();
-		private CancellationTokenSource cts;
 		private readonly ConcurrentExclusiveSchedulerPairCustom manager;
 
-		public TaskScheduler UIScheduler { get; set; }
-		public TaskScheduler ConcurrentScheduler => manager.ConcurrentScheduler;
-		public TaskScheduler ExclusiveScheduler => manager.ExclusiveScheduler;
-		public TaskScheduler LongRunningScheduler { get; private set; }
-		public CancellationToken Token => cts.Token;
-
 		private readonly ProgressReporter progressReporter = new ProgressReporter();
+		private CancellationTokenSource cts;
+		private ThreadingHelper threadingHelper;
 
 		public event Action<IProgress> OnProgress
 		{
@@ -69,24 +60,35 @@ namespace SpoiledCat.Threading
 		{
 			cts = new CancellationTokenSource();
 			manager = new ConcurrentExclusiveSchedulerPairCustom(cts.Token);
+			threadingHelper = new ThreadingHelper();
 		}
 
+		/// <summary>
+		/// Run this on the thread you would like to use as the main thread
+		/// </summary>
+		/// <returns></returns>
 		public ITaskManager Initialize()
 		{
 			return Initialize(ThreadingHelper.GetUIScheduler(SynchronizationContext.Current));
 		}
 
+		/// <summary>
+		/// Run this on a thread different from the main thread represented by the
+		/// synchronization context.
+		/// </summary>
+		/// <param name="synchronizationContext"></param>
+		/// <returns></returns>
 		public ITaskManager Initialize(SynchronizationContext synchronizationContext)
 		{
-			return Initialize(ThreadingHelper.GetUIScheduler(synchronizationContext));
+			synchronizationContext.Send(s => ((ITaskManager)s).Initialize(), this);
+			return this;
 		}
 
-		public ITaskManager Initialize(TaskScheduler uiTaskScheduler)
+		private ITaskManager Initialize(TaskScheduler uiTaskScheduler)
 		{
 			UIScheduler = uiTaskScheduler;
-			ThreadingHelper.SetUIThread();
-			ThreadingHelper.MainThreadScheduler = UIScheduler;
-			LongRunningScheduler = new TaskSchedulerExcludingThread(ThreadingHelper.MainThread);
+			threadingHelper.SetUIThread();
+			LongRunningScheduler = new TaskSchedulerExcludingThread(threadingHelper.MainThread);
 			return this;
 		}
 
@@ -139,7 +141,6 @@ namespace SpoiledCat.Threading
 			}
 		}
 
-
 		private T ScheduleUI<T>(T task, bool setupFaultHandler)
 			where T : ITask
 		{
@@ -148,7 +149,7 @@ namespace SpoiledCat.Threading
 				task.Task.ContinueWith(tt => {
 					Exception ex = tt.Exception.GetBaseException();
 					while (ex.InnerException != null) ex = ex.InnerException;
-					logger.Error(ex, String.Format("Exception on ui thread: {0} {1}", tt.Id, task.Name));
+					logger.Error(ex, $"Exception on ui thread: {tt.Id} {task.Name}");
 				},
 					cts.Token,
 					TaskContinuationOptions.OnlyOnFaulted, ConcurrentScheduler
@@ -165,7 +166,7 @@ namespace SpoiledCat.Threading
 				task.Task.ContinueWith(tt => {
 					Exception ex = tt.Exception.GetBaseException();
 					while (ex.InnerException != null) ex = ex.InnerException;
-					logger.Error(ex, String.Format("Exception on exclusive thread: {0} {1}", tt.Id, task.Name));
+					logger.Error(ex, $"Exception on exclusive thread: {tt.Id} {task.Name}");
 				},
 					cts.Token,
 					TaskContinuationOptions.OnlyOnFaulted, ConcurrentScheduler
@@ -184,7 +185,7 @@ namespace SpoiledCat.Threading
 				task.Task.ContinueWith(tt => {
 					Exception ex = tt.Exception.GetBaseException();
 					while (ex.InnerException != null) ex = ex.InnerException;
-					logger.Error(ex, String.Format("Exception on concurrent thread: {0} {1}", tt.Id, task.Name));
+					logger.Error(ex, $"Exception on concurrent thread: {tt.Id} {task.Name}");
 				},
 					cts.Token,
 					TaskContinuationOptions.OnlyOnFaulted, ConcurrentScheduler
@@ -203,7 +204,7 @@ namespace SpoiledCat.Threading
 				task.Task.ContinueWith(tt => {
 					Exception ex = tt.Exception.GetBaseException();
 					while (ex.InnerException != null) ex = ex.InnerException;
-					logger.Error(ex, String.Format("Exception on long running thread: {0} {1}", tt.Id, task.Name));
+					logger.Error(ex, $"Exception on long running thread: {tt.Id} {task.Name}");
 				},
 					cts.Token,
 					TaskContinuationOptions.OnlyOnFaulted, LongRunningScheduler
@@ -223,6 +224,7 @@ namespace SpoiledCat.Threading
 		}
 
 		private bool disposed = false;
+
 		private void Dispose(bool disposing)
 		{
 			if (disposed) return;
@@ -237,5 +239,13 @@ namespace SpoiledCat.Threading
 		{
 			Dispose(true);
 		}
+
+		public TaskScheduler UIScheduler { get; set; }
+		public TaskScheduler ConcurrentScheduler => manager.ConcurrentScheduler;
+		public TaskScheduler ExclusiveScheduler => manager.ExclusiveScheduler;
+		public TaskScheduler LongRunningScheduler { get; private set; }
+		public CancellationToken Token => cts.Token;
+		public bool InUIThread => threadingHelper.InUIThread;
+		public int UIThread => threadingHelper.MainThread;
 	}
 }

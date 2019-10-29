@@ -10,7 +10,6 @@ using System.Text;
 namespace SpoiledCat.Threading
 {
 	using Logging;
-	using NiceIO;
 
 	public interface IOutputProcessor
 	{
@@ -19,8 +18,8 @@ namespace SpoiledCat.Threading
 
 	public interface IOutputProcessor<T> : IOutputProcessor
 	{
-		T Result { get; }
 		event Action<T> OnEntry;
+		T Result { get; }
 	}
 
 	public interface IOutputProcessor<TData, T> : IOutputProcessor<T>
@@ -30,11 +29,13 @@ namespace SpoiledCat.Threading
 
 	public class BaseOutputProcessor<T> : IOutputProcessor<T>
 	{
-		public event Action<T> OnEntry;
 		public delegate T3 FuncO<in T1, T2, out T3>(T1 arg1, out T2 out1);
 
 		private readonly FuncO<string, T, bool> handler;
 		private readonly Func<string, T> simpleHandler;
+
+		private ILogging logger;
+		public event Action<T> OnEntry;
 
 		public BaseOutputProcessor(FuncO<string, T, bool> handler = null)
 		{
@@ -62,14 +63,14 @@ namespace SpoiledCat.Threading
 		}
 
 		public virtual void LineReceived(string line) {}
+
 		protected void RaiseOnEntry(T entry)
 		{
 			Result = entry;
 			OnEntry?.Invoke(entry);
 		}
-		public virtual T Result { get; protected set; }
 
-		private ILogging logger;
+		public virtual T Result { get; protected set; }
 		protected ILogging Logger { get { return logger = logger ?? LogHelper.GetLogger(GetType()); } }
 	}
 
@@ -107,12 +108,14 @@ namespace SpoiledCat.Threading
 				return;
 			RaiseOnEntry(line);
 		}
+
 		public override string Result => string.Empty;
 	}
 
 	public class SimpleOutputProcessor : BaseOutputProcessor<string>
 	{
 		private readonly StringBuilder sb = new StringBuilder();
+
 		public override void LineReceived(string line)
 		{
 			if (line == null)
@@ -120,6 +123,7 @@ namespace SpoiledCat.Threading
 			sb.AppendLine(line);
 			RaiseOnEntry(line);
 		}
+
 		public override string Result { get { return sb.ToString(); } }
 	}
 

@@ -15,27 +15,20 @@ namespace SpoiledCat.Threading
 
 	public interface ITaskScheduler
 	{
-		IEnumerable<Task> Tasks { get; }
 		void ExecuteTask(Task task);
+		IEnumerable<Task> Tasks { get; }
 	}
 
 	public class TaskSchedulerExcludingThread : TaskScheduler, ITaskScheduler
 	{
-		struct TaskData
-		{
-			public TaskSchedulerExcludingThread Scheduler;
-			public Task Task;
-		}
-
 		public TaskSchedulerExcludingThread(int threadToExclude)
 		{
 			ThreadToExclude = threadToExclude;
 		}
 
-		private static void LongRunningThreadWork(object obj)
+		public void ExecuteTask(Task task)
 		{
-			var taskData = (TaskData)obj;
-			taskData.Scheduler.TryExecuteTask(taskData.Task);
+			TryExecuteTask(task);
 		}
 
 		protected override void QueueTask(Task task)
@@ -77,14 +70,21 @@ namespace SpoiledCat.Threading
 		{
 		}
 
-		public void ExecuteTask(Task task)
+		private static void LongRunningThreadWork(object obj)
 		{
-			TryExecuteTask(task);
+			var taskData = (TaskData)obj;
+			taskData.Scheduler.TryExecuteTask(taskData.Task);
 		}
 
 		public int ThreadToExclude { get; set; }
 
 		public IEnumerable<Task> Tasks { get; } = new Queue<Task>();
+
+		struct TaskData
+		{
+			public TaskSchedulerExcludingThread Scheduler;
+			public Task Task;
+		}
 	}
 
 
@@ -93,9 +93,6 @@ namespace SpoiledCat.Threading
 	[DebuggerTypeProxy(typeof(ConcurrentExclusiveInterleaveDebugView))]
 	public sealed class ConcurrentExclusiveInterleave
 	{
-		private readonly CancellationToken token;
-		/// <summary>Synchronizes all activity in this type and its generated schedulers.</summary>
-		private readonly object internalLock;
 		/// <summary>The scheduler used to queue and execute "reader" tasks that may run concurrently with other readers.</summary>
 		private readonly ITaskScheduler concurrentTaskScheduler;
 		/// <summary>Whether the exclusive processing of a task should include all of its children as well.</summary>
@@ -103,6 +100,9 @@ namespace SpoiledCat.Threading
 		/// <summary>The scheduler used to queue and execute "writer" tasks that must run exclusively while no other tasks for this interleave are running.</summary>
 		private readonly ConcurrentExclusiveTaskScheduler exclusiveTaskScheduler;
 		private readonly TaskSchedulerExcludingThread interleaveTaskScheduler;
+		/// <summary>Synchronizes all activity in this type and its generated schedulers.</summary>
+		private readonly object internalLock;
+		private readonly CancellationToken token;
 		/// <summary>The parallel options used by the asynchronous task and parallel loops.</summary>
 		private ParallelOptions parallelOptions;
 		/// <summary>Whether this interleave has queued its processing task.</summary>
@@ -360,6 +360,25 @@ namespace SpoiledCat.Threading
 				this.maximumConcurrencyLevel = maximumConcurrencyLevel;
 			}
 
+			/// <summary>Executes a task on this scheduler.</summary>
+			/// <param name="task">The task to be executed.</param>
+			public void ExecuteTask(Task task)
+			{
+				var isProcessingTaskOnCurrentThread = this.processingTaskOnCurrentThread.Value;
+				if (!isProcessingTaskOnCurrentThread) this.processingTaskOnCurrentThread.Value = true;
+				//try
+				//{
+				TryExecuteTask(task);
+				//}
+				//catch(Exception ex)
+				//{
+				//    LogHelper.Error(ex);
+				//    throw;
+				//}
+
+				if (!isProcessingTaskOnCurrentThread) this.processingTaskOnCurrentThread.Value = false;
+			}
+
 			/// <summary>Queues a task to the scheduler.</summary>
 			/// <param name="task">The task to be queued.</param>
 			protected override void QueueTask(Task task)
@@ -387,26 +406,6 @@ namespace SpoiledCat.Threading
 				return false;
 			}
 
-			/// <summary>Executes a task on this scheduler.</summary>
-			/// <param name="task">The task to be executed.</param>
-			public void ExecuteTask(Task task)
-			{
-				var isProcessingTaskOnCurrentThread = this.processingTaskOnCurrentThread.Value;
-				if (!isProcessingTaskOnCurrentThread) this.processingTaskOnCurrentThread.Value = true;
-				//try
-				//{
-				TryExecuteTask(task);
-				//}
-				//catch(Exception ex)
-				//{
-				//    LogHelper.Error(ex);
-				//    throw;
-				//}
-
-				if (!isProcessingTaskOnCurrentThread) this.processingTaskOnCurrentThread.Value = false;
-			}
-
-
 			/// <summary>Gets for debugging purposes the tasks scheduled to this scheduler.</summary>
 			/// <returns>An enumerable of the tasks queued.</returns>
 			protected override IEnumerable<Task> GetScheduledTasks() => Tasks;
@@ -422,10 +421,14 @@ namespace SpoiledCat.Threading
 	/// <summary>Provides a task scheduler that dedicates a thread per task.</summary>
 	public class ThreadPerTaskScheduler : TaskScheduler, ITaskScheduler
 	{
+		public void ExecuteTask(Task task)
+		{
+			TryExecuteTask(task);
+		}
+
 		/// <summary>Gets the tasks currently scheduled to this scheduler.</summary>
 		/// <remarks>This will always return an empty enumerable, as tasks are launched as soon as they're queued.</remarks>
 		protected override IEnumerable<Task> GetScheduledTasks() => Tasks;
-		public IEnumerable<Task> Tasks { get; } = new Queue<Task>();
 
 		/// <summary>Starts a new thread to process the provided task.</summary>
 		/// <param name="task">The task to be executed.</param>
@@ -443,9 +446,6 @@ namespace SpoiledCat.Threading
 			return TryExecuteTask(task);
 		}
 
-		public void ExecuteTask(Task task)
-		{
-			TryExecuteTask(task);
-		}
+		public IEnumerable<Task> Tasks { get; } = new Queue<Task>();
 	}
 }

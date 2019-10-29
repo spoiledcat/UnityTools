@@ -51,22 +51,18 @@ namespace SpoiledCat.ProcessManager
 
 	class ProcessWrapper
 	{
-		private readonly string taskName;
-		private readonly IOutputProcessor outputProcessor;
+		private readonly List<string> errors = new List<string>();
+		private readonly bool longRunning;
 		private readonly RaiseAndDiscardOutputProcessor longRunningOutputProcessor;
-		private readonly Action onStart;
 		private readonly Action onEnd;
 		private readonly Action<Exception, string> onError;
-		private readonly CancellationToken token;
-		private readonly bool longRunning;
-		private readonly List<string> errors = new List<string>();
+		private readonly Action onStart;
+		private readonly IOutputProcessor outputProcessor;
 		private readonly ManualResetEventSlim stopEvent = new ManualResetEventSlim(false);
-
-		public Process Process { get; }
-		public StreamWriter Input { get; private set; }
+		private readonly string taskName;
+		private readonly CancellationToken token;
 
 		private ILogging logger;
-		protected ILogging Logger { get { return logger = logger ?? LogHelper.GetLogger(GetType()); } }
 
 		public ProcessWrapper(string taskName, Process process, IOutputProcessor outputProcessor,
 			 Action onStart, Action onEnd, Action<Exception, string> onError,
@@ -283,6 +279,10 @@ namespace SpoiledCat.ProcessManager
 			}
 			return waitSucceeded;
 		}
+
+		public Process Process { get; }
+		public StreamWriter Input { get; private set; }
+		protected ILogging Logger { get { return logger = logger ?? LogHelper.GetLogger(GetType()); } }
 	}
 
 	/// <summary>
@@ -293,13 +293,13 @@ namespace SpoiledCat.ProcessManager
 	public class ProcessTask<T> : TaskBase<T>, IProcessTask<T>
 	{
 		private IOutputProcessor<T> outputProcessor;
+
+		private Exception thrownException = null;
 		private ProcessWrapper wrapper;
+		public event Action<IProcess> OnEndProcess;
 
 		public event Action<string> OnErrorData;
 		public event Action<IProcess> OnStartProcess;
-		public event Action<IProcess> OnEndProcess;
-
-		private Exception thrownException = null;
 
 		protected ProcessTask() {}
 
@@ -384,6 +384,11 @@ namespace SpoiledCat.ProcessManager
 			wrapper?.Stop();
 		}
 
+		public override string ToString()
+		{
+			return $"{Task?.Id ?? -1} {Name} {GetType()} {ProcessName} {ProcessArguments}";
+		}
+
 		protected override void RaiseOnEnd()
 		{
 			base.RaiseOnEnd();
@@ -434,11 +439,6 @@ namespace SpoiledCat.ProcessManager
 			return result;
 		}
 
-		public override string ToString()
-		{
-			return $"{Task?.Id ?? -1} {Name} {GetType()} {ProcessName} {ProcessArguments}";
-		}
-
 		public IProcessEnvironment ProcessEnvironment { get; private set; }
 		public Process Process { get; set; }
 		public int ProcessId => Process.Id;
@@ -450,14 +450,14 @@ namespace SpoiledCat.ProcessManager
 
 	public class ProcessTaskWithListOutput<T> : DataTaskBase<T, List<T>>, IProcessTask<T, List<T>>
 	{
-		private IOutputProcessor<T, List<T>> outputProcessor;
 		private readonly bool longRunning;
+		private IOutputProcessor<T, List<T>> outputProcessor;
 		private Exception thrownException = null;
 		private ProcessWrapper wrapper;
+		public event Action<IProcess> OnEndProcess;
 
 		public event Action<string> OnErrorData;
 		public event Action<IProcess> OnStartProcess;
-		public event Action<IProcess> OnEndProcess;
 
 		protected ProcessTaskWithListOutput() {}
 
@@ -526,6 +526,11 @@ namespace SpoiledCat.ProcessManager
 			wrapper?.Stop();
 		}
 
+		public override string ToString()
+		{
+			return $"{Task?.Id ?? -1} {Name} {GetType()} {ProcessName} {ProcessArguments}";
+		}
+
 		protected override void RaiseOnEnd()
 		{
 			base.RaiseOnEnd();
@@ -579,11 +584,6 @@ namespace SpoiledCat.ProcessManager
 			return result;
 		}
 
-		public override string ToString()
-		{
-			return $"{Task?.Id ?? -1} {Name} {GetType()} {ProcessName} {ProcessArguments}";
-		}
-
 		public IProcessEnvironment ProcessEnvironment { get; private set; }
 		public Process Process { get; set; }
 		public int ProcessId => Process.Id;
@@ -598,10 +598,10 @@ namespace SpoiledCat.ProcessManager
 	{
 		private Exception thrownException = null;
 		private ProcessWrapper wrapper;
+		public event Action<IProcess> OnEndProcess;
 
 		public event Action<string> OnErrorData;
 		public event Action<IProcess> OnStartProcess;
-		public event Action<IProcess> OnEndProcess;
 
 		protected ProcessTaskLongRunning() {}
 
@@ -644,6 +644,11 @@ namespace SpoiledCat.ProcessManager
 			wrapper?.Stop();
 		}
 
+		public override string ToString()
+		{
+			return $"{Task?.Id ?? -1} {Name} {GetType()} {ProcessName} {ProcessArguments}";
+		}
+
 		protected override void RaiseOnEnd()
 		{
 			base.RaiseOnEnd();
@@ -677,11 +682,6 @@ namespace SpoiledCat.ProcessManager
 				 },
 				 token: Token);
 			wrapper.Run();
-		}
-
-		public override string ToString()
-		{
-			return $"{Task?.Id ?? -1} {Name} {GetType()} {ProcessName} {ProcessArguments}";
 		}
 
 		public IProcessEnvironment ProcessEnvironment { get; private set; }

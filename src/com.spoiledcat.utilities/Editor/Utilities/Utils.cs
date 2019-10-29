@@ -100,6 +100,5 @@ namespace SpoiledCat.Utilities
 				actual = file.ToSha256();
 			return hash.Equals(actual, StringComparison.InvariantCultureIgnoreCase);
 		}
-
 	}
 }

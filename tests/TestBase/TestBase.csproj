@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.12.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
     <ProjectReference Include="..\..\src\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj" />
     <ProjectReference Include="..\..\src\com.spoiledcat.processmanager\Editor\SpoiledCat.Unity.ProcessManager.csproj" />

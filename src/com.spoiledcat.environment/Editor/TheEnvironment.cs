@@ -22,8 +22,6 @@ namespace SpoiledCat.Unity
 		[SerializeField] private string unityAssetsPath;
 		[SerializeField] private string unityVersion;
 
-		public static string ApplicationName { get; set; }
-
 		public void Flush()
 		{
 #if UNITY_EDITOR
@@ -35,6 +33,22 @@ namespace SpoiledCat.Unity
 			extensionInstallPath = Environment.ExtensionInstallPath;
 			Save(true);
 		}
+
+		private NPath DetermineInstallationPath()
+		{
+#if UNITY_EDITOR
+			// Juggling to find out where we got installed
+			var shim = CreateInstance<RunLocationShim>();
+			var script = MonoScript.FromScriptableObject(shim);
+			var scriptPath = Application.dataPath.ToNPath().Parent.Combine(AssetDatabase.GetAssetPath(script).ToNPath());
+			DestroyImmediate(shim);
+			return scriptPath.Parent;
+#else
+			return Application.dataPath.ToNPath();
+#endif
+		}
+
+		public static string ApplicationName { get; set; }
 
 		public IEnvironment Environment
 		{
@@ -67,20 +81,6 @@ namespace SpoiledCat.Unity
 				}
 				return environment;
 			}
-		}
-
-		private NPath DetermineInstallationPath()
-		{
-#if UNITY_EDITOR
-			// Juggling to find out where we got installed
-			var shim = CreateInstance<RunLocationShim>();
-			var script = MonoScript.FromScriptableObject(shim);
-			var scriptPath = Application.dataPath.ToNPath().Parent.Combine(AssetDatabase.GetAssetPath(script).ToNPath());
-			DestroyImmediate(shim);
-			return scriptPath.Parent;
-#else
-			return Application.dataPath.ToNPath();
-#endif
 		}
 	}
 }

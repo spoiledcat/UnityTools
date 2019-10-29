@@ -15,7 +15,9 @@ namespace SpoiledCat.Threading
 {
     public static class ExceptionExtensions
     {
-        /// <summary>
+	    private static Action<Exception> saveStackTraceForThrowing;
+
+	    /// <summary>
         /// Represents exceptions we should never attempt to catch and ignore.
         /// </summary>
         /// <param name="exception">The exception being thrown.</param>
@@ -36,7 +38,7 @@ namespace SpoiledCat.Threading
                 || exception is ArgumentException;
         }
 
-        /// <summary>
+	    /// <summary>
         /// Represents exceptions we should never attempt to catch and ignore when executing third party plugin code.
         /// This is not as extensive as a proposed IsCriticalException method that I want to write for our own code.
         /// </summary>
@@ -55,13 +57,13 @@ namespace SpoiledCat.Threading
                 || exception is AccessViolationException;
         }
 
-        public static bool CanRetry(this Exception exception)
+	    public static bool CanRetry(this Exception exception)
         {
             return !exception.IsCriticalException()
                 && !(exception is ObjectDisposedException);
         }
 
-        public static void Rethrow(this Exception exception)
+	    public static void Rethrow(this Exception exception)
         {
 #if NET35
             SaveStackTraceForThrowing(exception);
@@ -71,8 +73,7 @@ namespace SpoiledCat.Threading
 #endif
         }
 
-        private static Action<Exception> saveStackTraceForThrowing;
-        private static Action<Exception> SaveStackTraceForThrowing {
+	    private static Action<Exception> SaveStackTraceForThrowing {
             get {
                 if (saveStackTraceForThrowing == null)
                 {

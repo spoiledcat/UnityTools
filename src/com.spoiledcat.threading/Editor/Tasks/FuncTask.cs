@@ -9,18 +9,14 @@ using System.Collections.Generic;
 namespace SpoiledCat.Threading
 {
     public partial class FuncTask<T> : TaskBase<T>
-    {
-    }
+    {}
 
     public partial class FuncTask<T, TResult> : TaskBase<T, TResult>
-    {
-    }
+    {}
 
     public partial class FuncListTask<T> : DataTaskBase<T, List<T>>
-    {
-    }
+    {}
 
     public partial class FuncListTask<T, TData, TResult> : DataTaskBase<T, TData, List<TResult>>
-    {
-    }
+    {}
 }

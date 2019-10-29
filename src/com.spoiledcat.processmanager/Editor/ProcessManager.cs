@@ -21,7 +21,6 @@ namespace SpoiledCat.ProcessManager
 
 		private readonly IEnvironment environment;
 		private readonly HashSet<IProcess> processes = new HashSet<IProcess>();
-		public static IProcessManager Instance { get; private set; }
 
 		public ProcessManager(IEnvironment environment,
 			CancellationToken cancellationToken)
@@ -30,6 +29,16 @@ namespace SpoiledCat.ProcessManager
 			this.environment = environment;
 			DefaultProcessEnvironment = new ProcessEnvironment(environment);
 			CancellationToken = cancellationToken;
+		}
+
+		public static NPath FindExecutableInPath(string executable, bool recurse = false, params NPath[] searchPaths)
+		{
+			Guard.ArgumentNotNullOrWhiteSpace(executable, "executable");
+
+			return searchPaths
+				 .Where(x => x.IsInitialized && !x.IsRelative && x.DirectoryExists())
+				 .SelectMany(x => x.Files(executable, recurse))
+				 .FirstOrDefault();
 		}
 
 		public T Configure<T>(T processTask,
@@ -120,15 +129,7 @@ namespace SpoiledCat.ProcessManager
 				p.Stop();
 		}
 
-		public static NPath FindExecutableInPath(string executable, bool recurse = false, params NPath[] searchPaths)
-		{
-			Guard.ArgumentNotNullOrWhiteSpace(executable, "executable");
-
-			return searchPaths
-				 .Where(x => x.IsInitialized && !x.IsRelative && x.DirectoryExists())
-				 .SelectMany(x => x.Files(executable, recurse))
-				 .FirstOrDefault();
-		}
+		public static IProcessManager Instance { get; private set; }
 
 		public CancellationToken CancellationToken { get; }
 

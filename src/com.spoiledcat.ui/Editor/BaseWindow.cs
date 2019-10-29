@@ -15,24 +15,32 @@ namespace SpoiledCat.UI
 
 	class ApplicationState : ScriptableSingleton<ApplicationState>
     {
-        [SerializeField] private bool firstRun = true;
-        [SerializeField] public string firstRunAtString;
+	    [NonSerialized] public DateTimeOffset? firstRunAtValue;
+	    [NonSerialized] private bool? firstRunValue;
 
-		[NonSerialized] private bool initialized = false;
-        [NonSerialized] private Guid? instanceId;
-        [NonSerialized] private bool? firstRunValue;
-        [NonSerialized] public DateTimeOffset? firstRunAtValue;
+	    [NonSerialized] private bool initialized = false;
+	    [NonSerialized] private Guid? instanceId;
+	    [SerializeField] private bool firstRun = true;
+	    [SerializeField] public string firstRunAtString;
 
-        public static ApplicationState Instance => instance;
+	    private void EnsureFirstRun()
+        {
+            if (!firstRunValue.HasValue)
+            {
+                firstRunValue = firstRun;
+            }
+        }
 
-        public bool FirstRun {
+	    public static ApplicationState Instance => instance;
+
+	    public bool FirstRun {
             get {
                 EnsureFirstRun();
                 return firstRunValue.Value;
             }
         }
 
-        public DateTimeOffset FirstRunAt {
+	    public DateTimeOffset FirstRunAt {
             get {
                 EnsureFirstRun();
 
@@ -56,15 +64,7 @@ namespace SpoiledCat.UI
             }
         }
 
-        private void EnsureFirstRun()
-        {
-            if (!firstRunValue.HasValue)
-            {
-                firstRunValue = firstRun;
-            }
-        }
-
-        public bool Initialized {
+	    public bool Initialized {
             get { return initialized; }
             set {
                 initialized = value;
@@ -80,9 +80,79 @@ namespace SpoiledCat.UI
 
 	public abstract class BaseWindow : EditorWindow
     {
-        [NonSerialized] private bool firstRepaint = true;
+	    [NonSerialized] private bool firstRepaint = true;
 
-        void InitializeWindow(bool requiresRedraw = true)
+	    protected BaseWindow()
+        {
+        }
+
+	    public static T GetWindowDontShow<T>() where T : EditorWindow
+        {
+            UnityEngine.Object[] windows = Resources.FindObjectsOfTypeAll(typeof(T));
+            return (windows.Length > 0) ? (T)windows[0] : ScriptableObject.CreateInstance<T>();
+        }
+
+	    public virtual void Initialize(bool firstRun)
+        {
+        }
+
+	    public virtual void Redraw()
+        {
+            Repaint();
+        }
+
+	    public virtual void Refresh()
+        {
+            NeedsRefresh = true;
+        }
+
+	    public virtual void Finish(bool result)
+        {
+        }
+
+	    public virtual void Awake()
+        {
+            InitializeWindow(false);
+        }
+
+	    public virtual void OnEnable()
+        {
+            InitializeWindow(false);
+        }
+
+	    public virtual void OnDisable()
+        {
+        }
+
+	    public virtual void Update()
+        {
+        }
+
+	    public virtual void OnFirstRepaint()
+        {
+
+        }
+
+	    public virtual void OnDataUpdate()
+        {
+        }
+
+	    // OnGUI calls this everytime, so override it to render as you would OnGUI
+	    public virtual void OnUI() { }
+
+	    public virtual void OnFocusChanged()
+        {
+        }
+
+	    public virtual void OnDestroy()
+        {
+        }
+
+	    public virtual void OnSelectionChange()
+        {
+        }
+
+	    void InitializeWindow(bool requiresRedraw = true)
         {
             if (!ApplicationState.Instance.Initialized)
             {
@@ -93,11 +163,7 @@ namespace SpoiledCat.UI
             }
         }
 
-        protected BaseWindow()
-        {
-        }
-
-		private void InternalInitialize()
+	    private void InternalInitialize()
 		{
 			Initialize(ApplicationState.Instance.FirstRun);
 			if (TaskManager == null)
@@ -107,56 +173,8 @@ namespace SpoiledCat.UI
 			}
 		}
 
-        public virtual void Initialize(bool firstRun)
-        {
-        }
-
-        public virtual void Redraw()
-        {
-            Repaint();
-        }
-
-        public virtual void Refresh()
-        {
-            NeedsRefresh = true;
-        }
-
-        public virtual void Finish(bool result)
-        {
-        }
-
-        public virtual void Awake()
-        {
-            InitializeWindow(false);
-        }
-
-        public virtual void OnEnable()
-        {
-            InitializeWindow(false);
-        }
-
-        public virtual void OnDisable()
-        {
-        }
-
-        public virtual void Update()
-        {
-        }
-
-        public virtual void OnFirstRepaint()
-        {
-
-        }
-
-        public virtual void OnDataUpdate()
-        {
-        }
-
-        // OnGUI calls this everytime, so override it to render as you would OnGUI
-        public virtual void OnUI() { }
-
-        // This is Unity's magic method
-        private void OnGUI()
+	    // This is Unity's magic method
+	    private void OnGUI()
         {
             if (Event.current.type == EventType.Layout)
             {
@@ -178,44 +196,26 @@ namespace SpoiledCat.UI
             }
         }
 
-        private void OnFocus()
+	    private void OnFocus()
         {
             HasFocus = true;
             OnFocusChanged();
         }
 
-        private void OnLostFocus()
+	    private void OnLostFocus()
         {
             HasFocus = false;
             OnFocusChanged();
         }
 
-        public virtual void OnFocusChanged()
-        {
-        }
+	    public Rect Position => position;
+	    public bool IsBusy { get; set; }
+	    public bool HasFocus { get; private set; }
+	    protected bool InLayout { get; private set; }
+	    protected bool InRepaint => Event.current.type == EventType.Repaint;
 
-        public virtual void OnDestroy()
-        {
-        }
+	    public bool NeedsRefresh { get; set; }
 
-        public virtual void OnSelectionChange()
-        {
-        }
-
-        public static T GetWindowDontShow<T>() where T : EditorWindow
-        {
-            UnityEngine.Object[] windows = Resources.FindObjectsOfTypeAll(typeof(T));
-            return (windows.Length > 0) ? (T)windows[0] : ScriptableObject.CreateInstance<T>();
-        }
-
-        public Rect Position => position;
-        public bool IsBusy { get; set; }
-        public bool HasFocus { get; private set; }
-        protected bool InLayout { get; private set; }
-        protected bool InRepaint => Event.current.type == EventType.Repaint;
-
-        public bool NeedsRefresh { get; set; }
-
-		public ITaskManager TaskManager { get; set; }
+	    public ITaskManager TaskManager { get; set; }
     }
 }

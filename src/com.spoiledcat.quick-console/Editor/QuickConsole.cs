@@ -24,69 +24,46 @@ namespace SpoiledCat
 
 	public static class PrefabUtilityShim
     {
-        private static MethodInfo PrefabUtility_CreateVariant_method { get; } =
-            typeof(PrefabUtility).GetMethod("CreateVariant", BindingFlags.NonPublic | BindingFlags.Static);
-
-        public static GameObject CreateVariant(GameObject assetRoot, string path) =>
+	    public static GameObject CreateVariant(GameObject assetRoot, string path) =>
             PrefabUtility_CreateVariant_method.Invoke(null, new object[] { assetRoot, path }) as GameObject;
+
+	    private static MethodInfo PrefabUtility_CreateVariant_method { get; } =
+            typeof(PrefabUtility).GetMethod("CreateVariant", BindingFlags.NonPublic | BindingFlags.Static);
     }
 
 
     public static class JsonHelper
     {
-        public static T From<T>(string json)
+	    public static T From<T>(string json)
         {
             return SimpleJson.DeserializeObject<T>(json);
         }
 
-        public static string To<T>(T obj)
+	    public static string To<T>(T obj)
         {
             return SimpleJson.SerializeObject(obj);
         }
-     }
+    }
 
     public class QuickConsole : BaseWindow
     {
-        [SerializeField] private string cmd;
-        [SerializeField] private string output;
-        [SerializeField] private List<UnityReference> context;
-        [SerializeField] private bool expandReferences;
-        [SerializeField] private bool expandOutput;
-        [SerializeField] private Vector2 sourceScrollPos;
-        [SerializeField] private Vector2 outputScrollPos;
+	    private static GUIStyle buttonStyle;
 
-        [NonSerialized] private string selectedSource;
-        [NonSerialized] private Compiler compiler;
-        [NonSerialized] private TaskScheduler scheduler;
-        [NonSerialized] private Rect sourceDropdownRect;
+	    private static Action EndEditingActiveTextField;
+	    [NonSerialized] private Compiler compiler;
+	    [NonSerialized] private TaskScheduler scheduler;
 
-        private static GUIStyle buttonStyle;
+	    [NonSerialized] private string selectedSource;
+	    [NonSerialized] private Rect sourceDropdownRect;
+	    [SerializeField] private string cmd;
+	    [SerializeField] private List<UnityReference> context;
+	    [SerializeField] private bool expandOutput;
+	    [SerializeField] private bool expandReferences;
+	    [SerializeField] private string output;
+	    [SerializeField] private Vector2 outputScrollPos;
+	    [SerializeField] private Vector2 sourceScrollPos;
 
-        private static Action EndEditingActiveTextField;
-
-        private MethodInfo EndEditingActiveTextField_method { get; } =
-            typeof(EditorGUI).GetMethod("EndEditingActiveTextField", BindingFlags.NonPublic | BindingFlags.Static);
-
-
-        public static GUIStyle ButtonStyle {
-            get {
-//                if (buttonStyle != null) return buttonStyle;
-                return buttonStyle = new GUIStyle(GUI.skin.button)
-                {
-                    //name = "SpoiledCat_ButtonStyle",
-                    richText = true,
-                    wordWrap = true
-                };
-                //var json = SimpleJson.SerializeObject(GUI.skin.button);
-                //buttonStyle = SimpleJson.DeserializeObject<GUIStyle>(json);
-                //buttonStyle.name = "SpoiledCat_ButtonStyle";
-                //buttonStyle.richText = true;
-                //buttonStyle.wordWrap = true;
-                //return buttonStyle;
-            }
-        }
-
-        [MenuItem("Debug/Stuff")]
+	    [MenuItem("Debug/Stuff")]
         public static void Stuff()
         {
             //GameObject.Find("GameObject").transform.Cast<Transform>().ForEach(x => Debug.Log(x.gameObject));
@@ -130,7 +107,7 @@ namespace SpoiledCat
             GetWindow<QuickConsole>().Show();
         }
 
-		public override void Initialize(bool firstRun)
+        public override void Initialize(bool firstRun)
 		{
 			EndEditingActiveTextField = () => EndEditingActiveTextField_method.Invoke(null, null);
 			compiler = new Compiler();
@@ -138,7 +115,7 @@ namespace SpoiledCat
 			if (context == null) context = new List<UnityReference>();
 		}
 
-		public override void OnUI()
+        public override void OnUI()
         {
             using (new EditorGUILayout.VerticalScope())
             {
@@ -325,53 +302,41 @@ namespace SpoiledCat
             task.Start(scheduler);
         }
 
+        private MethodInfo EndEditingActiveTextField_method { get; } =
+            typeof(EditorGUI).GetMethod("EndEditingActiveTextField", BindingFlags.NonPublic | BindingFlags.Static);
+
+        public static GUIStyle ButtonStyle {
+            get {
+//                if (buttonStyle != null) return buttonStyle;
+                return buttonStyle = new GUIStyle(GUI.skin.button)
+                {
+                    //name = "SpoiledCat_ButtonStyle",
+                    richText = true,
+                    wordWrap = true
+                };
+                //var json = SimpleJson.SerializeObject(GUI.skin.button);
+                //buttonStyle = SimpleJson.DeserializeObject<GUIStyle>(json);
+                //buttonStyle.name = "SpoiledCat_ButtonStyle";
+                //buttonStyle.richText = true;
+                //buttonStyle.wordWrap = true;
+                //return buttonStyle;
+            }
+        }
     }
 
 
     public class Compiler
     {
-        private readonly CSharpCodeProvider compiler = new CSharpCodeProvider();
-        private readonly List<string> assemblies = new List<string>();
-        private CompilerParameters compilerParameters;
+	    private const string templateClassHeader = "public static class {0} {{";
+	    private const string templateClassFooter = "}";
 
-        public Dictionary<string, (string snippet, string source)> SourcesByTypeName { get; } = new Dictionary<string, (string snippet, string source)>();
+	    private const string templateMethodHeaderStart = "public static void {0}(";
 
-        private Dictionary<string, (string className, string methodName, string source, Assembly assembly)>
-            compiledAssemblies =
-                new Dictionary<string, (string className, string methodName, string source, Assembly assembly)>();
+	    private const string templateMethodHeaderEnd = ") {";
 
-        private readonly List<string> usings = new List<string> {
-            "UnityEditor",
-            "UnityEngine",
-            "System.Collections.Generic",
-            "System.Linq",
-            "System.IO",
-            "SpoiledCat.Json",
-            "SpoiledCat.NiceIO",
-        };
+	    private const string templateMethodFooter = "}";
 
-        public Compiler()
-        {
-            assemblies.AddRange(AppDomain.CurrentDomain.GetAssemblies()
-                .Select(x => x.TryGetLocation())
-                .Where(x => x != null));
-
-            compilerParameters = new CompilerParameters(assemblies.ToArray()) {
-                GenerateExecutable = false,
-                GenerateInMemory = true
-            };
-        }
-
-        private const string templateClassHeader = "public static class {0} {{";
-        private const string templateClassFooter = "}";
-
-        private const string templateMethodHeaderStart = "public static void {0}(";
-
-        private const string templateMethodHeaderEnd = ") {";
-
-        private const string templateMethodFooter = "}";
-
-        private const string templateSource = @"
+	    private const string templateSource = @"
 // usings
 {0}
 // class start
@@ -385,14 +350,37 @@ namespace SpoiledCat
 // class end
 {5}
 ";
+	    private readonly List<string> assemblies = new List<string>();
+	    private readonly CSharpCodeProvider compiler = new CSharpCodeProvider();
 
-        private static string GetSourceName(List<UnityReference> context, string csharp) =>
-            $"{context.GetMethodSignature()}::{csharp}";
+	    private readonly List<string> usings = new List<string> {
+            "UnityEditor",
+            "UnityEngine",
+            "System.Collections.Generic",
+            "System.Linq",
+            "System.IO",
+            "SpoiledCat.Json",
+            "SpoiledCat.NiceIO",
+        };
 
-        private static string GetSourceName(UnityReference[] context, string csharp) =>
-            $"{context.GetMethodSignature()}::{csharp}";
+	    private Dictionary<string, (string className, string methodName, string source, Assembly assembly)>
+            compiledAssemblies =
+                new Dictionary<string, (string className, string methodName, string source, Assembly assembly)>();
+	    private CompilerParameters compilerParameters;
 
-        public (bool success, string result, Exception exception) CompileCSharp(List<UnityReference> context,
+	    public Compiler()
+        {
+            assemblies.AddRange(AppDomain.CurrentDomain.GetAssemblies()
+                .Select(x => x.TryGetLocation())
+                .Where(x => x != null));
+
+            compilerParameters = new CompilerParameters(assemblies.ToArray()) {
+                GenerateExecutable = false,
+                GenerateInMemory = true
+            };
+        }
+
+	    public (bool success, string result, Exception exception) CompileCSharp(List<UnityReference> context,
             string csharp)
         {
             var sourceName = GetSourceName(context, csharp);
@@ -412,49 +400,7 @@ namespace SpoiledCat
             return (exception == null, source, exception);
         }
 
-        private
-            (CompilerResults compilerResults, string source, string className, string methodName)
-            Compile(UnityReference[] args, string csharp)
-        {
-            (string source, string className, string methodName) = GenerateSource(args, csharp);
-
-            compilerParameters.OutputAssembly = $"Temp/assembly_{className}.dll".ToNPath().ToString();
-            CompilerResults r = compiler.CompileAssemblyFromSource(compilerParameters, source);
-
-            if (!r.Errors.HasErrors)
-            {
-                var typeName = $"{className}.{methodName}";
-                var sourceName = GetSourceName(args, csharp);
-                if (!compiledAssemblies.ContainsKey(sourceName))
-                {
-                    SourcesByTypeName.Add(typeName, (csharp, source));
-                    compiledAssemblies.Add(sourceName, (className, methodName, source, r.CompiledAssembly));
-                    compilerParameters.ReferencedAssemblies.Add(compilerParameters.OutputAssembly);
-                }
-            }
-
-            return (r, source, className, methodName);
-        }
-
-        private
-            (string source, string className, string methodName)
-            GenerateSource(UnityReference[] args, string csharp)
-        {
-            var className = $"Type{SourcesByTypeName.Count}";
-            var methodName = $"Run{SourcesByTypeName.Count}";
-            var sourceSignature =
-                $@"{string.Format(templateMethodHeaderStart, methodName)} {args.GetMethodSignature()} {templateMethodHeaderEnd}";
-
-            var body = new StringBuilder();
-            args.GetMethodHeader().ForEach(x => body.AppendLine(x));
-            body.AppendLine("        " + csharp.Replace("\n", "\n        "));
-
-            return (string.Format(templateSource, string.Join(Environment.NewLine, usings.Select(x => $"using {x};")),
-                string.Format(templateClassHeader, className), sourceSignature, body.ToString(),
-                templateMethodFooter, templateClassFooter), className, methodName);
-        }
-
-        public
+	    public
             (bool success, string result, Exception exception)
             RunCSharp(List<UnityReference> context, string csharp)
         {
@@ -498,30 +444,80 @@ namespace SpoiledCat
             result = source;
             return (success, result, exception);
         }
+
+	    private
+            (CompilerResults compilerResults, string source, string className, string methodName)
+            Compile(UnityReference[] args, string csharp)
+        {
+            (string source, string className, string methodName) = GenerateSource(args, csharp);
+
+            compilerParameters.OutputAssembly = $"Temp/assembly_{className}.dll".ToNPath().ToString();
+            CompilerResults r = compiler.CompileAssemblyFromSource(compilerParameters, source);
+
+            if (!r.Errors.HasErrors)
+            {
+                var typeName = $"{className}.{methodName}";
+                var sourceName = GetSourceName(args, csharp);
+                if (!compiledAssemblies.ContainsKey(sourceName))
+                {
+                    SourcesByTypeName.Add(typeName, (csharp, source));
+                    compiledAssemblies.Add(sourceName, (className, methodName, source, r.CompiledAssembly));
+                    compilerParameters.ReferencedAssemblies.Add(compilerParameters.OutputAssembly);
+                }
+            }
+
+            return (r, source, className, methodName);
+        }
+
+	    private
+            (string source, string className, string methodName)
+            GenerateSource(UnityReference[] args, string csharp)
+        {
+            var className = $"Type{SourcesByTypeName.Count}";
+            var methodName = $"Run{SourcesByTypeName.Count}";
+            var sourceSignature =
+                $@"{string.Format(templateMethodHeaderStart, methodName)} {args.GetMethodSignature()} {templateMethodHeaderEnd}";
+
+            var body = new StringBuilder();
+            args.GetMethodHeader().ForEach(x => body.AppendLine(x));
+            body.AppendLine("        " + csharp.Replace("\n", "\n        "));
+
+            return (string.Format(templateSource, string.Join(Environment.NewLine, usings.Select(x => $"using {x};")),
+                string.Format(templateClassHeader, className), sourceSignature, body.ToString(),
+                templateMethodFooter, templateClassFooter), className, methodName);
+        }
+
+	    private static string GetSourceName(List<UnityReference> context, string csharp) =>
+            $"{context.GetMethodSignature()}::{csharp}";
+
+	    private static string GetSourceName(UnityReference[] context, string csharp) =>
+            $"{context.GetMethodSignature()}::{csharp}";
+
+	    public Dictionary<string, (string snippet, string source)> SourcesByTypeName { get; } = new Dictionary<string, (string snippet, string source)>();
     }
 
     public class CompilerException : Exception
     {
-        public CompilerException(CompilerErrorCollection errors) : base($@"Error compiling expression
+	    public CompilerException(CompilerErrorCollection errors) : base($@"Error compiling expression
 {string.Join(Environment.NewLine, errors.OfType<CompilerError>().Select(e => e.ErrorText).ToArray())}")
         {}
     }
 
     static class UnityReferenceExtensions
     {
-        internal static string GetMethodSignature(this List<UnityReference> args)
+	    internal static string GetMethodSignature(this List<UnityReference> args)
         {
             return string.Join(",",
                 args.Where(x => x.reference != null && !string.IsNullOrEmpty(x.name))
                     .Select(x => $"{x.reference.GetType()} {x.name}"));
         }
 
-        internal static string GetMethodSignature(this UnityReference[] args)
+	    internal static string GetMethodSignature(this UnityReference[] args)
         {
             return string.Join(",", args.Select(x => $"{x.reference.GetType()} {(x.childrenAsGameObject || x.childrenAsTransform ? "import_" : "")}{x.name}"));
         }
 
-        internal static IEnumerable<string> GetMethodHeader(this UnityReference[] args)
+	    internal static IEnumerable<string> GetMethodHeader(this UnityReference[] args)
         {
             foreach (var arg in args)
             {
@@ -536,10 +532,10 @@ namespace SpoiledCat
     [Serializable]
     public class UnityReference
     {
-        [SerializeField] public Object reference;
-        [SerializeField] public string name;
-        [SerializeField] public bool childrenAsGameObject;
-        [SerializeField] public bool childrenAsTransform;
+	    [SerializeField] public bool childrenAsGameObject;
+	    [SerializeField] public bool childrenAsTransform;
+	    [SerializeField] public string name;
+	    [SerializeField] public Object reference;
     }
 
 }

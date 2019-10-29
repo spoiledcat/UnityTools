@@ -11,7 +11,7 @@ namespace SpoiledCat.Extensions
 {
     public static class Extensions
     {
-        public static IEnumerable<T> ForEach<T>(this IEnumerable<T> enumerable, Action<T> func)
+	    public static IEnumerable<T> ForEach<T>(this IEnumerable<T> enumerable, Action<T> func)
         {
             foreach (var item in enumerable)
             {
@@ -20,7 +20,7 @@ namespace SpoiledCat.Extensions
             }
         }
 
-        public static string TryGetLocation(this Assembly asm)
+	    public static string TryGetLocation(this Assembly asm)
         {
             try
             {

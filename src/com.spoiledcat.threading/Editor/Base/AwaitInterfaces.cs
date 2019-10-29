@@ -9,12 +9,12 @@ namespace SpoiledCat.Threading
 {
     interface IAwaitable
     {
-        IAwaiter GetAwaiter();
+	    IAwaiter GetAwaiter();
     }
 
     interface IAwaiter : INotifyCompletion
     {
-        bool IsCompleted { get; }
-        void GetResult();
+	    void GetResult();
+	    bool IsCompleted { get; }
     }
 }

@@ -9,48 +9,15 @@ namespace SpoiledCat.Logging
 {
     public static class LogHelper
     {
-        private static readonly LogAdapterBase nullLogAdapter = new NullLogAdapter();
+	    private static readonly LogAdapterBase nullLogAdapter = new NullLogAdapter();
 
-        private static bool tracingEnabled;
-        public static bool TracingEnabled
-        {
-            get
-            {
-                return tracingEnabled;
-            }
-            set
-            {
-                if (tracingEnabled != value)
-                {
-                    tracingEnabled = value;
-                    Instance.Info("Trace Logging " + (value ? "Enabled" : "Disabled"));
-                }
-            }
-        }
+	    private static bool tracingEnabled;
 
-        private static LogAdapterBase logAdapter = nullLogAdapter;
+	    private static LogAdapterBase logAdapter = nullLogAdapter;
 
-        public static LogAdapterBase LogAdapter
-        {
-            get { return logAdapter; }
-            set { logAdapter = value ?? nullLogAdapter; }
-        }
+	    private static ILogging instance;
 
-        private static ILogging instance;
-
-        public static ILogging Instance
-        {
-            get {
-                if (instance == null)
-                {
-                    instance = GetLogger();
-                }
-                return instance;
-            }
-            set { instance = value; }
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
+	    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         public static ILogging GetLogger<T>()
         {
             return GetLogger(typeof(T));
@@ -145,6 +112,42 @@ namespace SpoiledCat.Logging
         public static void Error(Exception ex, string s)
         {
             Instance.Error(ex, s);
+        }
+
+        public static bool TracingEnabled
+        {
+            get
+            {
+                return tracingEnabled;
+            }
+            set
+            {
+                if (tracingEnabled != value)
+                {
+                    tracingEnabled = value;
+                    Instance.Info("Trace Logging " + (value ? "Enabled" : "Disabled"));
+                }
+            }
+        }
+
+		public static bool Verbose { get; set; }
+
+        public static LogAdapterBase LogAdapter
+        {
+            get { return logAdapter; }
+            set { logAdapter = value ?? nullLogAdapter; }
+        }
+
+        public static ILogging Instance
+        {
+            get {
+                if (instance == null)
+                {
+                    instance = GetLogger();
+                }
+                return instance;
+            }
+            set { instance = value; }
         }
     }
 }

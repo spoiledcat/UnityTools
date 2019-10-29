@@ -14,18 +14,18 @@ namespace SpoiledCat.Threading
 
     public class UnzipTask : TaskBase<NPath>
     {
-        private readonly string archiveFilePath;
-        private readonly NPath extractedPath;
-        private readonly IZipHelper zipHelper;
-        private readonly IFileSystem fileSystem;
-        private ProgressReporter progressReporter = new ProgressReporter();
-        private Dictionary<string, TaskData> tasks = new Dictionary<string, TaskData>();
+	    private readonly string archiveFilePath;
+	    private readonly NPath extractedPath;
+	    private readonly IFileSystem fileSystem;
+	    private readonly IZipHelper zipHelper;
+	    private ProgressReporter progressReporter = new ProgressReporter();
+	    private Dictionary<string, TaskData> tasks = new Dictionary<string, TaskData>();
 
-        public UnzipTask(ITaskManager taskManager, NPath archiveFilePath, NPath extractedPath)
+	    public UnzipTask(ITaskManager taskManager, NPath archiveFilePath, NPath extractedPath)
             : this(taskManager, taskManager?.Token ?? default, archiveFilePath, extractedPath, null, NPath.FileSystem)
         {}
 
-        public UnzipTask(ITaskManager taskManager, CancellationToken token, NPath archiveFilePath, NPath extractedPath,
+	    public UnzipTask(ITaskManager taskManager, CancellationToken token, NPath archiveFilePath, NPath extractedPath,
             IZipHelper zipHelper, IFileSystem fileSystem)
             : base(taskManager, token)
         {
@@ -38,12 +38,12 @@ namespace SpoiledCat.Threading
             progressReporter.OnProgress += progress.UpdateProgress;
         }
 
-        protected NPath BaseRun(bool success)
+	    protected NPath BaseRun(bool success)
         {
             return base.RunWithReturn(success);
         }
 
-        protected override NPath RunWithReturn(bool success)
+	    protected override NPath RunWithReturn(bool success)
         {
             var ret = BaseRun(success);
             try
@@ -58,7 +58,7 @@ namespace SpoiledCat.Threading
             return ret;
         }
 
-        protected virtual NPath RunUnzip(bool success)
+	    protected virtual NPath RunUnzip(bool success)
         {
             Logger.Trace("Unzip File: {0} to Path: {1}", archiveFilePath, extractedPath);
 
@@ -115,15 +115,15 @@ namespace SpoiledCat.Threading
             return extractedPath;
         }
 
-        protected int RetryCount { get; }
+	    protected int RetryCount { get; }
     }
 
     public class UnzipException : Exception
     {
-        public UnzipException(string message) : base(message)
+	    public UnzipException(string message) : base(message)
         { }
 
-        public UnzipException(string message, Exception innerException) : base(message, innerException)
+	    public UnzipException(string message, Exception innerException) : base(message, innerException)
         { }
     }
 }

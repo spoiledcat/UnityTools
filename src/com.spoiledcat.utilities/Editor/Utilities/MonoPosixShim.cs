@@ -11,6 +11,15 @@ namespace SpoiledCat.Utilities
 
 	public static class MonoPosixShim
 	{
+		private static System.Reflection.Assembly monoPosixAsm;
+		private static bool? hasMonoPosix;
+
+		private static Func<int, int> monoUnixNativeSyscall_close = null;
+
+		private static Func<string, int, int, int> monoUnixNativeSyscall_open = null;
+
+		private static Func<string, int, int> monoUnixNativeSyscall_chmod = null;
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -19,11 +28,10 @@ namespace SpoiledCat.Utilities
 		/// <param name="filePermissions">Mono.Unix.Native.FilePermissions</param>
 		/// <returns></returns>
 		public static int Open(string pathname, int openFlags, int filePermissions) => MonoUnixNativeSyscall_open(pathname, openFlags, filePermissions);
+
 		public static int Close(int fd) => MonoUnixNativeSyscall_close(fd);
 		public static int Chmod(string file, int filePermissions) => MonoUnixNativeSyscall_chmod(file, filePermissions);
 
-		private static System.Reflection.Assembly monoPosixAsm;
-		private static bool? hasMonoPosix;
 		public static bool HasMonoPosix
 		{
 			get
@@ -38,7 +46,6 @@ namespace SpoiledCat.Utilities
 			}
 		}
 
-		private static Func<int, int> monoUnixNativeSyscall_close = null;
 		public static Func<int, int> MonoUnixNativeSyscall_close
 		{
 			get
@@ -64,7 +71,6 @@ namespace SpoiledCat.Utilities
 			}
 		}
 
-		private static Func<string, int, int, int> monoUnixNativeSyscall_open = null;
 		private static Func<string, int, int, int> MonoUnixNativeSyscall_open
 		{
 			get
@@ -90,7 +96,6 @@ namespace SpoiledCat.Utilities
 			}
 		}
 
-		private static Func<string, int, int> monoUnixNativeSyscall_chmod = null;
 		private static Func<string, int, int> MonoUnixNativeSyscall_chmod
 		{
 			get

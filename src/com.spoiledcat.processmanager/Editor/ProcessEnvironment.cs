@@ -13,15 +13,12 @@ namespace SpoiledCat.ProcessManager
 
 	public interface IProcessEnvironment
 	{
-		IEnvironment Environment { get; }
 		void Configure(ProcessStartInfo psi, NPath? workingDirectory = null);
+		IEnvironment Environment { get; }
 	}
 
 	public class ProcessEnvironment : IProcessEnvironment
 	{
-		public IEnvironment Environment { get; private set; }
-		protected ILogging Logger { get; private set; }
-
 		public ProcessEnvironment(IEnvironment environment)
 		{
 			Logger = LogHelper.GetLogger(GetType());
@@ -44,5 +41,8 @@ namespace SpoiledCat.ProcessManager
 			psi.EnvironmentVariables["PROCESS_FULLPATH"] = path;
 			psi.EnvironmentVariables[pathEnvVarKey] = path;
 		}
+
+		public IEnvironment Environment { get; private set; }
+		protected ILogging Logger { get; private set; }
 	}
 }

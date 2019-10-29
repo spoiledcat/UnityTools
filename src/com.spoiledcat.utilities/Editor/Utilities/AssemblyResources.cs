@@ -22,7 +22,24 @@ namespace SpoiledCat.Utilities
 
     public class AssemblyResources
     {
-        private static (string type, string os) ParseResourceType(ResourceType resourceType, IEnvironment environment)
+	    public static NPath ToFile(ResourceType resourceType, string resource, NPath destinationPath, IEnvironment environment)
+        {
+            var target = destinationPath.Combine(resource);
+            var source = TryGetFile(resourceType, resource, environment);
+            if (source.IsInitialized)
+            {
+                target.DeleteIfExists();
+                return source.Copy(target);
+            }
+            return NPath.Default;
+        }
+
+	    public static Stream ToStream(ResourceType resourceType, string resource, IEnvironment environment)
+        {
+            return TryGetStream(resourceType, resource, environment);
+        }
+
+	    private static (string type, string os) ParseResourceType(ResourceType resourceType, IEnvironment environment)
         {
             var os = "";
             if (resourceType == ResourceType.Platform)
@@ -38,7 +55,7 @@ namespace SpoiledCat.Utilities
             return (type, os);
         }
 
-        private static Stream TryGetResource(ResourceType resourceType, string type, string os, string resource)
+	    private static Stream TryGetResource(ResourceType resourceType, string type, string os, string resource)
         {
             // all the resources are embedded in Git.Api
             var asm = Assembly.GetCallingAssembly();
@@ -51,7 +68,7 @@ namespace SpoiledCat.Utilities
             return resourceName != null ? asm.GetManifestResourceStream(resourceName) : null;
         }
 
-        private static Stream TryGetStream(ResourceType resourceType, string resource, IEnvironment environment)
+	    private static Stream TryGetStream(ResourceType resourceType, string resource, IEnvironment environment)
         {
             /*
                 This function attempts to get files embedded in the callers assembly.
@@ -81,7 +98,7 @@ namespace SpoiledCat.Utilities
             return null;
         }
 
-        private static NPath TryGetFile(ResourceType resourceType, string resource, IEnvironment environment)
+	    private static NPath TryGetFile(ResourceType resourceType, string resource, IEnvironment environment)
         {
             /*
                 This function attempts to get files embedded in the callers assembly.
@@ -109,24 +126,5 @@ namespace SpoiledCat.Utilities
 
             return NPath.Default;
         }
-
-
-        public static NPath ToFile(ResourceType resourceType, string resource, NPath destinationPath, IEnvironment environment)
-        {
-            var target = destinationPath.Combine(resource);
-            var source = TryGetFile(resourceType, resource, environment);
-            if (source.IsInitialized)
-            {
-                target.DeleteIfExists();
-                return source.Copy(target);
-            }
-            return NPath.Default;
-        }
-
-        public static Stream ToStream(ResourceType resourceType, string resource, IEnvironment environment)
-        {
-            return TryGetStream(resourceType, resource, environment);
-        }
-
     }
 }

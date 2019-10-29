@@ -15,7 +15,7 @@ namespace SpoiledCat.Tests.TestWebServer
 
 	public class HttpServer
     {
-        private static readonly IDictionary<string, string> mimeTypeMappings =
+	    private static readonly IDictionary<string, string> mimeTypeMappings =
             new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
                 { ".gif", "image/gif" },
                 { ".html", "text/html" },
@@ -26,13 +26,13 @@ namespace SpoiledCat.Tests.TestWebServer
                 { ".zip", "application/zip" },
                 { ".json", "application/json" },
             };
-        private readonly HttpListener listener;
-        private readonly string rootDirectory;
-        private bool abort;
-        private static ILogging Logger = LogHelper.GetLogger<HttpServer>();
-        private ManualResetEvent delay = new ManualResetEvent(false);
+	    private static ILogging Logger = LogHelper.GetLogger<HttpServer>();
+	    private readonly HttpListener listener;
+	    private readonly string rootDirectory;
+	    private bool abort;
+	    private ManualResetEvent delay = new ManualResetEvent(false);
 
-        /// <summary>
+	    /// <summary>
         ///     Construct server with given port.
         /// </summary>
         /// <param name="path">Directory path to serve.</param>
@@ -60,7 +60,7 @@ namespace SpoiledCat.Tests.TestWebServer
             listener.Prefixes.Add("http://localhost:" + port + "/");
         }
 
-        /// <summary>
+	    /// <summary>
         ///     Stop server and dispose all functions.
         /// </summary>
         public void Stop()
@@ -68,7 +68,7 @@ namespace SpoiledCat.Tests.TestWebServer
             listener.Stop();
         }
 
-        public void Start()
+	    public void Start()
         {
             try
             {
@@ -96,13 +96,13 @@ namespace SpoiledCat.Tests.TestWebServer
             }
         }
 
-        public void Abort()
+	    public void Abort()
         {
             abort = true;
             delay.Set();
         }
 
-        private void Process(HttpListenerContext context)
+	    private void Process(HttpListenerContext context)
         {
             Logger.Info("Handling request {0}", context.Request.Url.AbsolutePath);
 
@@ -228,14 +228,14 @@ namespace SpoiledCat.Tests.TestWebServer
             }
         }
 
-        public int Delay { get; set; }
+	    public int Delay { get; set; }
 
-        public int Port { get; }
+	    public int Port { get; }
     }
 
     static class Utils
     {
-        public static bool Copy(Stream source, Stream destination, long totalSize = 0, int chunkSize = 8192,
+	    public static bool Copy(Stream source, Stream destination, long totalSize = 0, int chunkSize = 8192,
             Func<long, long, bool> progress = null, int progressUpdateRate = 100)
         {
             var buffer = new byte[chunkSize];

@@ -20,18 +20,18 @@ namespace SpoiledCat.Base.Tests
 	/// <summary>Provides a task scheduler that targets a specific SynchronizationContext.</summary>
     public sealed class SynchronizationContextTaskScheduler : TaskScheduler
     {
-        /// <summary>The queue of tasks to execute, maintained for debugging purposes.</summary>
-        private readonly ConcurrentQueue<Task> _tasks;
-        /// <summary>The target context under which to execute the queued tasks.</summary>
+	    /// <summary>The target context under which to execute the queued tasks.</summary>
         private readonly SynchronizationContext _context;
+	    /// <summary>The queue of tasks to execute, maintained for debugging purposes.</summary>
+        private readonly ConcurrentQueue<Task> _tasks;
 
-        /// <summary>Initializes an instance of the SynchronizationContextTaskScheduler class.</summary>
+	    /// <summary>Initializes an instance of the SynchronizationContextTaskScheduler class.</summary>
         public SynchronizationContextTaskScheduler() :
             this(SynchronizationContext.Current)
         {
         }
 
-        /// <summary>
+	    /// <summary>
         /// Initializes an instance of the SynchronizationContextTaskScheduler class
         /// with the specified SynchronizationContext.
         /// </summary>
@@ -43,7 +43,7 @@ namespace SpoiledCat.Base.Tests
             _tasks = new ConcurrentQueue<Task>();
         }
 
-        /// <summary>Queues a task to the scheduler for execution on the I/O ThreadPool.</summary>
+	    /// <summary>Queues a task to the scheduler for execution on the I/O ThreadPool.</summary>
         /// <param name="task">The Task to queue.</param>
         protected override void QueueTask(Task task)
         {
@@ -55,7 +55,7 @@ namespace SpoiledCat.Base.Tests
             }, null);
         }
 
-        /// <summary>Tries to execute a task on the current thread.</summary>
+	    /// <summary>Tries to execute a task on the current thread.</summary>
         /// <param name="task">The task to be executed.</param>
         /// <param name="taskWasPreviouslyQueued">Ignored.</param>
         /// <returns>Whether the task could be executed.</returns>
@@ -64,14 +64,14 @@ namespace SpoiledCat.Base.Tests
             return _context == SynchronizationContext.Current && TryExecuteTask(task);
         }
 
-        /// <summary>Gets an enumerable of tasks queued to the scheduler.</summary>
+	    /// <summary>Gets an enumerable of tasks queued to the scheduler.</summary>
         /// <returns>An enumerable of tasks queued to the scheduler.</returns>
         protected override IEnumerable<Task> GetScheduledTasks()
         {
             return _tasks.ToArray();
         }
 
-        /// <summary>Gets the maximum concurrency level supported by this scheduler.</summary>
+	    /// <summary>Gets the maximum concurrency level supported by this scheduler.</summary>
         public override int MaximumConcurrencyLevel { get { return 1; } }
     }
 }

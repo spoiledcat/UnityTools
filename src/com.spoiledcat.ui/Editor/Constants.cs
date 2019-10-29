@@ -9,9 +9,10 @@ namespace SpoiledCat.UI
 {
     public static class Constants
     {
-        public const string Iso8601Format = @"yyyy-MM-dd\THH\:mm\:ss.fffzzz";
-        public const string Iso8601FormatZ = @"yyyy-MM-dd\THH\:mm\:ss\Z";
-        public static readonly string[] Iso8601Formats = {
+	    public const string Iso8601Format = @"yyyy-MM-dd\THH\:mm\:ss.fffzzz";
+	    public const string Iso8601FormatZ = @"yyyy-MM-dd\THH\:mm\:ss\Z";
+	    public const DateTimeStyles DateTimeStyle = DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
+	    public static readonly string[] Iso8601Formats = {
             Iso8601Format,
             Iso8601FormatZ,
             @"yyyy-MM-dd\THH\:mm\:ss.fffffffzzz",
@@ -29,6 +30,5 @@ namespace SpoiledCat.UI
             @"yyyy-MM-dd\THH\:mm\:ss.ff\Z",
             @"yyyy-MM-dd\THH\:mm\:ss.f\Z",
         };
-        public const DateTimeStyles DateTimeStyle = DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
     }
 }

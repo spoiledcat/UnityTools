@@ -28,17 +28,6 @@ namespace SpoiledCat.Utilities
 	{
 		private static IZipHelper instance;
 
-		public static IZipHelper Instance
-		{
-			get
-			{
-				if (instance == null)
-					instance = new ZipHelper();
-				return instance;
-			}
-			set => instance = value;
-		}
-
 		public bool Extract(string archive, string outFolder, CancellationToken cancellationToken,
 			Action<string, long> onStart, Func<long, long, string, bool> onProgress, Func<string, bool> onFilter = null)
 		{
@@ -195,6 +184,17 @@ namespace SpoiledCat.Utilities
 			}
 
 			return fullZipToPath;
+		}
+
+		public static IZipHelper Instance
+		{
+			get
+			{
+				if (instance == null)
+					instance = new ZipHelper();
+				return instance;
+			}
+			set => instance = value;
 		}
 	}
 }

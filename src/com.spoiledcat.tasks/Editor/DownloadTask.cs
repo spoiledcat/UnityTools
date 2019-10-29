@@ -20,7 +20,7 @@ namespace SpoiledCat.Threading
              : this(taskManager, taskManager?.Token ?? default, url, targetDirectory, filename, retryCount)
         {}
 
-        public DownloadTask(
+	    public DownloadTask(
 			ITaskManager taskManager,
 			CancellationToken token,
 			UriString url,
@@ -37,12 +37,17 @@ namespace SpoiledCat.Threading
             Message = Filename;
         }
 
-        protected string BaseRunWithReturn(bool success)
+	    public override string ToString()
+        {
+            return $"{base.ToString()} {Url}";
+        }
+
+	    protected string BaseRunWithReturn(bool success)
         {
             return base.RunWithReturn(success);
         }
 
-        protected override NPath RunWithReturn(bool success)
+	    protected override NPath RunWithReturn(bool success)
         {
             var result = base.RunWithReturn(success);
             try
@@ -57,7 +62,7 @@ namespace SpoiledCat.Threading
             return result;
         }
 
-        /// <summary>
+	    /// <summary>
         /// The actual functionality to download with optional hash verification
         /// subclasses that wish to return the contents of the downloaded file
         /// or do something else with it can override this instead of RunWithReturn.
@@ -112,34 +117,29 @@ namespace SpoiledCat.Threading
             return Destination;
         }
 
-        public override string ToString()
-        {
-            return $"{base.ToString()} {Url}";
-        }
+	    public UriString Url { get; }
 
-        public UriString Url { get; }
+	    public NPath TargetDirectory { get; }
 
-        public NPath TargetDirectory { get; }
+	    public string Filename { get; }
 
-        public string Filename { get; }
+	    public NPath Destination => TargetDirectory.Combine(Filename);
 
-        public NPath Destination => TargetDirectory.Combine(Filename);
-
-        protected int RetryCount { get; }
+	    protected int RetryCount { get; }
     }
 
     class DownloadException : Exception
     {
-        public DownloadException(string message) : base(message)
+	    public DownloadException(string message) : base(message)
         { }
 
-        public DownloadException(string message, Exception innerException) : base(message, innerException)
+	    public DownloadException(string message, Exception innerException) : base(message, innerException)
         { }
     }
 
     public static class WebRequestExtensions
     {
-        public static WebResponse GetResponseWithoutException(this WebRequest request)
+	    public static WebResponse GetResponseWithoutException(this WebRequest request)
         {
             try
             {
@@ -159,27 +159,28 @@ namespace SpoiledCat.Threading
 
     public class DownloadData
     {
-        public UriString Url { get; }
-        public NPath File { get; }
-        public DownloadData(UriString url, NPath file)
+	    public DownloadData(UriString url, NPath file)
         {
             Url = url;
             File = file;
         }
+
+	    public UriString Url { get; }
+	    public NPath File { get; }
     }
 
     public class Downloader : TaskQueue<NPath, DownloadData>
     {
-        public event Action<UriString> OnDownloadStart;
-        public event Action<UriString, NPath> OnDownloadComplete;
-        public event Action<UriString, Exception> OnDownloadFailed;
+	    public event Action<UriString, NPath> OnDownloadComplete;
+	    public event Action<UriString, Exception> OnDownloadFailed;
+	    public event Action<UriString> OnDownloadStart;
 
-        public Downloader(ITaskManager taskManager)
+	    public Downloader(ITaskManager taskManager)
 	        : this(taskManager, taskManager?.Token ?? default)
         {
         }
 
-		public Downloader(ITaskManager taskManager, CancellationToken token)
+	    public Downloader(ITaskManager taskManager, CancellationToken token)
              : base(taskManager, t => {
                 var dt = t as DownloadTask;
                 var destinationFile = dt.TargetDirectory.Combine(dt.Url.Filename);
@@ -190,21 +191,7 @@ namespace SpoiledCat.Threading
             Message = "Downloading...";
         }
 
-        public void QueueDownload(UriString url, NPath targetDirectory, string filename = null, int retryCount = 0)
-        {
-            var download = new DownloadTask(TaskManager, url, targetDirectory, filename, retryCount);
-            download.OnStart += t => OnDownloadStart?.Invoke(((DownloadTask)t).Url);
-            download.OnEnd += (t, res, s, ex) => {
-                if (s)
-                    OnDownloadComplete?.Invoke(((DownloadTask)t).Url, res);
-                else
-                    OnDownloadFailed?.Invoke(((DownloadTask)t).Url, ex);
-            };
-            // queue after hooking up events so OnDownload* gets called first
-            Queue(download);
-        }
-
-        public static bool Download(ILogging logger,
+	    public static bool Download(ILogging logger,
             UriString url,
             Stream destinationStream,
             Func<long, long, bool> onProgress)
@@ -281,6 +268,20 @@ namespace SpoiledCat.Threading
                         });
                 }
             }
+        }
+
+	    public void QueueDownload(UriString url, NPath targetDirectory, string filename = null, int retryCount = 0)
+        {
+            var download = new DownloadTask(TaskManager, url, targetDirectory, filename, retryCount);
+            download.OnStart += t => OnDownloadStart?.Invoke(((DownloadTask)t).Url);
+            download.OnEnd += (t, res, s, ex) => {
+                if (s)
+                    OnDownloadComplete?.Invoke(((DownloadTask)t).Url, res);
+                else
+                    OnDownloadFailed?.Invoke(((DownloadTask)t).Url, ex);
+            };
+            // queue after hooking up events so OnDownload* gets called first
+            Queue(download);
         }
     }
 }

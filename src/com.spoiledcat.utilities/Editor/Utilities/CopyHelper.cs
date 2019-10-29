@@ -41,6 +41,7 @@ namespace SpoiledCat.Utilities
 				fromPath.DeleteIfExists();
 			}
 		}
+
 		public static void CopyFolder(NPath fromPath, NPath toPath)
 		{
 			Logger.Trace("CopyFolder from {0} to {1}", fromPath, toPath);

@@ -14,30 +14,30 @@ namespace SpoiledCat.Threading.Helpers
     [Serializable]
     internal class InstanceNotInitializedException : InvalidOperationException
     {
-        public InstanceNotInitializedException(object the, string property) :
+	    public InstanceNotInitializedException(object the, string property) :
             base(String.Format(CultureInfo.InvariantCulture, "{0} is not correctly initialized, {1} is null", the?.GetType().Name, property))
         {}
 
-        protected InstanceNotInitializedException(SerializationInfo info, StreamingContext context) : base(info, context)
+	    protected InstanceNotInitializedException(SerializationInfo info, StreamingContext context) : base(info, context)
         { }
     }
 
 	internal static class Guard
     {
-        public static void NotNull(object the, object value, string propertyName)
+	    public static void NotNull(object the, object value, string propertyName)
         {
             if (value != null) return;
             throw new InstanceNotInitializedException(the, propertyName);
         }
 
-        public static void ArgumentNotNull(object value, string name)
+	    public static void ArgumentNotNull(object value, string name)
         {
             if (value != null) return;
             string message = String.Format(CultureInfo.InvariantCulture, "Failed Null Check on '{0}'", name);
             throw new ArgumentNullException(name, message);
         }
 
-        public static void ArgumentNotNullOrEmpty<T>(IList<T> value, string name)
+	    public static void ArgumentNotNullOrEmpty<T>(IList<T> value, string name)
         {
             if (value == null)
             {
@@ -52,7 +52,7 @@ namespace SpoiledCat.Threading.Helpers
             }
         }
 
-        public static void ArgumentNonNegative(int value, string name)
+	    public static void ArgumentNonNegative(int value, string name)
         {
             if (value > -1) return;
 
@@ -60,7 +60,7 @@ namespace SpoiledCat.Threading.Helpers
             throw new ArgumentException(message, name);
         }
 
-        /// <summary>
+	    /// <summary>
         ///   Checks a string argument to ensure it isn't null or empty.
         /// </summary>
         /// <param name = "value">The argument value to check.</param>
@@ -73,7 +73,7 @@ namespace SpoiledCat.Threading.Helpers
             throw new ArgumentException(message, name);
         }
 
-        public static void ArgumentInRange(int value, int minValue, string name)
+	    public static void ArgumentInRange(int value, int minValue, string name)
         {
             if (value >= minValue) return;
             string message = String.Format(CultureInfo.InvariantCulture,
@@ -84,7 +84,7 @@ namespace SpoiledCat.Threading.Helpers
             throw new ArgumentOutOfRangeException(name, message);
         }
 
-        public static void ArgumentInRange(int value, int minValue, int maxValue, string name)
+	    public static void ArgumentInRange(int value, int minValue, int maxValue, string name)
         {
             if (value >= minValue && value <= maxValue) return;
             string message = String.Format(CultureInfo.InvariantCulture,
@@ -96,6 +96,6 @@ namespace SpoiledCat.Threading.Helpers
             throw new ArgumentOutOfRangeException(name, message);
         }
 
-        public static bool InUnitTestRunner { get; set; }
+	    public static bool InUnitTestRunner { get; set; }
     }
 }

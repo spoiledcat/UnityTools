@@ -1243,9 +1243,10 @@ namespace SpoiledCat.Json
 
     public static class DateTimeFormatConstants
     {
-        public const string Iso8601Format = @"yyyy-MM-dd\THH\:mm\:ss.fffzzz";
-        public const string Iso8601FormatZ = @"yyyy-MM-dd\THH\:mm\:ss\Z";
-        public static readonly string[] Iso8601Formats = {
+	    public const string Iso8601Format = @"yyyy-MM-dd\THH\:mm\:ss.fffzzz";
+	    public const string Iso8601FormatZ = @"yyyy-MM-dd\THH\:mm\:ss\Z";
+	    public const DateTimeStyles DateTimeStyle = DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
+	    public static readonly string[] Iso8601Formats = {
             Iso8601Format,
             Iso8601FormatZ,
             @"yyyy-MM-dd\THH\:mm\:ss.fffffffzzz",
@@ -1263,7 +1264,6 @@ namespace SpoiledCat.Json
             @"yyyy-MM-dd\THH\:mm\:ss.ff\Z",
             @"yyyy-MM-dd\THH\:mm\:ss.f\Z",
         };
-        public const DateTimeStyles DateTimeStyle = DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
     }
 
     [GeneratedCode("simple-json", "1.0.0")]
@@ -2124,16 +2124,67 @@ namespace SpoiledCat.Json
 
             public sealed class ThreadSafeDictionary<TKey, TValue> : IDictionary<TKey, TValue>
             {
-                private readonly object _lock = new object();
-                private readonly ThreadSafeDictionaryValueFactory<TKey, TValue> _valueFactory;
-                private Dictionary<TKey, TValue> _dictionary;
+	            private readonly object _lock = new object();
+	            private readonly ThreadSafeDictionaryValueFactory<TKey, TValue> _valueFactory;
+	            private Dictionary<TKey, TValue> _dictionary;
 
-                public ThreadSafeDictionary(ThreadSafeDictionaryValueFactory<TKey, TValue> valueFactory)
+	            public ThreadSafeDictionary(ThreadSafeDictionaryValueFactory<TKey, TValue> valueFactory)
                 {
                     _valueFactory = valueFactory;
                 }
 
-                private TValue Get(TKey key)
+	            public void Add(TKey key, TValue value)
+                {
+                    throw new NotImplementedException();
+                }
+
+	            public bool ContainsKey(TKey key)
+                {
+                    return _dictionary.ContainsKey(key);
+                }
+
+	            public bool Remove(TKey key)
+                {
+                    throw new NotImplementedException();
+                }
+
+	            public bool TryGetValue(TKey key, out TValue value)
+                {
+                    value = this[key];
+                    return true;
+                }
+
+	            public void Add(KeyValuePair<TKey, TValue> item)
+                {
+                    throw new NotImplementedException();
+                }
+
+	            public void Clear()
+                {
+                    throw new NotImplementedException();
+                }
+
+	            public bool Contains(KeyValuePair<TKey, TValue> item)
+                {
+                    throw new NotImplementedException();
+                }
+
+	            public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+                {
+                    throw new NotImplementedException();
+                }
+
+	            public bool Remove(KeyValuePair<TKey, TValue> item)
+                {
+                    throw new NotImplementedException();
+                }
+
+	            public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+                {
+                    return _dictionary.GetEnumerator();
+                }
+
+	            private TValue Get(TKey key)
                 {
                     if (_dictionary == null)
                         return AddValue(key);
@@ -2143,7 +2194,7 @@ namespace SpoiledCat.Json
                     return value;
                 }
 
-                private TValue AddValue(TKey key)
+	            private TValue AddValue(TKey key)
                 {
                     TValue value = _valueFactory(key);
                     lock (_lock)
@@ -2166,86 +2217,35 @@ namespace SpoiledCat.Json
                     return value;
                 }
 
-                public void Add(TKey key, TValue value)
+	            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
                 {
-                    throw new NotImplementedException();
+                    return _dictionary.GetEnumerator();
                 }
 
-                public bool ContainsKey(TKey key)
-                {
-                    return _dictionary.ContainsKey(key);
-                }
-
-                public ICollection<TKey> Keys
+	            public ICollection<TKey> Keys
                 {
                     get { return _dictionary.Keys; }
                 }
 
-                public bool Remove(TKey key)
-                {
-                    throw new NotImplementedException();
-                }
-
-                public bool TryGetValue(TKey key, out TValue value)
-                {
-                    value = this[key];
-                    return true;
-                }
-
-                public ICollection<TValue> Values
+	            public ICollection<TValue> Values
                 {
                     get { return _dictionary.Values; }
                 }
 
-                public TValue this[TKey key]
+	            public TValue this[TKey key]
                 {
                     get { return Get(key); }
                     set { throw new NotImplementedException(); }
                 }
 
-                public void Add(KeyValuePair<TKey, TValue> item)
-                {
-                    throw new NotImplementedException();
-                }
-
-                public void Clear()
-                {
-                    throw new NotImplementedException();
-                }
-
-                public bool Contains(KeyValuePair<TKey, TValue> item)
-                {
-                    throw new NotImplementedException();
-                }
-
-                public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
-                {
-                    throw new NotImplementedException();
-                }
-
-                public int Count
+	            public int Count
                 {
                     get { return _dictionary.Count; }
                 }
 
-                public bool IsReadOnly
+	            public bool IsReadOnly
                 {
                     get { throw new NotImplementedException(); }
-                }
-
-                public bool Remove(KeyValuePair<TKey, TValue> item)
-                {
-                    throw new NotImplementedException();
-                }
-
-                public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
-                {
-                    return _dictionary.GetEnumerator();
-                }
-
-                System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-                {
-                    return _dictionary.GetEnumerator();
                 }
             }
 
@@ -2254,27 +2254,26 @@ namespace SpoiledCat.Json
     [System.AttributeUsage(System.AttributeTargets.Property |
                        System.AttributeTargets.Field)]
     public sealed class NotSerializedAttribute : Attribute
-    {
-    }
+    {}
 
     public static class JsonSerializerExtensions
     {
-        static JsonSerializationStrategy publicLowerCaseStrategy = new JsonSerializationStrategy(true, true);
-        static JsonSerializationStrategy publicUpperCaseStrategy = new JsonSerializationStrategy(false, true);
-        static JsonSerializationStrategy privateLowerCaseStrategy = new JsonSerializationStrategy(true, false);
-        static JsonSerializationStrategy privateUpperCaseStrategy = new JsonSerializationStrategy(false, false);
+	    static JsonSerializationStrategy publicLowerCaseStrategy = new JsonSerializationStrategy(true, true);
+	    static JsonSerializationStrategy publicUpperCaseStrategy = new JsonSerializationStrategy(false, true);
+	    static JsonSerializationStrategy privateLowerCaseStrategy = new JsonSerializationStrategy(true, false);
+	    static JsonSerializationStrategy privateUpperCaseStrategy = new JsonSerializationStrategy(false, false);
 
-        public static string ToJson<T>(this T model, bool lowerCase = false, bool onlyPublic = true)
+	    public static string ToJson<T>(this T model, bool lowerCase = false, bool onlyPublic = true)
         {
             return SimpleJson.SerializeObject(model, GetStrategy(lowerCase, onlyPublic));
         }
 
-        public static T FromJson<T>(this string json, bool lowerCase = false, bool onlyPublic = true)
+	    public static T FromJson<T>(this string json, bool lowerCase = false, bool onlyPublic = true)
         {
             return SimpleJson.DeserializeObject<T>(json, GetStrategy(lowerCase, onlyPublic));
         }
 
-        public static T FromObject<T>(this object obj, bool lowerCase = false, bool onlyPublic = true)
+	    public static T FromObject<T>(this object obj, bool lowerCase = false, bool onlyPublic = true)
         {
             if (obj == null)
                 return default(T);
@@ -2284,7 +2283,7 @@ namespace SpoiledCat.Json
             return default(T);
         }
 
-        private static JsonSerializationStrategy GetStrategy(bool lowerCase, bool onlyPublic)
+	    private static JsonSerializationStrategy GetStrategy(bool lowerCase, bool onlyPublic)
         {
             if (lowerCase && onlyPublic)
                 return publicLowerCaseStrategy;
@@ -2295,7 +2294,7 @@ namespace SpoiledCat.Json
             return privateUpperCaseStrategy;
         }
 
-        /// <summary>
+	    /// <summary>
         /// Convert from PascalCase to camelCase.
         /// </summary>
         private static string ToJsonPropertyName(string propertyName)
@@ -2309,24 +2308,24 @@ namespace SpoiledCat.Json
             return propertyName.Substring(0, i).ToLowerInvariant() + propertyName.Substring(i);
         }
 
-        public class JsonSerializationStrategy : PocoJsonSerializerStrategy
+	    public class JsonSerializationStrategy : PocoJsonSerializerStrategy
         {
-            private readonly bool toLowerCase;
-            private readonly bool onlyPublic;
+	        private readonly bool onlyPublic;
+	        private readonly bool toLowerCase;
 
-            public JsonSerializationStrategy(bool toLowerCase, bool onlyPublic)
+	        public JsonSerializationStrategy(bool toLowerCase, bool onlyPublic)
             {
                 this.toLowerCase = toLowerCase;
                 this.onlyPublic = onlyPublic;
             }
 
-            protected override bool CanAddField(FieldInfo field)
+	        protected override bool CanAddField(FieldInfo field)
             {
                 var canAdd = base.CanAddField(field);
                 return canAdd && ((onlyPublic && field.IsPublic) || !onlyPublic);
             }
 
-            protected override bool CanAddProperty(PropertyInfo property, MethodInfo method)
+	        protected override bool CanAddProperty(PropertyInfo property, MethodInfo method)
             {
                 var canAdd = base.CanAddProperty(property, method);
                 if (!canAdd)
@@ -2346,7 +2345,7 @@ namespace SpoiledCat.Json
                 return true;
             }
 
-            protected override string MapClrMemberNameToJsonFieldName(string clrPropertyName)
+	        protected override string MapClrMemberNameToJsonFieldName(string clrPropertyName)
             {
                 if (!toLowerCase)
                     return base.MapClrMemberNameToJsonFieldName(clrPropertyName);

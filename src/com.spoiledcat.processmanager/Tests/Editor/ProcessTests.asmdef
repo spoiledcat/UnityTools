@@ -1,0 +1,24 @@
+{
+    "name": "ProcessTests",
+    "references": [
+        "GUID:3015b959d90993947bd722e47fe10b82",
+        "GUID:354f3f42ad547974db67e633b313dbf4",
+        "GUID:5bf40a4773817614db3c8c08715df070",
+        "GUID:38eef5a24ad9eec4d9c20289ab611a58",
+        "GUID:cf4e027c83f63f645b34401d5b257da8",
+        "GUID:e742a8a755eef3040a5bec01667fba35"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

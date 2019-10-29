@@ -4,6 +4,9 @@
     <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\</SolutionDir>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\src\com.spoiledcat.processmanager\Tests\Editor\BaseTest_Shared.cs" Link="BaseTest_Shared.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.9.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="NSubstitute" Version="4.2.1" />

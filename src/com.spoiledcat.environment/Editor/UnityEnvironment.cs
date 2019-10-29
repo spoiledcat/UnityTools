@@ -39,6 +39,7 @@ namespace SpoiledCat.Unity
 		string ExpandEnvironmentVariables(string name);
 		string GetEnvironmentVariable(string v);
 		string GetSpecialFolder(Environment.SpecialFolder folder);
+		string GetEnvironmentVariableKey(string name);
 
 		string Path { get; set; }
 		string NewLine { get; }
@@ -59,7 +60,6 @@ namespace SpoiledCat.Unity
 		ISettings SystemSettings { get; }
 		ISettings UserSettings { get; }
 		string ApplicationName { get; }
-		string GetEnvironmentVariableKey(string name);
 		NPath WorkingDirectory { get; }
 	}
 

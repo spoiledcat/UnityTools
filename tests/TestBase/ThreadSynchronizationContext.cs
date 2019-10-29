@@ -10,27 +10,26 @@ namespace SpoiledCat.Base.Tests
 
 	public class TestThreadSynchronizationContext : SynchronizationContext
     {
-        private readonly CancellationToken token;
-        private readonly ConcurrentQueue<PostData> queue = new ConcurrentQueue<PostData>();
-        private readonly ConcurrentQueue<PostData> priorityQueue = new ConcurrentQueue<PostData>();
-        private readonly JobSignal jobSignal = new JobSignal();
-        private long jobId;
-        private readonly Task task;
-        private int threadId;
+	    private readonly ConcurrentQueue<PostData> priorityQueue = new ConcurrentQueue<PostData>();
+	    private readonly ConcurrentQueue<PostData> queue = new ConcurrentQueue<PostData>();
+	    private readonly Task task;
+	    private readonly CancellationToken token;
+	    private int threadId;
 
-        public TestThreadSynchronizationContext(CancellationToken token)
+	    public TestThreadSynchronizationContext(CancellationToken token)
         {
             this.token = token;
             task = new Task(Start, token, TaskCreationOptions.LongRunning);
             task.Start();
         }
 
-        public override void Post(SendOrPostCallback d, object state)
-        {
-            queue.Enqueue(new PostData { Callback = d, State = state });
+	    public override void Post(SendOrPostCallback d, object state)
+	    {
+		    var data = new PostData { Completion = new ManualResetEventSlim(), Callback = d, State = state };
+			queue.Enqueue(data);
         }
 
-        public override void Send(SendOrPostCallback d, object state)
+	    public override void Send(SendOrPostCallback d, object state)
         {
             if (Thread.CurrentThread.ManagedThreadId == threadId)
             {
@@ -38,26 +37,39 @@ namespace SpoiledCat.Base.Tests
             }
             else
             {
-                var id = Interlocked.Increment(ref jobId);
-                priorityQueue.Enqueue(new PostData { Id = id, Callback = d, State = state });
-                Wait(id);
+                var data = new PostData { Completion = new ManualResetEventSlim(), Callback = d, State = state };
+				priorityQueue.Enqueue(data);
+				data.Completion.Wait(token);
             }
         }
 
-        private void Wait(long id)
+	    public void Pump()
         {
-            jobSignal.Wait(id, token);
-        }
+            PostData data;
+            if (priorityQueue.TryDequeue(out data))
+            {
+                data.Run();
+                data.Completion.Set();
+            }
+            if (queue.TryDequeue(out data))
+            {
+                data.Run();
+				data.Completion.Set();
+			}
+		}
 
-        private void Start()
+	    private void Start()
         {
             SetSynchronizationContext(this);
+
             threadId = Thread.CurrentThread.ManagedThreadId;
+
             var lastTime = DateTime.Now.Ticks;
             var wait = new ManualResetEventSlim(false);
             var ticksPerFrame = TimeSpan.TicksPerMillisecond * 10;
             var count = 0;
             var secondStart = DateTime.Now.Ticks;
+
             while (!token.IsCancellationRequested)
             {
                 var current = DateTime.Now.Ticks;
@@ -68,7 +80,9 @@ namespace SpoiledCat.Base.Tests
                     count = 0;
                     secondStart = current;
                 }
+
                 Pump();
+
                 lastTime = DateTime.Now.Ticks;
                 long waitTime = (current + ticksPerFrame - lastTime) / TimeSpan.TicksPerMillisecond;
                 if (waitTime > 0 && waitTime < int.MaxValue)
@@ -82,59 +96,24 @@ namespace SpoiledCat.Base.Tests
             }
         }
 
-        public void Pump()
-        {
-            PostData data;
-            if (priorityQueue.TryDequeue(out data))
-            {
-                data.Run();
-            }
-            if (queue.TryDequeue(out data))
-            {
-                LogHelper.GetLogger<TestThreadSynchronizationContext>().Trace($"Running {data.Id} on main thread");
-                data.Run();
-            }
-        }
-        struct PostData
-        {
-            public long Id;
+	    struct PostData
+	    {
+		    public ManualResetEventSlim Completion;
             public SendOrPostCallback Callback;
             public object State;
+
             public void Run()
             {
-                Callback(State);
+	            if (Completion.IsSet)
+		            return;
+
+	            try
+	            {
+		            Callback(State);
+	            }
+				catch { }
+				Completion.Set();
             }
-        }
-
-        class JobSignal : ManualResetEventSlim
-        {
-            private readonly HashSet<long> signaledIds = new HashSet<long>();
-
-            public void Set(long id)
-            {
-                try
-                {
-                    signaledIds.Add(id);
-                }
-                catch { } // it's already on the list
-                Set();
-                Reset();
-            }
-
-            public bool Wait(long id, CancellationToken token)
-            {
-                bool signaled = false;
-                do
-                {
-
-                    signaled = signaledIds.Contains(id);
-                    if (signaled)
-                        break;
-                    Wait(token);
-                }
-                while (!token.IsCancellationRequested && !signaled);
-                return signaled;
-            }
-        }
+	    }
     }
 }

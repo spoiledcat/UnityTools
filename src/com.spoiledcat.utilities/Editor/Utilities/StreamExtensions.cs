@@ -12,7 +12,7 @@ namespace SpoiledCat.Extensions
 
 	public static class StreamExtensions
     {
-        public static byte[] ToByteArray(this Stream input)
+	    public static byte[] ToByteArray(this Stream input)
         {
             var buffer = new byte[16 * 1024];
             using (var ms = new MemoryStream())
@@ -57,6 +57,5 @@ namespace SpoiledCat.Extensions
 
 		    return BitConverter.ToString(computeHash).Replace("-", string.Empty).ToLower();
 	    }
-
     }
 }

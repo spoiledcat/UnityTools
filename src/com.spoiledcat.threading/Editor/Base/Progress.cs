@@ -12,32 +12,34 @@ namespace SpoiledCat.Threading
 {
     public interface IProgress
     {
-        IProgress UpdateProgress(long value, long total, string message = null, IProgress innerProgress = null,
+	    event Action<IProgress> OnProgress;
+
+	    IProgress UpdateProgress(long value, long total, string message = null, IProgress innerProgress = null,
             bool dontInvoke = false);
-        ITask Task { get; }
-        /// <summary>
+
+	    ITask Task { get; }
+	    /// <summary>
         /// From 0 to 1
         /// </summary>
         float Percentage { get; }
-        long Value { get; }
-        long Total { get; }
-        string Message { get; }
-        bool Changed { get; }
+	    long Value { get; }
+	    long Total { get; }
+	    string Message { get; }
+	    bool Changed { get; }
 
-        // if this is an aggregate progress reporter, this will have more data
-        IProgress InnerProgress { get; }
-        event Action<IProgress> OnProgress;
+	    // if this is an aggregate progress reporter, this will have more data
+	    IProgress InnerProgress { get; }
     }
 
     public class ProgressReporter
     {
-        public event Action<IProgress> OnProgress;
-        private Dictionary<ITask, IProgress> tasks = new Dictionary<ITask, IProgress>();
-        private Progress progress = new Progress(TaskBase.Default);
-        public string Message { get; set; }
-        private long totalDone;
-        private long valueDone;
-        public void UpdateProgress(IProgress prog)
+	    private Progress progress = new Progress(TaskBase.Default);
+	    private Dictionary<ITask, IProgress> tasks = new Dictionary<ITask, IProgress>();
+	    private long totalDone;
+	    private long valueDone;
+	    public event Action<IProgress> OnProgress;
+
+	    public void UpdateProgress(IProgress prog)
         {
             long total = 0;
             long value = 0;
@@ -63,6 +65,8 @@ namespace SpoiledCat.Threading
             }
             OnProgress?.Invoke(data);
         }
+
+	    public string Message { get; set; }
     }
 
     struct ProgressData : IProgress
@@ -101,31 +105,22 @@ namespace SpoiledCat.Threading
 
     public class Progress : IProgress
     {
-        public ITask Task { get; }
-        public float Percentage { get; private set; }
-        public long Value { get; private set; }
-        public long Total { get; set; }
-        public string Message { get; private set; }
-        public bool Changed { get; private set; }
-        // if this is an aggregate progress reporter, this will have more data
-        public IProgress InnerProgress { get; private set; }
+	    private long previousValue = -1;
 
-        private long previousValue = -1;
+	    public event Action<IProgress> OnProgress;
 
-        public event Action<IProgress> OnProgress;
-
-        public Progress(ITask task)
+	    public Progress(ITask task)
         {
             Task = task;
             Message = task.Message;
         }
 
-        public void UpdateProgress(IProgress progress)
+	    public void UpdateProgress(IProgress progress)
         {
             UpdateProgress(progress.Value, progress.Total, progress.Message, progress.InnerProgress);
         }
 
-        public IProgress UpdateProgress(long value, long total, string message = null, IProgress innerProgress = null,
+	    public IProgress UpdateProgress(long value, long total, string message = null, IProgress innerProgress = null,
             bool dontInvoke = false)
         {
             InnerProgress = innerProgress;
@@ -159,5 +154,14 @@ namespace SpoiledCat.Threading
             }
             return this;
         }
+
+	    public ITask Task { get; }
+	    public float Percentage { get; private set; }
+	    public long Value { get; private set; }
+	    public long Total { get; set; }
+	    public string Message { get; private set; }
+	    public bool Changed { get; private set; }
+	    // if this is an aggregate progress reporter, this will have more data
+	    public IProgress InnerProgress { get; private set; }
     }
 }

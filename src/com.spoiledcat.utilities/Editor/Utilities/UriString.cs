@@ -57,6 +57,16 @@ namespace SpoiledCat.Utilities
 			}
 		}
 
+		// For xml serialization
+		protected UriString()
+		{
+		}
+
+		protected UriString(SerializationInfo info, StreamingContext context)
+			 : this(GetSerializedValue(info))
+		{
+		}
+
 		public static UriString ToUriString(Uri uri)
 		{
 			return uri == null ? null : new UriString(uri.ToString());
@@ -68,84 +78,26 @@ namespace SpoiledCat.Utilities
 			return new UriString(uri);
 		}
 
+		[SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")]
+		public static implicit operator UriString(string value)
+		{
+			if (value == null) return null;
+
+			return new UriString(value);
+		}
+
+		[SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")]
+		public static implicit operator string(UriString uriString)
+		{
+			return uriString?.Value;
+		}
+
 		public Uri ToUri()
 		{
 			if (url == null)
 				throw new InvalidOperationException("This Uri String is not a valid Uri");
 			return url;
 		}
-
-		void SetUri(Uri uri)
-		{
-			Host = uri.Host;
-			if (uri.Segments.Any())
-			{
-				Filename = uri.Segments.Last();
-				RepositoryName = GetRepositoryName(Filename);
-			}
-
-			if (uri.Segments.Length > 2)
-			{
-				Owner = (uri.Segments[uri.Segments.Length - 2] ?? "").TrimEnd('/').ToNullIfEmpty();
-			}
-
-			IsHypertextTransferProtocol = uri.IsHypertextTransferProtocol();
-		}
-
-		void SetFilePath(Uri uri)
-		{
-			Host = "";
-			Owner = "";
-			Filename = uri.Segments.Last();
-			RepositoryName = GetRepositoryName(Filename);
-			IsFileUri = true;
-		}
-
-		void SetFilePath(string path)
-		{
-			Host = "";
-			Owner = "";
-			Filename = path.Replace("/", @"\").RightAfterLast(@"\");
-			RepositoryName = GetRepositoryName(Filename);
-			IsFileUri = true;
-		}
-
-		// For xml serialization
-		protected UriString()
-		{
-		}
-
-		bool ParseScpSyntax(string scpString)
-		{
-			var match = sshRegex.Match(scpString);
-			if (match.Success)
-			{
-				Host = match.Groups["host"].Value.ToNullIfEmpty();
-				Owner = match.Groups["owner"].Value.ToNullIfEmpty();
-				RepositoryName = GetRepositoryName(match.Groups["repo"].Value);
-				IsScpUri = true;
-				return true;
-			}
-			return false;
-		}
-
-		public string Host { get; private set; }
-
-		public string Owner { get; private set; }
-
-		public string RepositoryName { get; private set; }
-
-		public string NameWithOwner { get; private set; }
-
-		public bool IsFileUri { get; private set; }
-
-		public bool IsScpUri { get; private set; }
-
-		public bool IsValidUri => url != null;
-		public string Protocol => url?.Scheme;
-		public int Port => url?.Port ?? -1;
-		public string Filename { get; private set; }
-		public string Path => url?.PathAndQuery;
 
 		/// <summary>
 		/// Attempts a best-effort to convert the remote origin to a GitHub Repository URL.
@@ -195,25 +147,6 @@ namespace SpoiledCat.Utilities
 			}.Uri.ToString());
 		}
 
-		/// <summary>
-		/// True if the URL is HTTP or HTTPS
-		/// </summary>
-		public bool IsHypertextTransferProtocol { get; private set; }
-
-		[SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")]
-		public static implicit operator UriString(string value)
-		{
-			if (value == null) return null;
-
-			return new UriString(value);
-		}
-
-		[SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")]
-		public static implicit operator string(UriString uriString)
-		{
-			return uriString?.Value;
-		}
-
 		[SuppressMessage("Microsoft.Usage", "CA2234:PassSystemUriObjectsInsteadOfStrings", Justification = "No.")]
 		public override UriString Combine(string addition)
 		{
@@ -253,9 +186,58 @@ namespace SpoiledCat.Utilities
 			return Value;
 		}
 
-		protected UriString(SerializationInfo info, StreamingContext context)
-			 : this(GetSerializedValue(info))
+		void SetUri(Uri uri)
 		{
+			Host = uri.Host;
+			if (uri.Segments.Any())
+			{
+				Filename = uri.Segments.Last();
+				RepositoryName = GetRepositoryName(Filename);
+			}
+
+			if (uri.Segments.Length > 2)
+			{
+				Owner = (uri.Segments[uri.Segments.Length - 2] ?? "").TrimEnd('/').ToNullIfEmpty();
+			}
+
+			IsHypertextTransferProtocol = uri.IsHypertextTransferProtocol();
+		}
+
+		void SetFilePath(Uri uri)
+		{
+			Host = "";
+			Owner = "";
+			Filename = uri.Segments.Last();
+			RepositoryName = GetRepositoryName(Filename);
+			IsFileUri = true;
+		}
+
+		void SetFilePath(string path)
+		{
+			Host = "";
+			Owner = "";
+			Filename = path.Replace("/", @"\").RightAfterLast(@"\");
+			RepositoryName = GetRepositoryName(Filename);
+			IsFileUri = true;
+		}
+
+		bool ParseScpSyntax(string scpString)
+		{
+			var match = sshRegex.Match(scpString);
+			if (match.Success)
+			{
+				Host = match.Groups["host"].Value.ToNullIfEmpty();
+				Owner = match.Groups["owner"].Value.ToNullIfEmpty();
+				RepositoryName = GetRepositoryName(match.Groups["repo"].Value);
+				IsScpUri = true;
+				return true;
+			}
+			return false;
+		}
+
+		bool IEquatable<UriString>.Equals(UriString other)
+		{
+			return other != null && ToString().Equals(other.ToString());
 		}
 
 		static string GetSerializedValue(SerializationInfo info)
@@ -289,10 +271,28 @@ namespace SpoiledCat.Utilities
 			return repositoryNameSegment.TrimEnd('/').TrimEnd(".git");
 		}
 
-		bool IEquatable<UriString>.Equals(UriString other)
-		{
-			return other != null && ToString().Equals(other.ToString());
-		}
+		public string Host { get; private set; }
+
+		public string Owner { get; private set; }
+
+		public string RepositoryName { get; private set; }
+
+		public string NameWithOwner { get; private set; }
+
+		public bool IsFileUri { get; private set; }
+
+		public bool IsScpUri { get; private set; }
+
+		public bool IsValidUri => url != null;
+		public string Protocol => url?.Scheme;
+		public int Port => url?.Port ?? -1;
+		public string Filename { get; private set; }
+		public string Path => url?.PathAndQuery;
+
+		/// <summary>
+		/// True if the URL is HTTP or HTTPS
+		/// </summary>
+		public bool IsHypertextTransferProtocol { get; private set; }
 	}
 
 	public static class UriStringExtensions
@@ -316,7 +316,9 @@ namespace SpoiledCat.Utilities
 		{
 		}
 
-		public abstract T Combine(string addition);
+		protected StringEquivalent(SerializationInfo info) : this(info.GetValue("Value", typeof(string)) as string)
+		{
+		}
 
 		[SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates", Justification = "Add doesn't make sense in the case of a string equivalent")]
 		public static T operator +(StringEquivalent<T> a, string b)
@@ -347,6 +349,8 @@ namespace SpoiledCat.Utilities
 			return !(a == b);
 		}
 
+		public abstract T Combine(string addition);
+
 		public override bool Equals(Object obj)
 		{
 			return obj != null && Equals(obj as T) || Equals(obj as string);
@@ -370,10 +374,6 @@ namespace SpoiledCat.Utilities
 		public override string ToString()
 		{
 			return Value;
-		}
-
-		protected StringEquivalent(SerializationInfo info) : this(info.GetValue("Value", typeof(string)) as string)
-		{
 		}
 
 		public virtual void GetObjectData(SerializationInfo info, StreamingContext context)

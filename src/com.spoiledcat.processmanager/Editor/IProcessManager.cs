@@ -9,17 +9,17 @@ namespace SpoiledCat.ProcessManager
 
 	public interface IProcess
 	{
+		event Action<IProcess> OnEndProcess;
+		event Action<string> OnErrorData;
+		event Action<IProcess> OnStartProcess;
 		void Configure(Process existingProcess);
 		void Configure(ProcessStartInfo psi);
 		void Stop();
-		event Action<string> OnErrorData;
 		StreamWriter StandardInput { get; }
 		int ProcessId { get; }
 		string ProcessName { get; }
 		string ProcessArguments { get; }
 		Process Process { get; set; }
-		event Action<IProcess> OnStartProcess;
-		event Action<IProcess> OnEndProcess;
 	}
 
 
@@ -31,9 +31,9 @@ namespace SpoiledCat.ProcessManager
 			where T : IProcessTask;
 
 		IProcess Reconnect(IProcess processTask, int i);
-		CancellationToken CancellationToken { get; }
-		IProcessEnvironment DefaultProcessEnvironment { get; }
 		void RunCommandLineWindow(NPath workingDirectory);
 		void Stop();
+		CancellationToken CancellationToken { get; }
+		IProcessEnvironment DefaultProcessEnvironment { get; }
 	}
 }

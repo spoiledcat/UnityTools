@@ -7,14 +7,14 @@ namespace SpoiledCat.Logging
 {
     public class MultipleLogAdapter : LogAdapterBase
     {
-        private readonly LogAdapterBase[] logAdapters;
+	    private readonly LogAdapterBase[] logAdapters;
 
-        public MultipleLogAdapter(params LogAdapterBase[] logAdapters)
+	    public MultipleLogAdapter(params LogAdapterBase[] logAdapters)
         {
             this.logAdapters = logAdapters ?? new LogAdapterBase[0];
         }
 
-        public override void Info(string context, string message)
+	    public override void Info(string context, string message)
         {
             foreach (var logger in logAdapters)
             {
@@ -22,7 +22,7 @@ namespace SpoiledCat.Logging
             }
         }
 
-        public override void Debug(string context, string message)
+	    public override void Debug(string context, string message)
         {
             foreach (var logger in logAdapters)
             {
@@ -30,7 +30,7 @@ namespace SpoiledCat.Logging
             }
         }
 
-        public override void Trace(string context, string message)
+	    public override void Trace(string context, string message)
         {
             foreach (var logger in logAdapters)
             {
@@ -38,7 +38,7 @@ namespace SpoiledCat.Logging
             }
         }
 
-        public override void Warning(string context, string message)
+	    public override void Warning(string context, string message)
         {
             foreach (var logger in logAdapters)
             {
@@ -46,7 +46,7 @@ namespace SpoiledCat.Logging
             }
         }
 
-        public override void Error(string context, string message)
+	    public override void Error(string context, string message)
         {
             foreach (var logger in logAdapters)
             {

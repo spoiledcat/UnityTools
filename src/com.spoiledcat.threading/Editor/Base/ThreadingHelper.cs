@@ -9,21 +9,14 @@ using System.Threading.Tasks;
 namespace SpoiledCat.Threading
 {
 	using Helpers;
-    public static class ThreadingHelper
+    public class ThreadingHelper
     {
-        public static TaskScheduler MainThreadScheduler { get; set; }
-
-        public static int MainThread { get; set; }
-        static bool InMainThread { get { return MainThread == 0 || Thread.CurrentThread.ManagedThreadId == MainThread; } }
-
-        public static void SetUIThread()
+	    public void SetUIThread()
         {
             MainThread = Thread.CurrentThread.ManagedThreadId;
         }
 
-        public static bool InUIThread => InMainThread || Guard.InUnitTestRunner;
-
-        public static TaskScheduler GetUIScheduler(SynchronizationContext synchronizationContext)
+	    public static TaskScheduler GetUIScheduler(SynchronizationContext synchronizationContext)
         {
             // quickly swap out the sync context so we can leverage FromCurrentSynchronizationContext for our ui scheduler
             var currentSyncContext = SynchronizationContext.Current;
@@ -33,5 +26,10 @@ namespace SpoiledCat.Threading
                 SynchronizationContext.SetSynchronizationContext(currentSyncContext);
             return ret;
         }
+
+	    public int MainThread { get; set; }
+	    bool InMainThread { get { return MainThread == 0 || Thread.CurrentThread.ManagedThreadId == MainThread; } }
+
+	    public bool InUIThread => InMainThread || Guard.InUnitTestRunner;
     }
 }

@@ -467,11 +467,11 @@ namespace SpoiledCat.Threading
 		[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 		private sealed class CompletionState : TaskCompletionSource<bool>
 		{
+			/// <summary>Whether completion processing has been queued.</summary>
+			public bool m_completionQueued;
 			/// <summary>Whether the scheduler has had completion requested.</summary>
 			/// <remarks>This variable is not volatile, so to gurantee safe reading reads, Volatile.Read is used in TryExecuteTaskInline.</remarks>
 			public bool m_completionRequested;
-			/// <summary>Whether completion processing has been queued.</summary>
-			public bool m_completionQueued;
 			/// <summary>Unrecoverable exceptions incurred while processing.</summary>
 			public List<Exception> m_exceptions;
 		}
@@ -485,10 +485,10 @@ namespace SpoiledCat.Threading
 		{
 			/// <summary>Cached delegate for invoking TryExecuteTaskShim.</summary>
 			private static readonly Func<object, bool> s_tryExecuteTaskShim = new Func<object, bool>(TryExecuteTaskShim);
-			/// <summary>The parent pair.</summary>
-			private readonly ConcurrentExclusiveSchedulerPairCustom m_pair;
 			/// <summary>The maximum concurrency level for the scheduler.</summary>
 			private readonly int m_maxConcurrencyLevel;
+			/// <summary>The parent pair.</summary>
+			private readonly ConcurrentExclusiveSchedulerPairCustom m_pair;
 			/// <summary>The processing mode of this scheduler, exclusive or concurrent.</summary>
 			private readonly ProcessingMode m_processingMode;
 			/// <summary>Gets the queue of tasks for this scheduler.</summary>
@@ -516,8 +516,14 @@ namespace SpoiledCat.Threading
 					(IProducerConsumerQueue<Task>)new MultiProducerMultiConsumerQueue<Task>();
 			}
 
-			/// <summary>Gets the maximum concurrency level this scheduler is able to support.</summary>
-			public override int MaximumConcurrencyLevel { get { return m_maxConcurrencyLevel; } }
+			/// <summary>Executes a task on this scheduler.</summary>
+			/// <param name="task">The task to be executed.</param>
+			[SecuritySafeCritical]
+			public void ExecuteTask(Task task)
+			{
+				Contract.Assert(task != null, "Infrastructure should have provided a non-null task.");
+				base.TryExecuteTask(task);
+			}
 
 			/// <summary>Queues a task to the scheduler.</summary>
 			/// <param name="task">The task to be queued.</param>
@@ -534,15 +540,6 @@ namespace SpoiledCat.Threading
 					m_tasks.Enqueue(task);
 					m_pair.ProcessAsyncIfNecessary();
 				}
-			}
-
-			/// <summary>Executes a task on this scheduler.</summary>
-			/// <param name="task">The task to be executed.</param>
-			[SecuritySafeCritical]
-			public void ExecuteTask(Task task)
-			{
-				Contract.Assert(task != null, "Infrastructure should have provided a non-null task.");
-				base.TryExecuteTask(task);
 			}
 
 			/// <summary>Tries to execute the task synchronously on this scheduler.</summary>
@@ -598,6 +595,11 @@ namespace SpoiledCat.Threading
 				return false;
 			}
 
+			/// <summary>Gets for debugging purposes the tasks scheduled to this scheduler.</summary>
+			/// <returns>An enumerable of the tasks queued.</returns>
+			[SecurityCritical]
+			protected override IEnumerable<Task> GetScheduledTasks() { return m_tasks; }
+
 			/// <summary>
 			/// Implements a reasonable approximation for TryExecuteTaskInline on the underlying scheduler,
 			/// which we can't call directly on the underlying scheduler.
@@ -646,10 +648,9 @@ namespace SpoiledCat.Threading
 				return tuple.Item1.TryExecuteTask(tuple.Item2);
 			}
 
-			/// <summary>Gets for debugging purposes the tasks scheduled to this scheduler.</summary>
-			/// <returns>An enumerable of the tasks queued.</returns>
-			[SecurityCritical]
-			protected override IEnumerable<Task> GetScheduledTasks() { return m_tasks; }
+			/// <summary>Gets the maximum concurrency level this scheduler is able to support.</summary>
+			public override int MaximumConcurrencyLevel { get { return m_maxConcurrencyLevel; } }
+
 			public IEnumerable<Task> Tasks => m_tasks;
 
 			/// <summary>Gets the number of tasks queued to this scheduler.</summary>
@@ -672,8 +673,10 @@ namespace SpoiledCat.Threading
 
 				/// <summary>Gets this pair's maximum allowed concurrency level.</summary>
 				public int MaximumConcurrencyLevel { get { return m_taskScheduler.m_maxConcurrencyLevel; } }
+
 				/// <summary>Gets the tasks scheduled to this scheduler.</summary>
 				public IEnumerable<Task> ScheduledTasks { get { return m_taskScheduler.m_tasks; } }
+
 				/// <summary>Gets the scheduler pair with which this scheduler is associated.</summary>
 				public ConcurrentExclusiveSchedulerPairCustom SchedulerPair { get { return m_taskScheduler.m_pair; } }
 			}
@@ -695,15 +698,19 @@ namespace SpoiledCat.Threading
 
 			/// <summary>Gets a representation of the execution state of the pair.</summary>
 			public ProcessingMode Mode { get { return m_pair.ModeForDebugger; } }
+
 			/// <summary>Gets the number of tasks waiting to run exclusively.</summary>
 			public IEnumerable<Task> ScheduledExclusive { get { return m_pair.m_exclusiveTaskScheduler.m_tasks; } }
+
 			/// <summary>Gets the number of tasks waiting to run concurrently.</summary>
 			public IEnumerable<Task> ScheduledConcurrent { get { return m_pair.m_concurrentTaskScheduler.m_tasks; } }
+
 			/// <summary>Gets the number of tasks currently being executed.</summary>
 			public int CurrentlyExecutingTaskCount
 			{
 				get { return (m_pair.m_processingCount == EXCLUSIVE_PROCESSING_SENTINEL) ? 1 : m_pair.m_processingCount; }
 			}
+
 			/// <summary>Gets the underlying task scheduler that actually executes the tasks.</summary>
 			public TaskScheduler TargetScheduler { get { return m_pair.m_underlyingTaskScheduler; } }
 		}
@@ -831,6 +838,11 @@ namespace SpoiledCat.Threading
 			/// <remarks>This method is meant to be thread-safe subject to the particular nature of the implementation.</remarks>
 			bool TryDequeue(out T result);
 
+			/// <summary>A thread-safe way to get the number of items in the collection. May synchronize access by locking the provided synchronization object.</summary>
+			/// <param name="syncObj">The sync object used to lock</param>
+			/// <returns>The collection count</returns>
+			int GetCountSafe(object syncObj);
+
 			/// <summary>Gets whether the collection is currently empty.</summary>
 			/// <remarks>This method may or may not be thread-safe.</remarks>
 			bool IsEmpty { get; }
@@ -838,11 +850,6 @@ namespace SpoiledCat.Threading
 			/// <summary>Gets the number of items in the collection.</summary>
 			/// <remarks>In many implementations, this method will not be thread-safe.</remarks>
 			int Count { get; }
-
-			/// <summary>A thread-safe way to get the number of items in the collection. May synchronize access by locking the provided synchronization object.</summary>
-			/// <param name="syncObj">The sync object used to lock</param>
-			/// <returns>The collection count</returns>
-			int GetCountSafe(object syncObj);
 		}
 
 		/// <summary>
@@ -861,15 +868,15 @@ namespace SpoiledCat.Threading
 			/// <returns>true if an item could be dequeued; otherwise, false.</returns>
 			bool IProducerConsumerQueue<T>.TryDequeue(out T result) { return base.TryDequeue(out result); }
 
+			/// <summary>A thread-safe way to get the number of items in the collection. May synchronize access by locking the provided synchronization object.</summary>
+			/// <remarks>ConcurrentQueue.Count is thread safe, no need to acquire the lock.</remarks>
+			int IProducerConsumerQueue<T>.GetCountSafe(object syncObj) { return base.Count; }
+
 			/// <summary>Gets whether the collection is currently empty.</summary>
 			bool IProducerConsumerQueue<T>.IsEmpty { get { return base.IsEmpty; } }
 
 			/// <summary>Gets the number of items in the collection.</summary>
 			int IProducerConsumerQueue<T>.Count { get { return base.Count; } }
-
-			/// <summary>A thread-safe way to get the number of items in the collection. May synchronize access by locking the provided synchronization object.</summary>
-			/// <remarks>ConcurrentQueue.Count is thread safe, no need to acquire the lock.</remarks>
-			int IProducerConsumerQueue<T>.GetCountSafe(object syncObj) { return base.Count; }
 		}
 
 		/// <summary>
@@ -914,7 +921,7 @@ namespace SpoiledCat.Threading
 
 			/// <summary>The initial size to use for segments (in number of elements).</summary>
 			private const int INIT_SEGMENT_SIZE = 32; // must be a power of 2
-													  /// <summary>The maximum size to use for segments (in number of elements).</summary>
+			/// <summary>The maximum size to use for segments (in number of elements).</summary>
 			private const int MAX_SEGMENT_SIZE = 0x1000000; // this could be made as large as Int32.MaxValue / 2
 
 			/// <summary>The head of the linked list of segments.</summary>
@@ -954,6 +961,97 @@ namespace SpoiledCat.Threading
 				else EnqueueSlow(item, ref segment);
 			}
 
+			/// <summary>Attempts to dequeue an item from the queue.</summary>
+			/// <param name="result">The dequeued item.</param>
+			/// <returns>true if an item could be dequeued; otherwise, false.</returns>
+			public bool TryDequeue(out T result)
+			{
+				Segment segment = m_head;
+				var array = segment.m_array;
+				int first = segment.m_state.m_first; // local copy to avoid multiple volatile reads
+
+				// Fast path: there's obviously data available in the current segment
+				if (first != segment.m_state.m_lastCopy)
+				{
+					result = array[first];
+					array[first] = default(T); // Clear the slot to release the element
+					segment.m_state.m_first = (first + 1) & (array.Length - 1);
+					return true;
+				}
+				// Slow path: there may not be data available in the current segment
+				else return TryDequeueSlow(ref segment, ref array, out result);
+			}
+
+			/// <summary>Attempts to peek at an item in the queue.</summary>
+			/// <param name="result">The peeked item.</param>
+			/// <returns>true if an item could be peeked; otherwise, false.</returns>
+			public bool TryPeek(out T result)
+			{
+				Segment segment = m_head;
+				var array = segment.m_array;
+				int first = segment.m_state.m_first; // local copy to avoid multiple volatile reads
+
+				// Fast path: there's obviously data available in the current segment
+				if (first != segment.m_state.m_lastCopy)
+				{
+					result = array[first];
+					return true;
+				}
+				// Slow path: there may not be data available in the current segment
+				else return TryPeekSlow(ref segment, ref array, out result);
+			}
+
+			/// <summary>Attempts to dequeue an item from the queue.</summary>
+			/// <param name="predicate">The predicate that must return true for the item to be dequeued.  If null, all items implicitly return true.</param>
+			/// <param name="result">The dequeued item.</param>
+			/// <returns>true if an item could be dequeued; otherwise, false.</returns>
+			public bool TryDequeueIf(Predicate<T> predicate, out T result)
+			{
+				Segment segment = m_head;
+				var array = segment.m_array;
+				int first = segment.m_state.m_first; // local copy to avoid multiple volatile reads
+
+				// Fast path: there's obviously data available in the current segment
+				if (first != segment.m_state.m_lastCopy)
+				{
+					result = array[first];
+					if (predicate == null || predicate(result))
+					{
+						array[first] = default(T); // Clear the slot to release the element
+						segment.m_state.m_first = (first + 1) & (array.Length - 1);
+						return true;
+					}
+					else
+					{
+						result = default(T);
+						return false;
+					}
+				}
+				// Slow path: there may not be data available in the current segment
+				else return TryDequeueIfSlow(predicate, ref segment, ref array, out result);
+			}
+
+			public void Clear()
+			{
+				T ignored;
+				while (TryDequeue(out ignored)) ;
+			}
+
+			/// <summary>Gets an enumerable for the collection.</summary>
+			/// <remarks>WARNING: This should only be used for debugging purposes.  It is not safe to be used concurrently.</remarks>
+			public IEnumerator<T> GetEnumerator()
+			{
+				for (Segment segment = m_head; segment != null; segment = segment.m_next)
+				{
+					for (int pt = segment.m_state.m_first;
+						pt != segment.m_state.m_last;
+						pt = (pt + 1) & (segment.m_array.Length - 1))
+					{
+						yield return segment.m_array[pt];
+					}
+				}
+			}
+
 			/// <summary>Enqueues an item into the queue.</summary>
 			/// <param name="item">The item to enqueue.</param>
 			/// <param name="segment">The segment in which to first attempt to store the item.</param>
@@ -985,27 +1083,6 @@ namespace SpoiledCat.Threading
 					Volatile.Write(ref m_tail.m_next, newSegment); // ensure segment not published until item is fully stored
 					m_tail = newSegment;
 				}
-			}
-
-			/// <summary>Attempts to dequeue an item from the queue.</summary>
-			/// <param name="result">The dequeued item.</param>
-			/// <returns>true if an item could be dequeued; otherwise, false.</returns>
-			public bool TryDequeue(out T result)
-			{
-				Segment segment = m_head;
-				var array = segment.m_array;
-				int first = segment.m_state.m_first; // local copy to avoid multiple volatile reads
-
-				// Fast path: there's obviously data available in the current segment
-				if (first != segment.m_state.m_lastCopy)
-				{
-					result = array[first];
-					array[first] = default(T); // Clear the slot to release the element
-					segment.m_state.m_first = (first + 1) & (array.Length - 1);
-					return true;
-				}
-				// Slow path: there may not be data available in the current segment
-				else return TryDequeueSlow(ref segment, ref array, out result);
 			}
 
 			/// <summary>Attempts to dequeue an item from the queue.</summary>
@@ -1048,25 +1125,6 @@ namespace SpoiledCat.Threading
 			}
 
 			/// <summary>Attempts to peek at an item in the queue.</summary>
-			/// <param name="result">The peeked item.</param>
-			/// <returns>true if an item could be peeked; otherwise, false.</returns>
-			public bool TryPeek(out T result)
-			{
-				Segment segment = m_head;
-				var array = segment.m_array;
-				int first = segment.m_state.m_first; // local copy to avoid multiple volatile reads
-
-				// Fast path: there's obviously data available in the current segment
-				if (first != segment.m_state.m_lastCopy)
-				{
-					result = array[first];
-					return true;
-				}
-				// Slow path: there may not be data available in the current segment
-				else return TryPeekSlow(ref segment, ref array, out result);
-			}
-
-			/// <summary>Attempts to peek at an item in the queue.</summary>
 			/// <param name="array">The array from which the item is peeked.</param>
 			/// <param name="segment">The segment from which the item is peeked.</param>
 			/// <param name="result">The peeked item.</param>
@@ -1099,36 +1157,6 @@ namespace SpoiledCat.Threading
 
 				result = array[first];
 				return true;
-			}
-
-			/// <summary>Attempts to dequeue an item from the queue.</summary>
-			/// <param name="predicate">The predicate that must return true for the item to be dequeued.  If null, all items implicitly return true.</param>
-			/// <param name="result">The dequeued item.</param>
-			/// <returns>true if an item could be dequeued; otherwise, false.</returns>
-			public bool TryDequeueIf(Predicate<T> predicate, out T result)
-			{
-				Segment segment = m_head;
-				var array = segment.m_array;
-				int first = segment.m_state.m_first; // local copy to avoid multiple volatile reads
-
-				// Fast path: there's obviously data available in the current segment
-				if (first != segment.m_state.m_lastCopy)
-				{
-					result = array[first];
-					if (predicate == null || predicate(result))
-					{
-						array[first] = default(T); // Clear the slot to release the element
-						segment.m_state.m_first = (first + 1) & (array.Length - 1);
-						return true;
-					}
-					else
-					{
-						result = default(T);
-						return false;
-					}
-				}
-				// Slow path: there may not be data available in the current segment
-				else return TryDequeueIfSlow(predicate, ref segment, ref array, out result);
 			}
 
 			/// <summary>Attempts to dequeue an item from the queue.</summary>
@@ -1178,10 +1206,19 @@ namespace SpoiledCat.Threading
 				}
 			}
 
-			public void Clear()
+			/// <summary>Gets an enumerable for the collection.</summary>
+			/// <remarks>WARNING: This should only be used for debugging purposes.  It is not safe to be used concurrently.</remarks>
+			IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
+
+			/// <summary>A thread-safe way to get the number of items in the collection. May synchronize access by locking the provided synchronization object.</summary>
+			/// <remarks>The Count is not thread safe, so we need to acquire the lock.</remarks>
+			int IProducerConsumerQueue<T>.GetCountSafe(object syncObj)
 			{
-				T ignored;
-				while (TryDequeue(out ignored)) ;
+				Contract.Assert(syncObj != null, "The syncObj parameter is null.");
+				lock (syncObj)
+				{
+					return Count;
+				}
 			}
 
 			/// <summary>Gets whether the collection is currently empty.</summary>
@@ -1197,24 +1234,6 @@ namespace SpoiledCat.Threading
 					return head.m_next == null;
 				}
 			}
-
-			/// <summary>Gets an enumerable for the collection.</summary>
-			/// <remarks>WARNING: This should only be used for debugging purposes.  It is not safe to be used concurrently.</remarks>
-			public IEnumerator<T> GetEnumerator()
-			{
-				for (Segment segment = m_head; segment != null; segment = segment.m_next)
-				{
-					for (int pt = segment.m_state.m_first;
-						pt != segment.m_state.m_last;
-						pt = (pt + 1) & (segment.m_array.Length - 1))
-					{
-						yield return segment.m_array[pt];
-					}
-				}
-			}
-			/// <summary>Gets an enumerable for the collection.</summary>
-			/// <remarks>WARNING: This should only be used for debugging purposes.  It is not safe to be used concurrently.</remarks>
-			IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
 
 			/// <summary>Gets the number of items in the collection.</summary>
 			/// <remarks>WARNING: This should only be used for debugging purposes.  It is not meant to be used concurrently.</remarks>
@@ -1239,25 +1258,14 @@ namespace SpoiledCat.Threading
 				}
 			}
 
-			/// <summary>A thread-safe way to get the number of items in the collection. May synchronize access by locking the provided synchronization object.</summary>
-			/// <remarks>The Count is not thread safe, so we need to acquire the lock.</remarks>
-			int IProducerConsumerQueue<T>.GetCountSafe(object syncObj)
-			{
-				Contract.Assert(syncObj != null, "The syncObj parameter is null.");
-				lock (syncObj)
-				{
-					return Count;
-				}
-			}
-
 			/// <summary>A segment in the queue containing one or more items.</summary>
 			[StructLayout(LayoutKind.Sequential)]
 			private sealed class Segment
 			{
-				/// <summary>The next segment in the linked list of segments.</summary>
-				public Segment m_next;
 				/// <summary>The data stored in this segment.</summary>
 				public readonly T[] m_array;
+				/// <summary>The next segment in the linked list of segments.</summary>
+				public Segment m_next;
 				/// <summary>Details about the segment.</summary>
 				public SegmentState m_state; // separated out to enable StructLayout attribute to take effect
 
