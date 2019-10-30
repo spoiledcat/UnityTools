@@ -1,0 +1,40 @@
+{
+  "scopedRegistries": [
+    {
+      "name": "Metadata",
+      "url": "http://packages.unity.com",
+      "scopes": [
+        "com.unity.package-manager.metadata"
+      ]
+    },
+    {
+      "name": "spoiledcat",
+      "url": "https://registry.spoiledcat.com/",
+      "scopes": [
+        "com.spoiledcat"
+      ]
+    }
+  ],
+  "dependencies": {
+    "com.spoiledcat.environment": "1.0.22",
+    "com.spoiledcat.logging": "1.0.22",
+    "com.spoiledcat.niceio": "1.0.22",
+    "com.spoiledcat.processmanager": "1.0.22",
+    "com.spoiledcat.quick-console": "1.0.22",
+    "com.spoiledcat.sharpziplib": "1.0.22",
+    "com.spoiledcat.simplejson": "1.0.22",
+    "com.spoiledcat.tasks": "1.0.22",
+    "com.spoiledcat.threading": "1.0.22",
+    "com.spoiledcat.ui": "1.0.22",
+    "com.spoiledcat.utilities": "1.0.22",
+    "com.unity.package-manager-ui": "2.1.2",
+    "com.unity.modules.imageconversion": "1.0.0",
+    "com.unity.modules.imgui": "1.0.0",
+    "com.unity.modules.jsonserialize": "1.0.0",
+    "com.unity.modules.ui": "1.0.0"
+  },
+  "testables": [
+      "com.spoiledcat.threading.tests",
+      "com.spoiledcat.processmanager.tests"
+  ]
+}

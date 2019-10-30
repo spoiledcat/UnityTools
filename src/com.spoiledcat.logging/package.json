@@ -11,7 +11,7 @@
     "repository" : {
       "type" : "git",
       "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
-      "directory": "src/Logging"
+      "directory": ""
     },
     "publishConfig": {
         "registry":"https://registry.spoiledcat.com/"

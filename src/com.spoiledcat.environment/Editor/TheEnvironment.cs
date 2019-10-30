@@ -13,7 +13,7 @@ namespace SpoiledCat.Unity
 {
 	using NiceIO;
 
-	sealed class TheEnvironment : ScriptableSingleton<TheEnvironment>
+	public sealed class TheEnvironment : ScriptableSingleton<TheEnvironment>
 	{
 		[NonSerialized] private IEnvironment environment;
 		[SerializeField] private string extensionInstallPath;

@@ -51,9 +51,6 @@ for:
     files:
     - doc/*
     - README.md
-  install:
-  - ps: '"//registry.spoiledcat.com/:_authToken=$env:npm_auth_token`n" | out-file "$env:userprofile\.npmrc" -Encoding ASCII'
-  - npm whoami
 
   deploy:
     provider: NuGet
@@ -67,9 +64,9 @@ for:
       APPVEYOR_REPO_TAG: true
 
   after_deploy:
+    - npm config set //registry.spoiledcat.com/:_authToken %NPM_TOKEN%
+    - npm config set always-auth true
     - ps: |
         if ($env:APPVEYOR_REPO_TAG -eq "true") {
-          "//registry.spoiledcat.com/:_authToken=`$`{NPM_TOKEN`}" | Out-File (Join-Path $ENV:APPVEYOR_BUILD_FOLDER ".npmrc") -Encoding UTF8
-          iex "npm pack"
-          iex "npm publish"
+
         }

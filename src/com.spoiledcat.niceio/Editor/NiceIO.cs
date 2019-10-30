@@ -1219,10 +1219,14 @@ namespace SpoiledCat.NiceIO
 
 		public static NPath Resolve(this NPath path)
 		{
-			if (!path.IsInitialized || !NPath.IsUnix /* nothing to resolve on windows */ || path.IsRelative ||
-				!path.FileExists())
+			if (!path.IsInitialized || !path.Exists())
 				return path;
-			return NPath.FileSystem.Resolve(path.ToString()).ToNPath();
+
+			// because Unity sometimes lies about where things are
+			string fullPath = NPath.FileSystem.GetFullPath(path.ToString());
+			if (!NPath.IsUnix)
+				return fullPath.ToNPath();
+			return NPath.FileSystem.Resolve(fullPath).ToNPath();
 		}
 
 		public static NPath CreateTempDirectory(this NPath baseDir, string myprefix = "")

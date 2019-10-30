@@ -42,7 +42,6 @@ namespace SpoiledCat.Threading
         T Finally<T>(T taskToContinueWith) where T : ITask;
 
 	    ITask Start();
-	    ITask Start(TaskScheduler scheduler);
 	    void RunSynchronously();
 
 	    ITask Progress(Action<IProgress> progressHandler);
@@ -91,7 +90,6 @@ namespace SpoiledCat.Threading
         ITask Finally(Action<bool, Exception, TResult> continuation, string name = null, TaskAffinity affinity = TaskAffinity.Concurrent);
 
 	    new ITask<TResult> Start();
-	    new ITask<TResult> Start(TaskScheduler scheduler);
 	    new TResult RunSynchronously();
 	    new ITask<TResult> Progress(Action<IProgress> progressHandler);
 
@@ -154,8 +152,6 @@ namespace SpoiledCat.Threading
 	    void ITask.RunSynchronously() => throw new NotImplementedException();
 
 	    ITask ITask.Start() => throw new NotImplementedException();
-
-	    ITask ITask.Start(TaskScheduler scheduler) => throw new NotImplementedException();
 
 	    T ITask.Then<T>(T continuation, TaskRunOptions runOptions, bool taskIsTopOfChain) => throw new NotImplementedException();
 
@@ -376,13 +372,12 @@ namespace SpoiledCat.Threading
             }
         }
 
-	    public virtual ITask Start(TaskScheduler scheduler)
+	    internal void Start(TaskScheduler scheduler)
         {
             if (Task.Status == TaskStatus.Created)
             {
                 Task.Start(scheduler);
             }
-            return this;
         }
 
 	    public ITask GetTopOfChain(bool onlyCreated = true)
@@ -754,12 +749,6 @@ namespace SpoiledCat.Threading
 	    public new ITask<TResult> Start()
         {
             base.Start();
-            return this;
-        }
-
-	    public new ITask<TResult> Start(TaskScheduler scheduler)
-        {
-            base.Start(scheduler);
             return this;
         }
 

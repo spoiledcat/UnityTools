@@ -30,6 +30,7 @@
     AfterTargets="AfterBuild"
     Inputs="@(SourcesToCopy);@(VersionFiles)"
     Outputs="@(SourcesToCopy->'$(PublishTo)$(PackageName)\%(RecursiveDir)%(Filename)%(Extension)');@(VersionFiles->'$(PublishTo)$(PackageName)$(PackageSubFolder)Version%(Extension)')"
+    Returns="$Ran"
     >
 
     <MakeDir Directories="$(PublishTo)$(PackageName)" />
@@ -37,18 +38,20 @@
     <Copy
       SourceFiles="@(SourcesToCopy)"
       DestinationFiles="@(SourcesToCopy->'$(PublishTo)$(PackageName)\%(RecursiveDir)%(Filename)%(Extension)')"
-      SkipUnchangedFiles="true">
-      <Output TaskParameter="CopiedFiles" ItemName="FilesCopied" />
-    </Copy>
+      SkipUnchangedFiles="true" />
 
     <Copy
       SourceFiles="@(VersionFiles)"
       DestinationFiles="@(VersionFiles->'$(PublishTo)$(PackageName)$(PackageSubFolder)Version%(Extension)')"
       SkipUnchangedFiles="true" />
 
-  </Target>
+      <ItemGroup>
+        <Ran Include="true" />
+      </ItemGroup>
 
-    <Target Name="StampPackageVersion" AfterTargets="CopySourcesToPackmanPackage">
+    </Target>
+
+    <Target Name="UpdatePackageJson" AfterTargets="CopySourcesToPackmanPackage" Condition="'$(Ran)' == 'true' ">
 
     <FileUpdate 
       Files="$(PublishTo)$(PackageName)\package.json" 
@@ -65,9 +68,12 @@
     <FileUpdate 
       Files="$(PublishTo)$(PackageName)\package.json" 
       Regex="(&quot;com\.spoiledcat\..*&quot;): &quot;.*&quot;" 
-      ReplacementText="$1: &quot;$(NuGetPackageVersion)&quot;">
-      <Output TaskParameter="AllItemsUpdated" PropertyName="FileWasStamped" />
-    </FileUpdate>
+      ReplacementText="$1: &quot;$(NuGetPackageVersion)&quot;" />
+
+    <FileUpdate 
+      Files="$(PublishTo)$(PackageName)\package.json" 
+      Regex="&quot;directory&quot;: &quot;.*&quot;" 
+      ReplacementText="&quot;directory&quot;: &quot;src/$(PackageName)&quot;" />
 
     <Message Importance="High" Text="Stamping version $(NuGetPackageVersion)" Condition=" '$(FileWasStamped)' == 'true' "/>
 
@@ -82,7 +88,8 @@
   <Target Name="EnumeratePackageTestFiles" Returns="@(TestsToCopy)">
     <CreateItem
       Include="$(PackageSourceRootFull)\Tests\**\*.*;$(SolutionDir)\extras\$(PackageName)\Tests\**\*.*"
-      Exclude="$(PackageSourceRootFull)**\*.csproj*;$(PackageSourceRootFull)**\*.ncrunch*;$(PackageSourceRootFull)**\obj\**">
+      Exclude="$(PackageSourceRootFull)\Tests\**\*.csproj*;$(PackageSourceRootFull)\Tests\**\*.ncrunch*;$(PackageSourceRootFull)\Tests\**\obj\**;$(PackageSourceRootFull)\Tests\Helpers~\$(AssemblyName)*;$(PackageSourceRootFull)\Tests\Helpers~\nunit*;$(PackageSourceRootFull)\Tests\Helpers~\*Test*;$(PackageSourceRootFull)\Tests\Helpers~\Castle*;$(PackageSourceRootFull)\Tests\Helpers~\Microsoft*;$(PackageSourceRootFull)\Tests\Helpers~\System.*;$(PackageSourceRootFull)\Tests\Helpers~\NSubstitute*
+      ">
       <Output TaskParameter="Include" ItemName="TestsToCopy" />
     </CreateItem>
   </Target>
@@ -130,9 +137,12 @@
     <FileUpdate 
       Files="$(PublishTo)$(PackageTestName)\package.json" 
       Regex="(&quot;com\.spoiledcat\..*&quot;): &quot;.*&quot;" 
-      ReplacementText="$1: &quot;$(NuGetPackageVersion)&quot;">
-      <Output TaskParameter="AllItemsUpdated" PropertyName="FileWasStamped" />
-    </FileUpdate>
+      ReplacementText="$1: &quot;$(NuGetPackageVersion)&quot;" />
+
+    <FileUpdate 
+      Files="$(PublishTo)$(PackageTestName)\package.json" 
+      Regex="&quot;directory&quot;: &quot;.*&quot;" 
+      ReplacementText="&quot;directory&quot;: &quot;src/$(PackageName)/Tests&quot;" />
 
     <Message Importance="High" Text="Stamping version $(NuGetPackageVersion)" Condition=" '$(FileWasStamped)' == 'true' "/>
 

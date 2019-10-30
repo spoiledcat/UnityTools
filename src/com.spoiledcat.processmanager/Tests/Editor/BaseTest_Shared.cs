@@ -7,7 +7,6 @@
 	using Threading;
 	using System.Diagnostics;
 	using System.Linq;
-	using System.Runtime.CompilerServices;
 	using System.Threading.Tasks;
 	using Extensions;
 	using Logging;
@@ -15,7 +14,7 @@
 	using ProcessManager;
 	using Unity;
 
-	public partial class BaseTest
+	public partial class BaseTest : IDisposable
 	{
 		protected const int Timeout = 30000;
 		protected const int RandomSeed = 120938;
@@ -81,6 +80,7 @@
 		{
 			while (!tasks.All(x => x.IsCompleted)) yield return null;
 		}
+
 	}
 
 
@@ -94,6 +94,16 @@
 		public static void Matches<T>(this IEnumerable<T> actual, IEnumerable<T> expected)
 		{
 			CollectionAssert.AreEqual(expected.ToArray(), actual.ToArray(), $"{Environment.NewLine}expected:{expected.Join()}{Environment.NewLine}actual  :{actual.Join()}{Environment.NewLine}");
+		}
+
+		public static void MatchesUnsorted(this IEnumerable actual, IEnumerable expected)
+		{
+			CollectionAssert.AreEquivalent(expected, actual, $"{Environment.NewLine}expected:{expected.Join()}{Environment.NewLine}actual  :{actual.Join()}{Environment.NewLine}");
+		}
+
+		public static void MatchesUnsorted<T>(this IEnumerable<T> actual, IEnumerable<T> expected)
+		{
+			CollectionAssert.AreEquivalent(expected.ToArray(), actual.ToArray(), $"{Environment.NewLine}expected:{expected.Join()}{Environment.NewLine}actual  :{actual.Join()}{Environment.NewLine}");
 		}
 	}
 

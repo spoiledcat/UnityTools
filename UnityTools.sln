@@ -2,41 +2,41 @@
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.705
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Environment", "src\com.spoiledcat.environment\Editor\SpoiledCat.Unity.Environment.csproj", "{11F6F1B7-7E18-4ADA-87A4-2D65100CAE5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Environment", "src\com.spoiledcat.environment\Editor\SpoiledCat.Unity.Environment.csproj", "{11F6F1B7-7E18-4ADA-87A4-2D65100CAE5E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Logging", "src\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj", "{AAE57A75-EC73-4C1A-9095-6B943AA15BC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logging", "src\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj", "{AAE57A75-EC73-4C1A-9095-6B943AA15BC7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.NiceIO", "src\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj", "{BA3EC028-1970-4F51-95B5-2C18C7706924}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NiceIO", "src\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj", "{BA3EC028-1970-4F51-95B5-2C18C7706924}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.SimpleJson", "src\com.spoiledcat.simplejson\Editor\SpoiledCat.Unity.SimpleJson.csproj", "{2A572465-DE6D-42FA-BC88-C846D6931B5F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleJson", "src\com.spoiledcat.simplejson\Editor\SpoiledCat.Unity.SimpleJson.csproj", "{2A572465-DE6D-42FA-BC88-C846D6931B5F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.SharpZipLib", "src\com.spoiledcat.sharpziplib\Editor\SpoiledCat.Unity.SharpZipLib.csproj", "{E74CD1E7-C4EB-43D3-A843-F520BC712BA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpZipLib", "src\com.spoiledcat.sharpziplib\Editor\SpoiledCat.Unity.SharpZipLib.csproj", "{E74CD1E7-C4EB-43D3-A843-F520BC712BA4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Threading", "src\com.spoiledcat.threading\Editor\SpoiledCat.Unity.Threading.csproj", "{9699A2CF-3009-4272-AE5A-0A0C7AF6BCB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threading", "src\com.spoiledcat.threading\Editor\SpoiledCat.Unity.Threading.csproj", "{9699A2CF-3009-4272-AE5A-0A0C7AF6BCB6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.ProcessManager", "src\com.spoiledcat.processmanager\Editor\SpoiledCat.Unity.ProcessManager.csproj", "{DE31B55F-80BC-40D5-9A93-276537963DCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager", "src\com.spoiledcat.processmanager\Editor\SpoiledCat.Unity.ProcessManager.csproj", "{DE31B55F-80BC-40D5-9A93-276537963DCC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.QuickConsole", "src\com.spoiledcat.quick-console\Editor\SpoiledCat.Unity.QuickConsole.csproj", "{35B2BEAA-0E79-4360-994C-0108D9E61CA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickConsole", "src\com.spoiledcat.quick-console\Editor\SpoiledCat.Unity.QuickConsole.csproj", "{35B2BEAA-0E79-4360-994C-0108D9E61CA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Tasks", "src\com.spoiledcat.tasks\Editor\SpoiledCat.Unity.Tasks.csproj", "{19E58BF2-1CE5-4906-B8EE-F40CF04B8055}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tasks", "src\com.spoiledcat.tasks\Editor\SpoiledCat.Unity.Tasks.csproj", "{19E58BF2-1CE5-4906-B8EE-F40CF04B8055}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.UI", "src\com.spoiledcat.ui\Editor\SpoiledCat.Unity.UI.csproj", "{7F58AD75-25A1-4D10-BCD4-52F965AA25D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UI", "src\com.spoiledcat.ui\Editor\SpoiledCat.Unity.UI.csproj", "{7F58AD75-25A1-4D10-BCD4-52F965AA25D5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Utilities", "src\com.spoiledcat.utilities\Editor\SpoiledCat.Unity.Utilities.csproj", "{D82E300E-7BD9-4B87-9522-847D4EDAABE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utilities", "src\com.spoiledcat.utilities\Editor\SpoiledCat.Unity.Utilities.csproj", "{D82E300E-7BD9-4B87-9522-847D4EDAABE7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1B6C7155-DF65-440B-B560-7414E4325AE3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager.Tests", "tests\SpoiledCat.Unity.ProcessManager\ProcessManager.Tests.csproj", "{009A4389-7D4D-4FD7-9F64-995DCF6EF62F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager.Tests", "tests\ProcessManager.Tests\ProcessManager.Tests.csproj", "{009A4389-7D4D-4FD7-9F64-995DCF6EF62F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threading.Tests", "tests\SpoiledCat.Unity.Threading\Threading.Tests.csproj", "{FF6B651C-2A64-435A-806A-7AA10B3F116F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandLine", "tests\CommandLine\CommandLine.csproj", "{08B87D2A-8CF1-4211-B7AA-5209F00F72F8}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebServer", "tests\TestWebServer\TestWebServer.csproj", "{3DD3451C-30FA-4294-A3A9-1E080342F867}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threading.Tests", "tests\Threading.Tests\Threading.Tests.csproj", "{FF6B651C-2A64-435A-806A-7AA10B3F116F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "helpers", "helpers", "{8E2B165B-88F8-4C91-A603-52920F82B3AD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBase", "tests\TestBase\TestBase.csproj", "{D85495CD-E955-4E08-8D57-7381C6CA88EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandLine", "tests\Helpers\Helper.CommandLine\Helper.CommandLine.csproj", "{08B87D2A-8CF1-4211-B7AA-5209F00F72F8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebServer", "tests\Helpers\Helper.WebServer\Helper.WebServer.csproj", "{3DD3451C-30FA-4294-A3A9-1E080342F867}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBase", "tests\Helpers\TestBase\TestBase.csproj", "{D85495CD-E955-4E08-8D57-7381C6CA88EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

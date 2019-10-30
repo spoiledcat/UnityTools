@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "com.spoiledcat.environment": "file:../../../../build/packages/com.spoiledcat.environment",
+    "com.spoiledcat.logging": "file:../../../../build/packages/com.spoiledcat.logging",
+    "com.spoiledcat.niceio": "file:../../../../build/packages/com.spoiledcat.niceio",
+    "com.spoiledcat.processmanager": "file:../../../../build/packages/com.spoiledcat.processmanager",
+    "com.spoiledcat.processmanager.tests": "file:../../../../build/packages/com.spoiledcat.processmanager.tests",
+    "com.spoiledcat.quick-console": "file:../../../../build/packages/com.spoiledcat.quick-console",
+    "com.spoiledcat.sharpziplib": "file:../../../../build/packages/com.spoiledcat.sharpziplib",
+    "com.spoiledcat.simplejson": "file:../../../../build/packages/com.spoiledcat.simplejson",
+    "com.spoiledcat.tasks": "file:../../../../build/packages/com.spoiledcat.tasks",
+    "com.spoiledcat.threading": "file:../../../../build/packages/com.spoiledcat.threading",
+    "com.spoiledcat.threading.tests": "file:../../../../build/packages/com.spoiledcat.threading.tests",
+    "com.spoiledcat.ui": "file:../../../../build/packages/com.spoiledcat.ui",
+    "com.spoiledcat.utilities": "file:../../../../build/packages/com.spoiledcat.utilities",
+    "com.unity.package-manager-ui": "2.2.0",
+    "com.unity.test-framework": "1.0.13",
+    "com.unity.modules.imageconversion": "1.0.0",
+    "com.unity.modules.imgui": "1.0.0",
+    "com.unity.modules.jsonserialize": "1.0.0",
+    "com.unity.modules.ui": "1.0.0"
+  },
+  "testables": [
+    "com.spoiledcat.threading.tests",
+    "com.spoiledcat.processmanager.tests"
+  ]
+}

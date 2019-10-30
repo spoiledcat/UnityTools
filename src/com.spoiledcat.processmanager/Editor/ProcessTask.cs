@@ -34,19 +34,22 @@ namespace SpoiledCat.ProcessManager
 		}
 	}
 
-	public interface IProcessTask : IProcess
+	public interface IProcessTask : ITask, IProcess
 	{
 		IProcessEnvironment ProcessEnvironment { get; }
+		new IProcessTask Start();
 	}
 
 	public interface IProcessTask<T> : ITask<T>, IProcessTask
 	{
 		void Configure(ProcessStartInfo psi, IOutputProcessor<T> processor);
+		new IProcessTask<T> Start();
 	}
 
 	public interface IProcessTask<TData, T> : ITask<TData, T>, IProcessTask
 	{
 		void Configure(ProcessStartInfo psi, IOutputProcessor<TData, T> processor);
+		new IProcessTask<TData, T> Start();
 	}
 
 	class ProcessWrapper
@@ -145,7 +148,19 @@ namespace SpoiledCat.ProcessManager
 				Logger.Trace($"Running '{Process.StartInfo.FileName} {Process.StartInfo.Arguments}'");
 
 				token.ThrowIfCancellationRequested();
+
+				if (Process.StartInfo.CreateNoWindow && longRunning)
+				{
+					Process.Exited += (obj, args) => {
+						while (!token.IsCancellationRequested && gotOutput.WaitOne(100))
+						{}
+						stopEvent.Set();
+					};
+				}
+
 				Process.Start();
+
+				ProcessId = Process.Id;
 
 				if (Process.StartInfo.RedirectStandardInput)
 					Input = new StreamWriter(Process.StandardInput.BaseStream, new UTF8Encoding(false));
@@ -162,22 +177,27 @@ namespace SpoiledCat.ProcessManager
 					{
 						stopEvent.Wait(token);
 					}
-
-					bool done = false;
-					while (!done)
+					else
 					{
-						var exited = WaitForExit(500);
-						if (exited)
+						bool done = false;
+						while (!done)
 						{
-							// process is done and we haven't seen output, we're done
-							done = !gotOutput.WaitOne(100);
-						}
-						else if (token.IsCancellationRequested /* || (taskName.Contains("git lfs") && lastOutput.AddMilliseconds(ApplicationConfiguration.DefaultGitTimeout) < DateTimeOffset.UtcNow) */)
-						// if we're exiting or we haven't had output for a while
-						{
-							Stop(true);
-							token.ThrowIfCancellationRequested();
-							throw new ProcessException(-2, "Process timed out");
+							var exited = WaitForExit(500);
+							if (exited)
+							{
+								// process is done and we haven't seen output, we're done
+								done = !gotOutput.WaitOne(100);
+							}
+							else if (token.IsCancellationRequested
+									/* || (taskName.Contains("git lfs") && lastOutput.AddMilliseconds(ApplicationConfiguration.DefaultGitTimeout) < DateTimeOffset.UtcNow) */
+									)
+								// if we're exiting or we haven't had output for a while
+							{
+								Stop(true);
+								ExitCode = Process.ExitCode;
+								token.ThrowIfCancellationRequested();
+								throw new ProcessException(-2, "Process timed out");
+							}
 						}
 					}
 
@@ -189,6 +209,11 @@ namespace SpoiledCat.ProcessManager
 			}
 			catch (Exception ex)
 			{
+				if (!Process.HasExited)
+				{
+					Stop(true);
+				}
+
 				var errorCode = -42;
 				if (ex is Win32Exception)
 					errorCode = ((Win32Exception)ex).NativeErrorCode;
@@ -211,8 +236,16 @@ namespace SpoiledCat.ProcessManager
 				thrownException = new ProcessException(errorCode, sb.ToString(), ex);
 			}
 
+			ExitCode = Process.ExitCode;
+
+			try
+			{
+				Process.Close();
+			} catch {}
+
 			if (thrownException != null || errors.Count > 0)
 				onError?.Invoke(thrownException, string.Join(Environment.NewLine, errors.ToArray()));
+
 			onEnd?.Invoke();
 		}
 
@@ -238,32 +271,32 @@ namespace SpoiledCat.ProcessManager
 					Process.CancelOutputRead();
 				if (!Process.HasExited && Process.StartInfo.RedirectStandardInput)
 					Input.WriteLine("\x3");
-				stopEvent.Set();
 			}
 			catch
 			{ }
 
+			if (Process.HasExited)
+				return;
+
 			try
 			{
-
-				if (!Process.HasExited)
-				{
-					Process.Kill();
-				}
-
+				bool waitSucceeded = false;
 				if (!dontWait)
 				{
-					bool waitSucceeded = Process.WaitForExit(500);
-					if (waitSucceeded)
-					{
-						Process.Close();
-					}
+					waitSucceeded = Process.WaitForExit(500);
+				}
+
+				if (!waitSucceeded)
+				{
+					Process.Kill();
+					waitSucceeded = Process.WaitForExit(100);
 				}
 			}
 			catch (Exception ex)
 			{
 				Logger.Trace(ex);
 			}
+			stopEvent.Set();
 		}
 
 		private bool WaitForExit(int milliseconds)
@@ -282,6 +315,8 @@ namespace SpoiledCat.ProcessManager
 
 		public Process Process { get; }
 		public StreamWriter Input { get; private set; }
+		public int ProcessId { get; private set; }
+		public int ExitCode { get; private set; }
 		protected ILogging Logger { get { return logger = logger ?? LogHelper.GetLogger(GetType()); } }
 	}
 
@@ -379,6 +414,17 @@ namespace SpoiledCat.ProcessManager
 			Name = ProcessArguments;
 		}
 
+		public new IProcessTask<T> Start()
+		{
+			base.Start();
+			return this;
+		}
+
+		IProcessTask IProcessTask.Start()
+		{
+			return Start();
+		}
+
 		public void Stop()
 		{
 			wrapper?.Stop();
@@ -441,8 +487,8 @@ namespace SpoiledCat.ProcessManager
 
 		public IProcessEnvironment ProcessEnvironment { get; private set; }
 		public Process Process { get; set; }
-		public int ProcessId => Process.Id;
-		public override bool Successful => base.Successful && Process.ExitCode == 0;
+		public int ProcessId => wrapper.ProcessId;
+		public override bool Successful => base.Successful && wrapper.ExitCode == 0;
 		public StreamWriter StandardInput => wrapper?.Input;
 		public virtual string ProcessName { get; protected set; }
 		public virtual string ProcessArguments { get; }
@@ -487,7 +533,7 @@ namespace SpoiledCat.ProcessManager
 			ProcessArguments = arguments;
 			ProcessName = executable;
 		}
-
+		
 		public virtual void Configure(ProcessStartInfo psi)
 		{
 			Guard.ArgumentNotNull(psi, "psi");
@@ -519,6 +565,18 @@ namespace SpoiledCat.ProcessManager
 			ConfigureOutputProcessor();
 			Process = new Process { StartInfo = psi, EnableRaisingEvents = true };
 			ProcessName = psi.FileName;
+		}
+
+		IProcessTask IProcessTask.Start()
+		{
+			base.Start();
+			return this;
+		}
+
+		public new IProcessTask<T, List<T>> Start()
+		{
+			base.Start();
+			return this;
 		}
 
 		public void Stop()
@@ -586,11 +644,23 @@ namespace SpoiledCat.ProcessManager
 
 		public IProcessEnvironment ProcessEnvironment { get; private set; }
 		public Process Process { get; set; }
-		public int ProcessId => Process.Id;
-		public override bool Successful => base.Successful && Process.ExitCode == 0;
+		public int ProcessId => wrapper.ProcessId;
+		public override bool Successful => base.Successful && wrapper.ExitCode == 0;
 		public StreamWriter StandardInput => wrapper?.Input;
 		public virtual string ProcessName { get; protected set; }
 		public virtual string ProcessArguments { get; }
+
+		IProcessEnvironment IProcessTask.ProcessEnvironment => throw new NotImplementedException();
+
+		StreamWriter IProcess.StandardInput => throw new NotImplementedException();
+
+		int IProcess.ProcessId => throw new NotImplementedException();
+
+		string IProcess.ProcessName => throw new NotImplementedException();
+
+		string IProcess.ProcessArguments => throw new NotImplementedException();
+
+		Process IProcess.Process { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 	}
 
 
@@ -639,6 +709,12 @@ namespace SpoiledCat.ProcessManager
 			throw new NotImplementedException();
 		}
 
+		public new IProcessTask Start()
+		{
+			base.Start();
+			return this;
+		}
+
 		public void Stop()
 		{
 			wrapper?.Stop();
@@ -681,15 +757,18 @@ namespace SpoiledCat.ProcessManager
 					 Errors = error;
 				 },
 				 token: Token);
+
 			wrapper.Run();
 		}
 
 		public IProcessEnvironment ProcessEnvironment { get; private set; }
 		public Process Process { get; set; }
-		public int ProcessId => Process.Id;
-		public override bool Successful => base.Successful && Process.ExitCode == 0;
+		public int ProcessId => wrapper.ProcessId;
+		public override bool Successful => base.Successful && wrapper.ExitCode == 0;
 		public StreamWriter StandardInput => wrapper?.Input;
 		public virtual string ProcessName { get; protected set; }
 		public virtual string ProcessArguments { get; }
+
+		public override TaskAffinity Affinity => TaskAffinity.LongRunning;
 	}
 }

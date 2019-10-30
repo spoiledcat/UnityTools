@@ -3,17 +3,15 @@
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
-	using NiceIO;
 	using Threading;
 	using System.Diagnostics;
 	using System.Linq;
-	using System.Runtime.CompilerServices;
 	using System.Threading.Tasks;
 	using Extensions;
 	using Logging;
 	using NUnit.Framework;
 
-	public partial class BaseTest
+	public partial class BaseTest : IDisposable
 	{
 		protected const int Timeout = 30000;
 		protected const int RandomSeed = 120938;

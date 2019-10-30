@@ -35,7 +35,7 @@ namespace SpoiledCat.Unity
 
 	public interface IEnvironment
 	{
-		void Initialize(NPath assetsPath, NPath extensionInstallPath, string unityVersion = null, NPath unityApplicationPath = default, NPath unityApplicationContentsPath = default);
+		IEnvironment Initialize(NPath assetsPath, NPath extensionInstallPath, string unityVersion = null, NPath unityApplicationPath = default, NPath unityApplicationContentsPath = default);
 		string ExpandEnvironmentVariables(string name);
 		string GetEnvironmentVariable(string v);
 		string GetSpecialFolder(Environment.SpecialFolder folder);
@@ -82,7 +82,7 @@ namespace SpoiledCat.Unity
 			LogPath.EnsureParentDirectoryExists();
 		}
 
-		public virtual void Initialize(
+		public virtual IEnvironment Initialize(
 			NPath Application_dataPath,
 			NPath extensionInstallPath,
 			string unityVersion = null,
@@ -100,6 +100,8 @@ namespace SpoiledCat.Unity
 			LocalSettings = new LocalSettings(this);
 			SystemSettings = new SystemSettings(this);
 			WorkingDirectory = NPath.CurrentDirectory;
+
+			return this;
 		}
 
 		public void SetWorkingDirectory(NPath workingDirectory)

@@ -1,0 +1,28 @@
+{
+    "name": "com.spoiledcat.processmanager.tests",
+    "displayName": "Tests - SpoiledCat Process Manager",
+    "description": "Tests - SpoiledCat Process Manager",
+    "type": "tests",
+    "version": "0.0.0-placeholder",
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
+    },
+    "repository" : {
+      "type" : "git",
+      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+      "directory": ""
+    },
+    "publishConfig": {
+        "registry":"https://registry.spoiledcat.com/"
+    },
+    "dependencies": {
+        "com.spoiledcat.environment": "0.0.0-placeholder",
+        "com.spoiledcat.logging": "0.0.0-placeholder",
+        "com.spoiledcat.niceio": "0.0.0-placeholder",
+        "com.spoiledcat.processmanager": "0.0.0-placeholder",
+        "com.spoiledcat.threading": "0.0.0-placeholder",
+        "com.spoiledcat.utilities": "0.0.0-placeholder"
+    }
+}

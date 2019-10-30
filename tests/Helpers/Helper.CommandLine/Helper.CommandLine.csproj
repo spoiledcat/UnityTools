@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
+    <ProjectReference Include="..\..\..\src\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj" />
+    <ProjectReference Include="..\..\..\src\com.spoiledcat.tasks\Editor\SpoiledCat.Unity.Tasks.csproj" />
+    <ProjectReference Include="..\..\..\src\com.spoiledcat.utilities\Editor\SpoiledCat.Unity.Utilities.csproj" />
+    <ProjectReference Include="..\Helper.WebServer\Helper.WebServer.csproj" />
+  </ItemGroup>
+</Project>
