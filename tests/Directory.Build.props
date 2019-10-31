@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))..\</RepoRoot>
+    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</RepoRoot>
     <RepoBuildPath>$(RepoRoot)build\</RepoBuildPath>
     <RepoBinPath>$(RepoBuildPath)bin\</RepoBinPath>
     <RepoObjPath>$(RepoBuildPath)obj\</RepoObjPath>

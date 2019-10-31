@@ -80,6 +80,10 @@
     PACKAGE TESTS
   -->
 
+  <Target Name="CleanTestArtifacts" AfterTargets="AfterClean">
+    <RemoveDir Directories="$(PublishTo)$(PackageTestName)" />
+  </Target>
+
   <!-- Assemble all test files in a Tests folder into a package called (PackageName).tests -->
   <Target Name="EnumeratePackageTestFiles" Returns="@(TestsToCopy)">
     <CreateItem

@@ -7,7 +7,6 @@
     <PackageName>com.spoiledcat.processmanager</PackageName>
     <PackageSubFolder>\Helpers~\</PackageSubFolder>
     <PackageTestName>com.spoiledcat.processmanager.tests</PackageTestName>
-    <OutputPath>$(SolutionDir)$(PackageSource)$(PackageName)$(PackageSubFolder)</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
@@ -32,9 +31,29 @@
     <ProjectReference Include="..\Helpers\TestBase\TestBase.csproj" />
   </ItemGroup>
 
-  <Target Name="CopyHelperBinariesToPackage" DependsOnTargets="EnumerateHelperBinaries" AfterTargets="AfterBuild" Inputs="@(BinariesToCopy)" Outputs="@(BinariesToCopy->'$(PublishTo)$(PackageName)$(PackageSubFolder)%(RecursiveDir)%(Filename)%(Extension)')">
-    <MakeDir Directories="$(PublishTo)$(PackageTestName)$(PackageSubFolder)" />
-    <Copy SourceFiles="@(BinariesToCopy)" DestinationFiles="@(BinariesToCopy->'$(PublishTo)$(PackageTestName)$(PackageSubFolder)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  <Target Name="CopyHelperBinariesToPackage"
+      DependsOnTargets="AfterBuild;EnumerateHelperBinaries"
+      AfterTargets="AfterBuild"
+      Inputs="@(BinariesToCopy)"
+      Outputs="@(BinariesToCopy->'$(PublishTo)$(PackageName)$(PackageSubFolder)%(RecursiveDir)%(Filename)%(Extension)');@(BinariesToCopy->'$(SolutionDir)$(PackageSource)$(PackageName)$(PackageSubFolder)%(RecursiveDir)%(Filename)%(Extension)')"
+      >
+
+    <MakeDir Directories="$(PublishTo)$(PackageTestName)$(PackageSubFolder);$(SolutionDir)$(PackageSource)$(PackageName)$(PackageSubFolder)" />
+
+    <Copy
+      SourceFiles="@(BinariesToCopy)"
+      DestinationFiles="@(BinariesToCopy->'$(PublishTo)$(PackageTestName)$(PackageSubFolder)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+
+    <Copy
+      SourceFiles="@(BinariesToCopy)"
+      DestinationFiles="@(BinariesToCopy->'$(SolutionDir)$(PackageSource)$(PackageName)$(PackageSubFolder)%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true"
+      />
+
+  </Target>
+
+  <Target Name="CleanHelperArtifacts" AfterTargets="AfterClean">
+    <RemoveDir Directories="$(PublishTo)$(PackageTestName)$(PackageSubFolder);$(SolutionDir)$(PackageSource)$(PackageName)$(PackageSubFolder)" />
   </Target>
 
   <Target Name="EnumerateHelperBinaries" Returns="@(BinariesToCopy)">

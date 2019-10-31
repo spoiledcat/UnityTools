@@ -39,4 +39,8 @@
     <NoWarn>8002</NoWarn>
   </PropertyGroup>
 
+  <Target Name="CleanBuildArtifacts" AfterTargets="AfterClean">
+    <RemoveDir Directories="$(PublishTo)$(PackageName);$(OutputPath);$(PackageOutputPath)" />
+  </Target>
+
 </Project>
