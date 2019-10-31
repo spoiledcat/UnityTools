@@ -11,16 +11,26 @@ if ($Trace) {
 
 . $PSScriptRoot\helpers.ps1 | out-null
 
-Push-Location "build\packages"
-New-Item -itemtype Directory -Path "npm" -Force -ErrorAction SilentlyContinue
+$destdir = Join-Path $rootDirectory 'build\npm'
+$srcdir = Join-Path $rootDirectory 'build\packages'
 
-Get-ChildItem | % {
-    try {
-        Push-Location $_.Name
-        Invoke-Command -Fatal { & npm pack }
-        Move-Item *.tgz ..\..\npm
-    } finally {
-        Pop-Location
+New-Item -itemtype Directory -Path $destdir -Force -ErrorAction SilentlyContinue
+
+Push-Location $srcdir
+
+try {
+
+    Get-ChildItem | % {
+        try {
+            Push-Location $_.Name
+            Write-Output "Packing $($_.Name)"
+            Invoke-Command -Fatal { & npm pack }
+            Move-Item *.tgz $destdir
+        } finally {
+            Pop-Location
+        }
     }
+
+} finally {
+    Pop-Location
 }
-Pop-Location
