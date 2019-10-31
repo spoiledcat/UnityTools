@@ -2,3 +2,4 @@
 /.vs
 *.user
 /lib
+.DS_Store

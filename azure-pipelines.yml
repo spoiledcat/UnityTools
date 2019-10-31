@@ -88,7 +88,7 @@ steps:
 #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 #   inputs:
 #     command: 'publish'
-#     workingDir: 'build/packages/com.spoiledcat.tasks'
+#     workingDir: 'build/packages/com.spoiledcat.threading.tasks'
 #     publishEndpoint: 'registry'
 
 # - task: Npm@1

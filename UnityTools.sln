@@ -18,7 +18,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager", "src\com.s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickConsole", "src\com.spoiledcat.quick-console\Editor\SpoiledCat.Unity.QuickConsole.csproj", "{35B2BEAA-0E79-4360-994C-0108D9E61CA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tasks", "src\com.spoiledcat.tasks\Editor\SpoiledCat.Unity.Tasks.csproj", "{19E58BF2-1CE5-4906-B8EE-F40CF04B8055}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tasks", "src\com.spoiledcat.threading.tasks\Editor\SpoiledCat.Unity.Threading.Tasks.csproj", "{19E58BF2-1CE5-4906-B8EE-F40CF04B8055}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UI", "src\com.spoiledcat.ui\Editor\SpoiledCat.Unity.UI.csproj", "{7F58AD75-25A1-4D10-BCD4-52F965AA25D5}"
 EndProject

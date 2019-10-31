@@ -1,6 +1,6 @@
 {
-    "name": "com.spoiledcat.tasks",
-    "displayName": "SpoiledCat Tasks",
+    "name": "com.spoiledcat.threading.tasks",
+    "displayName": "SpoiledCat threading Tasks",
     "description": "Premade tasks for use with the SpoiledCat Threading package",
     "version": "0.0.0-placeholder",
     "license" : "MIT",

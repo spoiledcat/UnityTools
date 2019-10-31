@@ -22,6 +22,6 @@
         "com.spoiledcat.logging": "0.0.0-placeholder",
         "com.spoiledcat.utilities": "0.0.0-placeholder",
         "com.spoiledcat.niceio": "0.0.0-placeholder",
-        "com.spoiledcat.tasks": "0.0.0-placeholder"
+        "com.spoiledcat.threading.tasks": "0.0.0-placeholder"
     }
 }

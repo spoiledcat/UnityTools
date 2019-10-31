@@ -8,7 +8,7 @@
     "com.spoiledcat.quick-console": "file:../../../../build/packages/com.spoiledcat.quick-console",
     "com.spoiledcat.sharpziplib": "file:../../../../build/packages/com.spoiledcat.sharpziplib",
     "com.spoiledcat.simplejson": "file:../../../../build/packages/com.spoiledcat.simplejson",
-    "com.spoiledcat.tasks": "file:../../../../build/packages/com.spoiledcat.tasks",
+    "com.spoiledcat.threading.tasks": "file:../../../../build/packages/com.spoiledcat.threading.tasks",
     "com.spoiledcat.threading": "file:../../../../build/packages/com.spoiledcat.threading",
     "com.spoiledcat.threading.tests": "file:../../../../build/packages/com.spoiledcat.threading.tests",
     "com.spoiledcat.ui": "file:../../../../build/packages/com.spoiledcat.ui",

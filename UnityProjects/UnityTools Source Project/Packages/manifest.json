@@ -7,7 +7,7 @@
     "com.spoiledcat.quick-console": "file:../../../../src/com.spoiledcat.quick-console",
     "com.spoiledcat.sharpziplib": "file:../../../../src/com.spoiledcat.sharpziplib",
     "com.spoiledcat.simplejson": "file:../../../../src/com.spoiledcat.simplejson",
-    "com.spoiledcat.tasks": "file:../../../../src/com.spoiledcat.tasks",
+    "com.spoiledcat.threading.tasks": "file:../../../../src/com.spoiledcat.threading.tasks",
     "com.spoiledcat.threading": "file:../../../../src/com.spoiledcat.threading",
     "com.spoiledcat.ui": "file:../../../../src/com.spoiledcat.ui",
     "com.spoiledcat.utilities": "file:../../../../src/com.spoiledcat.utilities",
