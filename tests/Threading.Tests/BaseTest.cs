@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Collections;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace SpoiledCat.Base.Tests
 {
-	using System.Collections;
 	using Logging;
 	using NiceIO;
 	using Threading;
-	using System.Threading.Tasks;
-	using System.Threading;
-
 
 	public partial class BaseTest : IDisposable
 	{
+		public const bool TracingEnabled = false;
+
 		public BaseTest()
 		{
 			LogHelper.LogAdapter = new NUnitLogAdapter();
-			LogHelper.TracingEnabled = true;
+			LogHelper.TracingEnabled = TracingEnabled;
 
 			var syncContext = new TestThreadSynchronizationContext(default(CancellationToken));
 			TaskManager = new TaskManager().Initialize(syncContext);
@@ -32,7 +33,7 @@ namespace SpoiledCat.Base.Tests
 
 		protected void StartTest(out Stopwatch watch, out ILogging logger, out ITaskManager taskManager, [CallerMemberName] string testName = "test")
 		{
-			logger = new LogFacade(testName, new NUnitLogAdapter(), true);
+			logger = new LogFacade(testName, new NUnitLogAdapter(), TracingEnabled);
 			watch = new Stopwatch();
 
 			taskManager = TaskManager;
