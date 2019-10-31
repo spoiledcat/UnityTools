@@ -11,8 +11,12 @@ if ($Trace) {
 
 . $PSScriptRoot\helpers.ps1 | out-null
 
-Push-Location "build\packages"
-Get-ChildItem | % {
-    Invoke-Command -Fatal { & 7z a "..\$($_.Name).zip" "$($_.Name)" }
+Push-Location "build\npm"
+Get-ChildItem *.tgz | % {
+    try {
+        Invoke-Command -Fatal { & npm publish $_.Name }
+    } finally {
+        Pop-Location
+    }
 }
 Pop-Location

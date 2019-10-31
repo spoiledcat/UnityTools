@@ -8,6 +8,8 @@ configuration: Release
 environment:
    # Don't report back to the mothership
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  NPM_TOKEN:
+    secure: iNSaHS9YTyJXCAm4vZJaVu/BgIBMF9kfzUc8uxRAo28o3agRlLFSYyyzaNC1FYyzJ/kkCNX/QNwg1N/3yXeVSlJB/x19GLPZeJ6fsu9p1J8=
 
 install:
 - ps: scripts\Get-Deps.ps1
@@ -43,13 +45,13 @@ after_test:
       # let the version.json decide if it's a public build or not based on the branch name
       dotnet pack --no-build --no-restore -c $env:CONFIGURATION
     }
-    scripts\ZipPackages.ps1
+    scripts\Pack-Packages.ps1
 
 artifacts:
 - path: build\**\*.nupkg
   name: NuGet
-- path: build\*.zip
-  name: Package
+- path: build\**\*.tgz
+  name: Npm
 
 deploy:
   provider: NuGet
@@ -67,5 +69,5 @@ after_deploy:
       if ($env:APPVEYOR_REPO_TAG -eq "true") {
         npm config set //registry.spoiledcat.com/:_authToken $env:NPM_TOKEN
         npm config set always-auth true
-        scripts\PublishToNpm.ps1
+        scripts\Publish-ToNpm.ps1
       }

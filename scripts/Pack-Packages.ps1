@@ -12,10 +12,13 @@ if ($Trace) {
 . $PSScriptRoot\helpers.ps1 | out-null
 
 Push-Location "build\packages"
+New-Item -itemtype Directory -Path "npm" -Force -ErrorAction SilentlyContinue
+
 Get-ChildItem | % {
     try {
-            Push-Location $_.Name
-            Invoke-Command -Fatal { & npm publish }
+        Push-Location $_.Name
+        Invoke-Command -Fatal { & npm pack }
+        Move-Item *.tgz ..\..\npm
     } finally {
         Pop-Location
     }
