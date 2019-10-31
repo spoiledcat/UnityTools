@@ -4,6 +4,7 @@ SOURCE="${BASH_SOURCE[0]}"
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
 CONFIGURATION=""
+PUBLIC=""
 
 while (( "$#" )); do
   case "$1" in
@@ -16,6 +17,7 @@ while (( "$#" )); do
       shift
     ;;
     -p|--public)
+      PUBLIC="/p:PublicRelease=true"
       shift
     ;;
     -*|--*=) # unsupported flags
@@ -37,7 +39,6 @@ if [[ x"$CONFIGURATION" == x"" ]]; then
   CONFIGURATION="Debug"
 fi
 
-
 pushd $DIR
-dotnet pack --no-build --no-restore -c $CONFIGURATION
+dotnet pack --no-build --no-restore -c $CONFIGURATION $PUBLIC
 popd

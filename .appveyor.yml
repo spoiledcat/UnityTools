@@ -32,7 +32,14 @@ test:
       - '**\*.Tests.dll'
 
 after_test:
-- dotnet pack --no-build --no-restore -c %CONFIGURATION%
+- ps: |
+    if ($env:APPVEYOR_REPO_TAG -eq "true") {
+      # always stamp builds triggered from tags with a public version
+      dotnet pack --no-build --no-restore -c $env:CONFIGURATION /p:PublicRelease=true
+    } else {
+      # let the version.json decide if it's a public build or not based on the branch name
+      dotnet pack --no-build --no-restore -c $env:CONFIGURATION
+    }
 
 artifacts:
 - path: build\**\*.nupkg
