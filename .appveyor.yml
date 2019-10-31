@@ -30,6 +30,9 @@ test:
   assemblies:
     only:
       - '**\*.Tests.dll'
+  categories:
+    except:
+    - DoNotRunOnAppVeyor
 
 after_test:
 - ps: |
