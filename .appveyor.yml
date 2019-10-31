@@ -31,42 +31,21 @@ artifacts:
 - path: build\**\*.nupkg
   name: NuGet
 
-for:
--
-  branches:
-    except:
-    - /^v\d+(?:\.\d+)?$/
-  skip_tags: true
-  skip_commits:
-    files:
-    - doc/*
-    - README.md
+deploy:
+  provider: NuGet
+  server:                  # remove to push to NuGet.org
+  api_key:
+    secure: KNFSKb7s+3+79G+FOMmubE+llHdsyV+3ApSqqgrbia5DM4RCzKDEIXaQGPqip9bf
+  skip_symbols: true
+  symbol_server:           # remove to push symbols to SymbolSource.org
+  artifact: /.*\.nupkg/
+  on:
+    APPVEYOR_REPO_TAG: true
 
--
-  branches:
-    only:
-    - /^v\d+(?:\.\d+)?$/
-  skip_tags: false
-  skip_commits:
-    files:
-    - doc/*
-    - README.md
-
-  deploy:
-    provider: NuGet
-    server:                  # remove to push to NuGet.org
-    api_key:
-      secure: KNFSKb7s+3+79G+FOMmubE+llHdsyV+3ApSqqgrbia5DM4RCzKDEIXaQGPqip9bf
-    skip_symbols: true
-    symbol_server:           # remove to push symbols to SymbolSource.org
-    artifact: /.*\.nupkg/
-    on:
-      APPVEYOR_REPO_TAG: true
-
-  after_deploy:
-    - ps: |
-        if ($env:APPVEYOR_REPO_TAG -eq "true") {
-          { & npm config set //registry.spoiledcat.com/:_authToken $env:NPM_TOKEN }
-          { & npm config set always-auth true }
-          scripts\PublishToNpm.ps1
-        }
+after_deploy:
+  - ps: |
+      if ($env:APPVEYOR_REPO_TAG -eq "true") {
+        { & npm config set //registry.spoiledcat.com/:_authToken $env:NPM_TOKEN }
+        { & npm config set always-auth true }
+        scripts\PublishToNpm.ps1
+      }
