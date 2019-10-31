@@ -17,7 +17,7 @@ before_build:
 - appveyor-retry dotnet restore -v Minimal
 
 build_script:
-- dotnet build -c %CONFIGURATION%
+- dotnet build --no-restore -c %CONFIGURATION%
 
 test:
   assemblies:
@@ -25,7 +25,7 @@ test:
       - '**\*.Tests.dll'
 
 after_test:
-- dotnet pack -c %CONFIGURATION%
+- dotnet pack --no-restore -c %CONFIGURATION%
 
 artifacts:
 - path: build\**\*.nupkg
