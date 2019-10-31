@@ -11,12 +11,8 @@ if ($Trace) {
 
 . $PSScriptRoot\helpers.ps1 | out-null
 
-Push-Location "build\npm"
-Get-ChildItem *.tgz | % {
-    try {
-        Invoke-Command -Fatal { & npm publish $_.Name }
-    } finally {
-        Pop-Location
-    }
+$destdir = Join-Path $rootDirectory 'build\npm'
+
+Get-ChildItem $destdir | % {
+    Invoke-Command { & npm publish "$destdir\$($_.Name)" }
 }
-Pop-Location
