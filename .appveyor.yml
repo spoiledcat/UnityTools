@@ -68,5 +68,5 @@ for:
     - npm config set always-auth true
     - ps: |
         if ($env:APPVEYOR_REPO_TAG -eq "true") {
-
+          scripts\PublishToNpm.ps1
         }
