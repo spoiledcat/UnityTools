@@ -45,13 +45,9 @@
       DestinationFiles="@(VersionFiles->'$(PublishTo)$(PackageName)$(PackageSubFolder)Version%(Extension)')"
       SkipUnchangedFiles="true" />
 
-      <ItemGroup>
-        <Ran Include="true" />
-      </ItemGroup>
+  </Target>
 
-    </Target>
-
-    <Target Name="UpdatePackageJson" AfterTargets="CopySourcesToPackmanPackage" Condition="'$(Ran)' == 'true' ">
+  <Target Name="UpdatePackageJson" DependsOnTargets="CopySourcesToPackmanPackage" AfterTargets="CopySourcesToPackmanPackage">
 
     <FileUpdate 
       Files="$(PublishTo)$(PackageName)\package.json" 
@@ -119,6 +115,7 @@
   </Target>
     
   <Target Name="StampPackageTestVersion"
+    DependsOnTargets="CopyTestsToPackmanPackage"
     AfterTargets="CopyTestsToPackmanPackage"
     Condition="Exists('$(PackageSourceRoot)\Tests')">
 
@@ -144,10 +141,7 @@
       Regex="&quot;directory&quot;: &quot;.*&quot;" 
       ReplacementText="&quot;directory&quot;: &quot;src/$(PackageName)/Tests&quot;" />
 
-    <Message Importance="High" Text="Stamping version $(NuGetPackageVersion)" Condition=" '$(FileWasStamped)' == 'true' "/>
-
   </Target>
-
 
 
   <!-- Helper to get the updated version from the Nerdbank.GitVersioning nuget task -->
