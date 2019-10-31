@@ -17,7 +17,14 @@ before_build:
 - appveyor-retry dotnet restore -v Minimal
 
 build_script:
-- dotnet build --no-restore -c %CONFIGURATION%
+- ps: |
+    if ($env:APPVEYOR_REPO_TAG -eq "true") {
+      # always stamp builds triggered from tags with a public version
+      dotnet build --no-restore -c $env:CONFIGURATION /p:PublicRelease=true
+    } else {
+      # let the version.json decide if it's a public build or not based on the branch name
+      dotnet build --no-restore -c $env:CONFIGURATION
+    }
 
 test:
   assemblies:
@@ -25,7 +32,7 @@ test:
       - '**\*.Tests.dll'
 
 after_test:
-- dotnet pack --no-restore -c %CONFIGURATION%
+- dotnet pack --no-build --no-restore -c %CONFIGURATION%
 
 artifacts:
 - path: build\**\*.nupkg
@@ -45,7 +52,7 @@ deploy:
 after_deploy:
   - ps: |
       if ($env:APPVEYOR_REPO_TAG -eq "true") {
-        { & npm config set //registry.spoiledcat.com/:_authToken $env:NPM_TOKEN }
-        { & npm config set always-auth true }
+        npm config set //registry.spoiledcat.com/:_authToken $env:NPM_TOKEN
+        npm config set always-auth true
         scripts\PublishToNpm.ps1
       }
