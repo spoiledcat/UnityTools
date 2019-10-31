@@ -93,7 +93,7 @@ public class LargeAssetManagerWindow : BaseWindow
 		webServerRunning = webServerTask != null && !webServerTask.IsCompleted;
 	}
 
-	public override void OnUI()
+	public override async void OnUI()
 	{
 		using (new EditorGUILayout.VerticalScope())
 		{
@@ -119,12 +119,12 @@ public class LargeAssetManagerWindow : BaseWindow
 
 
 						webServerTask.FinallyInUI((success, exception) => {
-							             if (!success && exception != null)
-								             Debug.LogException(exception);
-							             else
-								             Debug.Log("If we're exiting, it's because the domain is going down or you clicked Stop");
-						             })
-						             .Start();
+										 if (!success && exception != null)
+											 Debug.LogException(exception);
+										 else
+											 Debug.Log("If we're exiting, it's because the domain is going down or you clicked Stop");
+									 })
+									 .Start();
 					}
 				}
 

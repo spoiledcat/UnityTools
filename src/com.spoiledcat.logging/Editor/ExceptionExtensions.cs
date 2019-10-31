@@ -8,30 +8,30 @@ using System.Linq;
 
 namespace SpoiledCat.Extensions
 {
-    public static class ExceptionExtensions
-    {
-	    public static string GetExceptionMessage(this Exception ex)
-	    {
-		    var message = GetExceptionMessageShort(ex);
+	public static class ExceptionExtensions
+	{
+		public static string GetExceptionMessage(this Exception ex)
+		{
+			var message = GetExceptionMessageShort(ex);
 
-            message += Environment.NewLine + "=======";
+			message += Environment.NewLine + "=======";
 
-            var caller = Environment.StackTrace;
+			var caller = Environment.StackTrace;
 			var stack = caller.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-            message += Environment.NewLine + string.Join(Environment.NewLine, stack.Skip(1).SkipWhile(x => x.Contains(nameof(GetExceptionMessage)) || x.Contains("LogFacade")).ToArray());
-            return message;
-        }
+			message += Environment.NewLine + string.Join(Environment.NewLine, stack.Skip(1).SkipWhile(x => x.Contains(nameof(GetExceptionMessage)) || x.Contains("LogFacade")).ToArray());
+			return message;
+		}
 
-	    public static string GetExceptionMessageShort(this Exception ex)
-        {
-            var message = ex.ToString();
-            var inner = ex.InnerException;
-            while (inner != null)
-            {
-                message += Environment.NewLine + inner.ToString();
-                inner = inner.InnerException;
-            }
-            return message;
-        }
-    }
+		public static string GetExceptionMessageShort(this Exception ex)
+		{
+			var message = ex.ToString();
+			var inner = ex.InnerException;
+			while (inner != null)
+			{
+				message += Environment.NewLine + inner.ToString();
+				inner = inner.InnerException;
+			}
+			return message;
+		}
+	}
 }

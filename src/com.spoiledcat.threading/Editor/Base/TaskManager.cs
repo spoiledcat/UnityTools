@@ -136,7 +136,7 @@ namespace SpoiledCat.Threading
 				task.Task.ContinueWith(tt => {
 						Exception ex = tt.Exception.GetBaseException();
 						while (ex.InnerException != null) ex = ex.InnerException;
-						logger.Error(ex, $"Exception on {schedulerName} thread: {tt.Id} {task.Name}");
+						logger.Trace(ex, $"Exception on {schedulerName} thread: {tt.Id} {task.Name}");
 					},
 					cts.Token,
 					TaskContinuationOptions.OnlyOnFaulted,
@@ -155,10 +155,10 @@ namespace SpoiledCat.Threading
 
 			// tell all schedulers to stop scheduling new tasks
 			manager.Complete();
-            // tell all tasks to exit
+			// tell all tasks to exit
 			cts.Cancel();
 			cts = null;
-            // wait for everything to shut down within 500ms
+			// wait for everything to shut down within 500ms
 			await Task.WhenAny(manager.Completion, Task.Delay(500));
 		}
 

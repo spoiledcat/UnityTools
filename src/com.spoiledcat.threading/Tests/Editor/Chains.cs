@@ -1,11 +1,12 @@
-﻿namespace SpoiledCat.Threading.Tests
-{
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using Base.Tests;
-	using NUnit.Framework;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using BaseTests;
+using NUnit.Framework;
+using SpoiledCat.Threading;
 
+namespace ThreadingTests
+{
 	partial class Chains : BaseTest
 	{
 		[CustomUnityTest]
@@ -22,29 +23,29 @@
 			var exceptionMessage = $"{nameof(CatchAlwaysRunsBeforeFinally)} an exception";
 
 			var task = new FuncTask<string>(taskManager, _ => "one name") { Affinity = TaskAffinity.UI, Name = $"{nameof(CatchAlwaysRunsBeforeFinally)} Task 1" }
-			           .Then((s, d) => output.Add(d), $"{nameof(CatchAlwaysRunsBeforeFinally)} Task 2")
-			           .Then(_ => throw new Exception(exceptionMessage))
-			           .Then(new FuncTask<string>(taskManager, _ => "another name") { Affinity = TaskAffinity.Exclusive, Name = $"{nameof(CatchAlwaysRunsBeforeFinally)} Task 3" })
-			           .Then(new FuncTask<string, string>(taskManager, (s, d) => {
-				           output.Add(d);
-				           return "done";
-			           }) { Name = $"{nameof(CatchAlwaysRunsBeforeFinally)} Task 4" })
-			           .Catch(ex => {
-				           lock(runOrder)
-				           {
-					           exception = ex;
-					           runOrder.Add("catch");
-				           }
-			           })
-			           .Finally((s, e, d) => {
-				           lock(runOrder)
-				           {
-					           success = s;
-					           finallyException = e;
-					           runOrder.Add("finally");
-				           }
-				           return d;
-			           });
+					   .Then((s, d) => output.Add(d), $"{nameof(CatchAlwaysRunsBeforeFinally)} Task 2")
+					   .Then(_ => throw new Exception(exceptionMessage))
+					   .Then(new FuncTask<string>(taskManager, _ => "another name") { Affinity = TaskAffinity.Exclusive, Name = $"{nameof(CatchAlwaysRunsBeforeFinally)} Task 3" })
+					   .Then(new FuncTask<string, string>(taskManager, (s, d) => {
+						   output.Add(d);
+						   return "done";
+					   }) { Name = $"{nameof(CatchAlwaysRunsBeforeFinally)} Task 4" })
+					   .Catch(ex => {
+						   lock(runOrder)
+						   {
+							   exception = ex;
+							   runOrder.Add("catch");
+						   }
+					   })
+					   .Finally((s, e, d) => {
+						   lock(runOrder)
+						   {
+							   success = s;
+							   finallyException = e;
+							   runOrder.Add("finally");
+						   }
+						   return d;
+					   });
 
 			// wait for the tasks to finish
 			foreach (var frame in StartAndWaitForCompletion(task)) yield return frame;
@@ -73,19 +74,19 @@
 			var expectedOutput = new List<string> { "one name", "another name", "done" };
 
 			var task = new FuncTask<string>(taskManager, _ => "one name") { Affinity = TaskAffinity.UI }
-			           .Then((s, d) => output.Add(d)).Then(new FuncTask<string>(taskManager, _ => "another name") { Affinity = TaskAffinity.Exclusive })
-			           .Then((s, d) => {
-				           output.Add(d);
-				           return "done";
-			           }).Finally((s, e, d) => {
-				           lock(runOrder)
-				           {
-					           success = s;
-					           output.Add(d);
-					           finallyException = e;
-					           runOrder.Add("finally");
-				           }
-			           });
+					   .Then((s, d) => output.Add(d)).Then(new FuncTask<string>(taskManager, _ => "another name") { Affinity = TaskAffinity.Exclusive })
+					   .Then((s, d) => {
+						   output.Add(d);
+						   return "done";
+					   }).Finally((s, e, d) => {
+						   lock(runOrder)
+						   {
+							   success = s;
+							   output.Add(d);
+							   finallyException = e;
+							   runOrder.Add("finally");
+						   }
+					   });
 
 			// wait for the tasks to finish
 			foreach (var frame in StartAndWaitForCompletion(task)) yield return frame;
@@ -112,32 +113,32 @@
 			var expectedOutput = new List<string> { "one name", "another name", "done" };
 
 			var task = new FuncTask<string>(taskManager, _ => "one name") { Affinity = TaskAffinity.UI }
-			           .Then((s, d) => output.Add(d)).Then(new FuncTask<string>(taskManager, _ => "another name") { Affinity = TaskAffinity.Exclusive })
-			           .Then((s, d) => {
-				           output.Add(d);
-				           return "done";
-			           }).Catch(ex => {
-				           lock(runOrder)
-				           {
-					           exception = ex;
-					           runOrder.Add("catch");
-				           }
-			           }).Finally((s, e, d) => {
-				           lock(runOrder)
-				           {
-					           success = s;
-					           output.Add(d);
-					           finallyException = e;
-					           runOrder.Add("finally");
-				           }
-				           return d;
-			           }).ThenInUI((s, d) => {
-				           lock(runOrder)
-				           {
-					           runOrder.Add("boo");
-				           }
-				           return d;
-			           });
+					   .Then((s, d) => output.Add(d)).Then(new FuncTask<string>(taskManager, _ => "another name") { Affinity = TaskAffinity.Exclusive })
+					   .Then((s, d) => {
+						   output.Add(d);
+						   return "done";
+					   }).Catch(ex => {
+						   lock(runOrder)
+						   {
+							   exception = ex;
+							   runOrder.Add("catch");
+						   }
+					   }).Finally((s, e, d) => {
+						   lock(runOrder)
+						   {
+							   success = s;
+							   output.Add(d);
+							   finallyException = e;
+							   runOrder.Add("finally");
+						   }
+						   return d;
+					   }).ThenInUI((s, d) => {
+						   lock(runOrder)
+						   {
+							   runOrder.Add("boo");
+						   }
+						   return d;
+					   });
 
 			// wait for the tasks to finish
 			foreach (var frame in StartAndWaitForCompletion(task)) yield return frame;
@@ -168,26 +169,26 @@
 			var exceptionMessage = $"{nameof(FinallyReportsException)} an exception";
 
 			var task = new FuncTask<string>(taskManager, _ => "one name") { Name = "Task1", Affinity = TaskAffinity.UI }
-			           .Then((s, d) => output.Add(d), "Task2")
-			           .Then(_ => throw new Exception(exceptionMessage), "Throwing")
-			           .Then(new FuncTask<string>(taskManager, _ => "another name") { Name = "Task3", Affinity = TaskAffinity.Exclusive })
-			           .ThenInUI((s, d) => output.Add(d), "Task4")
-			           .Finally((s, e) => {
-				           lock (lck)
-				           {
-					           count++;
-				           }
-				           success = s;
-				           lock (lck)
-				           {
-					           count++;
-				           }
-				           finallyException = e;
-				           lock (lck)
-				           {
-					           count++;
-				           }
-			           });
+					   .Then((s, d) => output.Add(d), "Task2")
+					   .Then(_ => throw new Exception(exceptionMessage), "Throwing")
+					   .Then(new FuncTask<string>(taskManager, _ => "another name") { Name = "Task3", Affinity = TaskAffinity.Exclusive })
+					   .ThenInUI((s, d) => output.Add(d), "Task4")
+					   .Finally((s, e) => {
+						   lock (lck)
+						   {
+							   count++;
+						   }
+						   success = s;
+						   lock (lck)
+						   {
+							   count++;
+						   }
+						   finallyException = e;
+						   lock (lck)
+						   {
+							   count++;
+						   }
+					   });
 
 			// wait for the tasks to finish
 			foreach (var frame in StartAndWaitForCompletion(task)) yield return frame;
@@ -217,12 +218,12 @@
 			var expectedOutput = new List<string> { "one name" };
 
 			var task = new FuncTask<string>(taskManager, _ => "one name") { Affinity = TaskAffinity.UI }
-			           .Then((s, d) => output.Add(d)).Then(_ => throw new Exception("an exception")).Catch(ex => thrown = ex.Message)
-			           .Then(new FuncTask<string>(taskManager, _ => "another name") { Affinity = TaskAffinity.Exclusive }).ThenInUI((s, d) => output.Add(d))
-			           .Finally((s, e) => {
-				           success = s;
-				           finallyException = e;
-			           });
+					   .Then((s, d) => output.Add(d)).Then(_ => throw new Exception("an exception")).Catch(ex => thrown = ex.Message)
+					   .Then(new FuncTask<string>(taskManager, _ => "another name") { Affinity = TaskAffinity.Exclusive }).ThenInUI((s, d) => output.Add(d))
+					   .Finally((s, e) => {
+						   success = s;
+						   finallyException = e;
+					   });
 
 			// wait for the tasks to finish
 			foreach (var frame in StartAndWaitForCompletion(task)) yield return frame;
@@ -246,11 +247,11 @@
 			var exceptionMessage = $"{nameof(YouCanUseCatchAtTheEndOfAChain)} an exception";
 
 			var task = new FuncTask<string>(taskManager, _ => "one name") { Affinity = TaskAffinity.UI }
-			           .Then((s, d) => output.Add(d)).Then(_ => throw new Exception(exceptionMessage))
-			           .Then(new FuncTask<string>(taskManager, _ => "another name") { Affinity = TaskAffinity.Exclusive })
-			           .ThenInUI((s, d) => output.Add(d))
-			           .Finally((_, __) => {})
-			           .Catch(ex => exception = ex);
+					   .Then((s, d) => output.Add(d)).Then(_ => throw new Exception(exceptionMessage))
+					   .Then(new FuncTask<string>(taskManager, _ => "another name") { Affinity = TaskAffinity.Exclusive })
+					   .ThenInUI((s, d) => output.Add(d))
+					   .Finally((_, __) => {})
+					   .Catch(ex => exception = ex);
 
 			// wait for the tasks to finish
 			foreach (var frame in StartAndWaitForCompletion(task)) yield return frame;

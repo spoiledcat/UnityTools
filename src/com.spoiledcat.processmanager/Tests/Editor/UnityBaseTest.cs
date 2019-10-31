@@ -1,14 +1,14 @@
-﻿namespace SpoiledCat.Base.Tests
-{
-	using System;
-	using System.Runtime.CompilerServices;
-	using Logging;
-	using NiceIO;
-	using ProcessManager;
-	using Threading;
-	using Unity;
-	using UnityEngine.TestTools;
+﻿using System;
+using System.Runtime.CompilerServices;
+using SpoiledCat.Logging;
+using SpoiledCat.NiceIO;
+using SpoiledCat.ProcessManager;
+using SpoiledCat.Threading;
+using SpoiledCat.Unity;
+using UnityEngine.TestTools;
 
+namespace BaseTests
+{
 	// Unity does not support async/await tests, but it does
 	// have a special type of test with a [CustomUnityTest] attribute
 	// which mimicks a coroutine in EditMode. This attribute is
@@ -19,13 +19,12 @@
 	public class CustomUnityTestAttribute : UnityTestAttribute
 	{ }
 
-
 	public partial class BaseTest
 	{
 		private LogAdapterBase existingLogger;
 		private bool existingTracing;
 
-        public BaseTest()
+		public BaseTest()
 		{
 			// set up the logger so it doesn't write exceptions to the unity log, the test runner doesn't like it
 			existingLogger = LogHelper.LogAdapter;
@@ -33,7 +32,7 @@
 			LogHelper.TracingEnabled = false;
 			LogHelper.LogAdapter = new NullLogAdapter();
 
-            TaskManager = new TaskManager().Initialize();
+			TaskManager = new TaskManager().Initialize();
 
 			UnityEngine.Debug.Log($"Starting test fixture. Main thread is {TaskManager.UIThread}");
 		}
@@ -84,5 +83,5 @@
 			}
 		}
 
-    }
+	}
 }

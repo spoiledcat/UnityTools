@@ -92,8 +92,8 @@ namespace SpoiledCat.Git
 
 				// on developer builds, prefer local zips over downloading
 #if DEVELOPER_BUILD
-            state = GrabZipFromResourcesIfNeeded(state);
-            state = GetZipsIfNeeded(state);
+				state = GrabZipFromResourcesIfNeeded(state);
+				state = GetZipsIfNeeded(state);
 #else
 				state = GetZipsIfNeeded(state);
 				state = GrabZipFromResourcesIfNeeded(state);
@@ -409,7 +409,7 @@ namespace SpoiledCat.Git
 		public class GitInstallDetails
 		{
 #if DEVELOPER_BUILD
-         private const string packageFeed = "http://localhost:50000/unity/git/git.json";
+			private const string packageFeed = "http://localhost:50000/unity/git/git.json";
 #else
 			private const string packageFeed = "https://api.github.com/repos/desktop/dugite-native/releases/latest";
 #endif

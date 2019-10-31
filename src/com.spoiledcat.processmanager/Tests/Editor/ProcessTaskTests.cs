@@ -1,13 +1,14 @@
-﻿namespace SpoiledCat.ProcessManager.Tests
-{
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.Linq;
-	using Base.Tests;
-	using NUnit.Framework;
-	using Threading;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using BaseTests;
+using NUnit.Framework;
+using SpoiledCat.Threading;
+using SpoiledCat.ProcessManager;
 
+namespace ProcessManagerTests
+{
 	public partial class ProcessTaskTests : BaseTest
 	{
 		[CustomUnityTest]
@@ -81,18 +82,18 @@
 			string process2Value = null;
 
 			var process1Task = new FirstNonNullLineProcessTask(taskManager, processManager, TestApp, @"--sleep 100 -d process1")
-			                   .Configure(processManager, withInput: true)
-			                   .Then((b, s) => {
-				                   process1Value = s;
-				                   values.Add(s);
-			                   });
+							   .Configure(processManager, withInput: true)
+							   .Then((b, s) => {
+								   process1Value = s;
+								   values.Add(s);
+							   });
 
 			var process2Task = new FirstNonNullLineProcessTask(taskManager, processManager, TestApp, @"---sleep 100 -d process2")
-			                   .Configure(processManager, withInput: true)
-			                   .Then((b, s) => {
-				                   process2Value = s;
-				                   values.Add(s);
-			                   });
+							   .Configure(processManager, withInput: true)
+							   .Then((b, s) => {
+								   process2Value = s;
+								   values.Add(s);
+							   });
 
 			var combinedTask = process1Task.Then(process2Task);
 
@@ -153,12 +154,12 @@
 			var expectedOutput = new List<string> { "one name" };
 
 			var task = new FirstNonNullLineProcessTask(taskManager, processManager, TestApp, @"--sleep 100 -d ""one name""")
-			           .Catch(ex => thrown = ex)
-			           .Then((s, d) => output.Add(d))
-			           .Then(new FirstNonNullLineProcessTask(taskManager, processManager, TestApp, @"-e kaboom -r -1"))
-			           .Catch(ex => thrown = ex)
-			           .Then((s, d) => output.Add(d))
-			           .Finally((s, e) => success = s);
+					   .Catch(ex => thrown = ex)
+					   .Then((s, d) => output.Add(d))
+					   .Then(new FirstNonNullLineProcessTask(taskManager, processManager, TestApp, @"-e kaboom -r -1"))
+					   .Catch(ex => thrown = ex)
+					   .Then((s, d) => output.Add(d))
+					   .Finally((s, e) => success = s);
 
 			// wait for the tasks to finish
 			foreach (var frame in StartAndWaitForCompletion(task)) yield return frame;

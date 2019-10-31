@@ -1,13 +1,14 @@
-﻿namespace SpoiledCat.Threading.Tests
-{
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Threading;
-	using Base.Tests;
-	using NUnit.Framework;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using BaseTests;
+using NUnit.Framework;
+using SpoiledCat.Threading;
 
+namespace ThreadingTests
+{
 	partial class SchedulerTests : BaseTest
 	{
 		[CustomUnityTest]

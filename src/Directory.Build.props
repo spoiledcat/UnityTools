@@ -32,4 +32,11 @@
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net471" Version="1.0.0-preview.2" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers" Condition=" '$(TargetFramework)' == 'net471' " />
     <PackageReference Include="SpoiledCat.MSBuild.Tasks.FileUpdate" Version="1.0.13" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(RepoRoot)common\publickey.snk</AssemblyOriginatorKeyFile>
+    <NoWarn>8002</NoWarn>
+  </PropertyGroup>
+
 </Project>

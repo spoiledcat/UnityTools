@@ -7,14 +7,14 @@ using System.Runtime.CompilerServices;
 
 namespace SpoiledCat.Threading
 {
-    interface IAwaitable
-    {
-	    IAwaiter GetAwaiter();
-    }
+	interface IAwaitable
+	{
+		IAwaiter GetAwaiter();
+	}
 
-    interface IAwaiter : INotifyCompletion
-    {
-	    void GetResult();
-	    bool IsCompleted { get; }
-    }
+	interface IAwaiter : INotifyCompletion
+	{
+		void GetResult();
+		bool IsCompleted { get; }
+	}
 }

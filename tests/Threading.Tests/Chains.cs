@@ -1,8 +1,7 @@
-﻿namespace SpoiledCat.Threading.Tests
-{
-	using System.Threading.Tasks;
-	using NUnit.Framework;
+﻿using NUnit.Framework;
 
+namespace ThreadingTests
+{
 	// Unity does not support async/await tests, but it does
 	// have a special type of test with a [CustomUnityTest] attribute
 	// which mimicks a coroutine in EditMode. This attribute is

@@ -13,80 +13,80 @@ using System.Runtime.ExceptionServices;
 
 namespace SpoiledCat.Threading
 {
-    public static class ExceptionExtensions
-    {
-	    private static Action<Exception> saveStackTraceForThrowing;
+	public static class ExceptionExtensions
+	{
+		private static Action<Exception> saveStackTraceForThrowing;
 
-	    /// <summary>
-        /// Represents exceptions we should never attempt to catch and ignore.
-        /// </summary>
-        /// <param name="exception">The exception being thrown.</param>
-        /// <returns></returns>
-        public static bool IsCriticalException(this Exception exception)
-        {
-            if (exception == null)
-            {
-                throw new ArgumentNullException("exception");
-            }
+		/// <summary>
+		/// Represents exceptions we should never attempt to catch and ignore.
+		/// </summary>
+		/// <param name="exception">The exception being thrown.</param>
+		/// <returns></returns>
+		public static bool IsCriticalException(this Exception exception)
+		{
+			if (exception == null)
+			{
+				throw new ArgumentNullException("exception");
+			}
 
-            return exception.IsFatalException()
-                || exception is AppDomainUnloadedException
-                || exception is BadImageFormatException
-                || exception is CannotUnloadAppDomainException
-                || exception is InvalidProgramException
-                || exception is NullReferenceException
-                || exception is ArgumentException;
-        }
+			return exception.IsFatalException()
+				|| exception is AppDomainUnloadedException
+				|| exception is BadImageFormatException
+				|| exception is CannotUnloadAppDomainException
+				|| exception is InvalidProgramException
+				|| exception is NullReferenceException
+				|| exception is ArgumentException;
+		}
 
-	    /// <summary>
-        /// Represents exceptions we should never attempt to catch and ignore when executing third party plugin code.
-        /// This is not as extensive as a proposed IsCriticalException method that I want to write for our own code.
-        /// </summary>
-        /// <param name="exception">The exception being thrown.</param>
-        /// <returns></returns>
-        public static bool IsFatalException(this Exception exception)
-        {
-            if (exception == null)
-            {
-                throw new ArgumentNullException("exception");
-            }
+		/// <summary>
+		/// Represents exceptions we should never attempt to catch and ignore when executing third party plugin code.
+		/// This is not as extensive as a proposed IsCriticalException method that I want to write for our own code.
+		/// </summary>
+		/// <param name="exception">The exception being thrown.</param>
+		/// <returns></returns>
+		public static bool IsFatalException(this Exception exception)
+		{
+			if (exception == null)
+			{
+				throw new ArgumentNullException("exception");
+			}
 
-            return exception is StackOverflowException
-                || exception is OutOfMemoryException
-                || exception is ThreadAbortException
-                || exception is AccessViolationException;
-        }
+			return exception is StackOverflowException
+				|| exception is OutOfMemoryException
+				|| exception is ThreadAbortException
+				|| exception is AccessViolationException;
+		}
 
-	    public static bool CanRetry(this Exception exception)
-        {
-            return !exception.IsCriticalException()
-                && !(exception is ObjectDisposedException);
-        }
+		public static bool CanRetry(this Exception exception)
+		{
+			return !exception.IsCriticalException()
+				&& !(exception is ObjectDisposedException);
+		}
 
-	    public static void Rethrow(this Exception exception)
-        {
+		public static void Rethrow(this Exception exception)
+		{
 #if NET35
-            SaveStackTraceForThrowing(exception);
-            throw exception;
+			SaveStackTraceForThrowing(exception);
+			throw exception;
 #else
-            ExceptionDispatchInfo.Capture(exception).Throw();
+			ExceptionDispatchInfo.Capture(exception).Throw();
 #endif
-        }
+		}
 
-	    private static Action<Exception> SaveStackTraceForThrowing {
-            get {
-                if (saveStackTraceForThrowing == null)
-                {
-                    // in mono, FixRemotingException saves the original stacktrace
-                    // in .net < 4.0, InternalPreserveStackTrace saves it
-                    // but .net also has a FixRemotingException method, so try InternalPreserveStackTrace first
-                    var method = typeof(Exception).GetMethod( "InternalPreserveStackTrace", BindingFlags.Instance | BindingFlags.NonPublic );
-                    if (method == null) // maybe it's mono
-                        typeof(Exception).GetMethod( "FixRemotingException", BindingFlags.Instance | BindingFlags.NonPublic );
-                    saveStackTraceForThrowing = (Action<Exception>)Delegate.CreateDelegate(typeof(Action<Exception>), method);
-                }
-                return saveStackTraceForThrowing;
-            }
-        }
-    }
+		private static Action<Exception> SaveStackTraceForThrowing {
+			get {
+				if (saveStackTraceForThrowing == null)
+				{
+					// in mono, FixRemotingException saves the original stacktrace
+					// in .net < 4.0, InternalPreserveStackTrace saves it
+					// but .net also has a FixRemotingException method, so try InternalPreserveStackTrace first
+					var method = typeof(Exception).GetMethod( "InternalPreserveStackTrace", BindingFlags.Instance | BindingFlags.NonPublic );
+					if (method == null) // maybe it's mono
+						typeof(Exception).GetMethod( "FixRemotingException", BindingFlags.Instance | BindingFlags.NonPublic );
+					saveStackTraceForThrowing = (Action<Exception>)Delegate.CreateDelegate(typeof(Action<Exception>), method);
+				}
+				return saveStackTraceForThrowing;
+			}
+		}
+	}
 }

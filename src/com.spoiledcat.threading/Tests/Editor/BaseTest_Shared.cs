@@ -1,16 +1,16 @@
-﻿namespace SpoiledCat.Base.Tests
-{
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using Threading;
-	using System.Diagnostics;
-	using System.Linq;
-	using System.Threading.Tasks;
-	using Extensions;
-	using Logging;
-	using NUnit.Framework;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using SpoiledCat.Threading;
+using SpoiledCat.Extensions;
+using SpoiledCat.Logging;
+using NUnit.Framework;
 
+namespace BaseTests
+{
 	public partial class BaseTest : IDisposable
 	{
 		protected const int Timeout = 30000;

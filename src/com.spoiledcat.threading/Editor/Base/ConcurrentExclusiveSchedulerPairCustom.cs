@@ -447,14 +447,14 @@ namespace SpoiledCat.Threading
 		}
 
 #if PRENET45
-        /// <summary>
-        /// Type used with TaskCompletionSource(Of TResult) as the TResult
-        /// to ensure that the resulting task can't be upcast to something
-        /// that in the future could lead to compat problems.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-        [DebuggerNonUserCode]
-        private struct VoidTaskResult { }
+		/// <summary>
+		/// Type used with TaskCompletionSource(Of TResult) as the TResult
+		/// to ensure that the resulting task can't be upcast to something
+		/// that in the future could lead to compat problems.
+		/// </summary>
+		[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+		[DebuggerNonUserCode]
+		private struct VoidTaskResult { }
 #endif
 
 		/// <summary>
@@ -742,19 +742,19 @@ namespace SpoiledCat.Threading
 			Contract.Requires(syncObj != null, "The monitor object to check must be provided.");
 #if PRENET45
 #if DEBUG
-            // PRENET45
+			// PRENET45
 
-            if (ShouldCheckMonitorStatus)
-            {
-                bool exceptionThrown;
-                try
-                {
-                    Monitor.Pulse(syncObj); // throws a SynchronizationLockException if the monitor isn't held by this thread
-                    exceptionThrown = false;
-                }
-                catch (SynchronizationLockException) { exceptionThrown = true; }
-                Contract.Assert(held == !exceptionThrown, "The locking scheme was not correctly followed.");
-            }
+			if (ShouldCheckMonitorStatus)
+			{
+				bool exceptionThrown;
+				try
+				{
+					Monitor.Pulse(syncObj); // throws a SynchronizationLockException if the monitor isn't held by this thread
+					exceptionThrown = false;
+				}
+				catch (SynchronizationLockException) { exceptionThrown = true; }
+				Contract.Assert(held == !exceptionThrown, "The locking scheme was not correctly followed.");
+			}
 #endif
 #else
 			Contract.Assert(Monitor.IsEntered(syncObj) == held, "The locking scheme was not correctly followed.");
@@ -772,7 +772,7 @@ namespace SpoiledCat.Threading
 		{
 			TaskCreationOptions options =
 #if PRENET45
-                TaskCreationOptions.None;
+				TaskCreationOptions.None;
 #else
 				TaskCreationOptions.DenyChildAttach;
 #endif

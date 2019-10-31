@@ -7,9 +7,9 @@ using System;
 
 namespace SpoiledCat.Threading
 {
-    public partial class ActionTask
-    {}
+	public partial class ActionTask
+	{}
 
-    public partial class ActionTask<T>
-    {}
+	public partial class ActionTask<T>
+	{}
 }

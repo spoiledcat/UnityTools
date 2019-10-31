@@ -1,13 +1,14 @@
-﻿namespace SpoiledCat.Threading.Tests
-{
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.Linq;
-	using Base.Tests;
-	using Extensions;
-	using NUnit.Framework;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using BaseTests;
+using SpoiledCat.Extensions;
+using NUnit.Framework;
+using SpoiledCat.Threading;
 
+namespace ThreadingTests
+{
 	partial class DependencyTests : BaseTest
 	{
 		[CustomUnityTest]
@@ -76,11 +77,11 @@
 			var runOrder = new List<string>();
 			var exceptions = new List<Exception>();
 			var task = new ActionTask(taskManager, _ => throw new InvalidOperationException())
-			           .Then(_ => runOrder.Add("1"))
-			           .Catch(ex => exceptions.Add(ex))
-			           .Then(() => runOrder.Add("OnFailure"),
-				           runOptions: TaskRunOptions.OnFailure)
-			           .Finally((s, e) => {});
+					   .Then(_ => runOrder.Add("1"))
+					   .Catch(ex => exceptions.Add(ex))
+					   .Then(() => runOrder.Add("OnFailure"),
+						   runOptions: TaskRunOptions.OnFailure)
+					   .Finally((s, e) => {});
 
 			// wait for the tasks to finish
 			foreach (var frame in StartAndWaitForCompletion(task)) yield return frame;

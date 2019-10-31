@@ -1,13 +1,13 @@
-﻿namespace SpoiledCat.Threading.Tests
-{
-	using System;
-	using System.Threading.Tasks;
-	using Base.Tests;
-	using NUnit.Framework;
+﻿using System;
+using System.Threading.Tasks;
+using BaseTests;
+using NUnit.Framework;
+using SpoiledCat.Threading;
 
+namespace ThreadingTests
+{
 	partial class AsyncTests : BaseTest
 	{
-
 		[Test]
 		public async Task StartAsyncWorks()
 		{

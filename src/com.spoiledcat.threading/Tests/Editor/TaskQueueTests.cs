@@ -1,15 +1,16 @@
-﻿namespace SpoiledCat.Threading.Tests
-{
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Threading.Tasks;
-	using Base.Tests;
-	using Extensions;
-	using NiceIO;
-	using NUnit.Framework;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using NUnit.Framework;
+using BaseTests;
+using SpoiledCat.Extensions;
+using SpoiledCat.NiceIO;
+using SpoiledCat.Threading;
 
+namespace ThreadingTests
+{
 	partial class TaskQueueTests : BaseTest
 	{
 		[Test]

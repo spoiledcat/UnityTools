@@ -1,13 +1,14 @@
-﻿namespace SpoiledCat.Threading.Tests
-{
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Threading.Tasks;
-	using Base.Tests;
-	using NUnit.Framework;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using BaseTests;
+using NUnit.Framework;
+using SpoiledCat.Threading;
 
+namespace ThreadingTests
+{
 	partial class Dependencies : BaseTest
 	{
 		class TestActionTask : ActionTask
@@ -105,33 +106,33 @@
 		}
 
 		/***
-         * This test creates a tree as following:
-         *
+		 * This test creates a tree as following:
+		 *
 		 *  +---------------+
-         *  |  outerChain1  |
+		 *  |  outerChain1  |
 		 *  +---------------+
-         *          |
+		 *          |
 		 *          v
 		 *  +---------------+
-         *  |  innerChain1  |
+		 *  |  innerChain1  |
 		 *  +---------------+
-         *          |
+		 *          |
 		 *          v
 		 *  +---------------+
-         *  |  innerChain2  |
+		 *  |  innerChain2  |
 		 *  +---------------+
-         *          |
+		 *          |
 		 *          v
 		 *  +---------------------------------------------+
-         *  |  innerChain3/outerChainTask2 (same object)  |
+		 *  |  innerChain3/outerChainTask2 (same object)  |
 		 *  +---------------------------------------------+
-         *          |
+		 *          |
 		 *          v
 		 *  +----------------------------------+
-         *  |  outerChainTask3 (Finally task)  |
+		 *  |  outerChainTask3 (Finally task)  |
 		 *  +----------------------------------+
-         *
-         */
+		 *
+		 */
 		[CustomUnityTest]
 		public IEnumerator MergingTwoChainsWorks()
 		{

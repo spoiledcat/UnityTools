@@ -11,51 +11,51 @@ namespace SpoiledCat.Extensions
 	using NiceIO;
 
 	public static class StreamExtensions
-    {
-	    public static byte[] ToByteArray(this Stream input)
-        {
-            var buffer = new byte[16 * 1024];
-            using (var ms = new MemoryStream())
-            {
-                int read;
-                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    ms.Write(buffer, 0, read);
-                }
+	{
+		public static byte[] ToByteArray(this Stream input)
+		{
+			var buffer = new byte[16 * 1024];
+			using (var ms = new MemoryStream())
+			{
+				int read;
+				while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+				{
+					ms.Write(buffer, 0, read);
+				}
 
-                return ms.ToArray();
-            }
-        }
-    }
+				return ms.ToArray();
+			}
+		}
+	}
 
-    public static class NPathExtensions
-    {
-	    public static string ToMD5(this NPath path)
-	    {
-		    byte[] computeHash;
-		    using (var hash = System.Security.Cryptography.MD5.Create())
-		    {
-			    using (var stream = NPath.FileSystem.OpenRead(path))
-			    {
-				    computeHash = hash.ComputeHash(stream);
-			    }
-		    }
+	public static class NPathExtensions
+	{
+		public static string ToMD5(this NPath path)
+		{
+			byte[] computeHash;
+			using (var hash = System.Security.Cryptography.MD5.Create())
+			{
+				using (var stream = NPath.FileSystem.OpenRead(path))
+				{
+					computeHash = hash.ComputeHash(stream);
+				}
+			}
 
-		    return BitConverter.ToString(computeHash).Replace("-", string.Empty).ToLower();
-	    }
+			return BitConverter.ToString(computeHash).Replace("-", string.Empty).ToLower();
+		}
 
-	    public static string ToSha256(this NPath path)
-	    {
-		    byte[] computeHash;
-		    using (var hash = System.Security.Cryptography.SHA256.Create())
-		    {
-			    using (var stream = NPath.FileSystem.OpenRead(path))
-			    {
-				    computeHash = hash.ComputeHash(stream);
-			    }
-		    }
+		public static string ToSha256(this NPath path)
+		{
+			byte[] computeHash;
+			using (var hash = System.Security.Cryptography.SHA256.Create())
+			{
+				using (var stream = NPath.FileSystem.OpenRead(path))
+				{
+					computeHash = hash.ComputeHash(stream);
+				}
+			}
 
-		    return BitConverter.ToString(computeHash).Replace("-", string.Empty).ToLower();
-	    }
-    }
+			return BitConverter.ToString(computeHash).Replace("-", string.Empty).ToLower();
+		}
+	}
 }

@@ -5,12 +5,12 @@ using System.Collections;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace SpoiledCat.Base.Tests
-{
-	using Logging;
-	using NiceIO;
-	using Threading;
+using SpoiledCat.Logging;
+using SpoiledCat.NiceIO;
+using SpoiledCat.Threading;
 
+namespace BaseTests
+{
 	public partial class BaseTest : IDisposable
 	{
 		public const bool TracingEnabled = false;
@@ -23,7 +23,7 @@ namespace SpoiledCat.Base.Tests
 			var syncContext = new TestThreadSynchronizationContext(default(CancellationToken));
 			TaskManager = new TaskManager().Initialize(syncContext);
 
-			LogHelper.Info($"Starting test fixture. Main thread is {TaskManager.UIThread}");
+			LogHelper.Trace($"Starting test fixture. Main thread is {TaskManager.UIThread}");
 		}
 
 		public void Dispose()

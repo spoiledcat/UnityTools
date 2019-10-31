@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpoiledCat.Base.Tests
+namespace BaseTests
 {
 	// Unity does not support async/await tests, but it does
 	// have a special type of test with a [CustomUnityTest] attribute

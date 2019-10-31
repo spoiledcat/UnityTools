@@ -1,13 +1,14 @@
-﻿namespace SpoiledCat.Threading.Tests
-{
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Threading.Tasks;
-	using Base.Tests;
-	using NUnit.Framework;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using BaseTests;
+using NUnit.Framework;
+using SpoiledCat.Threading;
 
+namespace ThreadingTests
+{
 	partial class Exceptions : BaseTest
 	{
 		[CustomUnityTest]
@@ -45,24 +46,24 @@
 			var exceptions = new List<Exception>();
 
 			var task = new ActionTask(taskManager, _ => throw new InvalidOperationException())
-			           .Catch(e => {
-				           runOrder.Add("1");
-				           exceptions.Add(e);
-				           return true;
-			           })
-			           .Then(_ => throw new InvalidCastException())
-			           .Catch(e => {
-				           runOrder.Add("2");
-				           exceptions.Add(e);
-				           return true;
-			           })
-			           .Then(_ => throw new ArgumentNullException())
-			           .Catch(e => {
-				           runOrder.Add("3");
-				           exceptions.Add(e);
-				           return true;
-			           })
-			           .Finally((s, e) => {});
+					   .Catch(e => {
+						   runOrder.Add("1");
+						   exceptions.Add(e);
+						   return true;
+					   })
+					   .Then(_ => throw new InvalidCastException())
+					   .Catch(e => {
+						   runOrder.Add("2");
+						   exceptions.Add(e);
+						   return true;
+					   })
+					   .Then(_ => throw new ArgumentNullException())
+					   .Catch(e => {
+						   runOrder.Add("3");
+						   exceptions.Add(e);
+						   return true;
+					   })
+					   .Finally((s, e) => {});
 
 			// wait for the tasks to finish
 			foreach (var frame in StartAndWaitForCompletion(task)) yield return frame;
@@ -99,21 +100,21 @@
 			var exceptions = new List<Exception>();
 
 			var task = new ActionTask(taskManager, _ => throw new InvalidOperationException())
-			           .Catch(e => {
-				           runOrder.Add("1");
-				           exceptions.Add(e);
-			           })
-			           .Then(_ => throw new InvalidCastException())
-			           .Catch(e => {
-				           runOrder.Add("2");
-				           exceptions.Add(e);
-			           })
-			           .Then(_ => throw new ArgumentNullException())
-			           .Catch(e => {
-				           runOrder.Add("3");
-				           exceptions.Add(e);
-			           })
-			           .Finally((b, e) => {});
+					   .Catch(e => {
+						   runOrder.Add("1");
+						   exceptions.Add(e);
+					   })
+					   .Then(_ => throw new InvalidCastException())
+					   .Catch(e => {
+						   runOrder.Add("2");
+						   exceptions.Add(e);
+					   })
+					   .Then(_ => throw new ArgumentNullException())
+					   .Catch(e => {
+						   runOrder.Add("3");
+						   exceptions.Add(e);
+					   })
+					   .Finally((b, e) => {});
 
 			// wait for the tasks to finish
 			foreach (var frame in StartAndWaitForCompletion(task)) yield return frame;

@@ -4,15 +4,14 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Threading;
+using SpoiledCat.Logging;
+using SpoiledCat.NiceIO;
+using SpoiledCat.Unity;
+using SpoiledCat.Threading;
+using SpoiledCat.ProcessManager;
 
-namespace SpoiledCat.Base.Tests
+namespace BaseTests
 {
-	using Logging;
-	using NiceIO;
-	using Unity;
-	using Threading;
-	using ProcessManager;
-
 	public partial class BaseTest
 	{
 		public const bool TracingEnabled = false;
@@ -25,7 +24,7 @@ namespace SpoiledCat.Base.Tests
 			var syncContext = new TestThreadSynchronizationContext(default(CancellationToken));
 			TaskManager = new TaskManager().Initialize(syncContext);
 
-			LogHelper.Info($"Starting test fixture. Main thread is {TaskManager.UIThread}");
+			LogHelper.Trace($"Starting test fixture. Main thread is {TaskManager.UIThread}");
 		}
 
 		public void Dispose()

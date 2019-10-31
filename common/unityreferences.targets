@@ -79,12 +79,6 @@
       </UnityDLLsMissingErrorText>
     </PropertyGroup>
     <Error Condition="'$(UnityDir)' == ''" Text="$([System.String]::Format('$(UnityDLLsMissingErrorText)', '$(SolutionDir)'))" />
-
   </Target>
 
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(SolutionDir)common\publickey.snk</AssemblyOriginatorKeyFile>
-    <NoWarn>8002</NoWarn>
-  </PropertyGroup>
 </Project>

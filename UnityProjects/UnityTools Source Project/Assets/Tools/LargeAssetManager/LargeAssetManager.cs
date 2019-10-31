@@ -98,8 +98,8 @@ public class LargeAssetManager
 				asset.LocalPath = file;
 				asset.Path = templateAsset.Path;
 				asset.Url = templateAsset.Url.Combine("assets")
-				                         .Combine(dt)
-				                         .Combine(file.FileName);
+										 .Combine(dt)
+										 .Combine(file.FileName);
 				asset.NeedsUnzip = templateAsset.NeedsUnzip;
 			}
 			else

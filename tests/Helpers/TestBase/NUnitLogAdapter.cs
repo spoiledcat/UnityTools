@@ -1,9 +1,9 @@
-﻿namespace SpoiledCat.Base.Tests
-{
-	using System;
-	using System.Threading;
-	using Logging;
+﻿using System;
+using System.Threading;
+using SpoiledCat.Logging;
 
+namespace BaseTests
+{
 	public class NUnitLogAdapter : LogAdapterBase
 	{
 		public override void Info(string context, string message)
