@@ -3,6 +3,11 @@
 SOURCE="${BASH_SOURCE[0]}"
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
+OS="Mac"
+if [[ -e "/c/" ]]; then
+  OS="Windows"
+fi
+
 CONFIGURATION=""
 PUBLIC=""
 
@@ -37,6 +42,10 @@ done
 
 if [[ x"$CONFIGURATION" == x"" ]]; then
   CONFIGURATION="Debug"
+fi
+
+if [[ x"$OS" == x"Windows" && x"$PUBLIC" != x"" ]]; then
+  PUBLIC="/$PUBLIC"
 fi
 
 pushd $DIR
