@@ -15,8 +15,7 @@ Push-Location "build\packages"
 Get-ChildItem | % {
     try {
             Push-Location $_.Name
-            Invoke-Command -Fatal { & npm publish --dry-run }
-        }
+            Invoke-Command -Fatal { & npm publish }
     } finally {
         Pop-Location
     }

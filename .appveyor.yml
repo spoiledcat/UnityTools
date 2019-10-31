@@ -64,9 +64,9 @@ for:
       APPVEYOR_REPO_TAG: true
 
   after_deploy:
-    - npm config set //registry.spoiledcat.com/:_authToken %NPM_TOKEN%
-    - npm config set always-auth true
     - ps: |
         if ($env:APPVEYOR_REPO_TAG -eq "true") {
+          { & npm config set //registry.spoiledcat.com/:_authToken $env:NPM_TOKEN }
+          { & npm config set always-auth true }
           scripts\PublishToNpm.ps1
         }
