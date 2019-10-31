@@ -40,10 +40,13 @@ after_test:
       # let the version.json decide if it's a public build or not based on the branch name
       dotnet pack --no-build --no-restore -c $env:CONFIGURATION
     }
+    scripts\ZipPackages.ps1
 
 artifacts:
 - path: build\**\*.nupkg
   name: NuGet
+- path: build\*.zip
+  name: Package
 
 deploy:
   provider: NuGet
