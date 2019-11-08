@@ -2,10 +2,11 @@
   <PropertyGroup>
     <TargetFrameworks>net471;netcoreapp2.2</TargetFrameworks>
     <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\..\</SolutionDir>
+    <Description>An Unity EditorWindow subclass that provides the standard IMGUI methods as overrides, with additional logic for managing the life cycle of imgui windows</Description>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)common\unityreferences.targets" />
-  <Import Project="$(SolutionDir)common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
   <ItemGroup>
     <ProjectReference Include="..\..\com.spoiledcat.threading\Editor\SpoiledCat.Unity.Threading.csproj" />
   </ItemGroup>
+  <Import Project="$(SolutionDir)common\unityreferences.targets" />
+  <Import Project="$(SolutionDir)common\packaging.targets" />
 </Project>

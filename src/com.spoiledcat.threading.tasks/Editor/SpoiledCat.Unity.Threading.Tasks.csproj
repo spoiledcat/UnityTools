@@ -2,11 +2,12 @@
   <PropertyGroup>
     <TargetFrameworks>net471;netcoreapp2.2</TargetFrameworks>
     <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\..\</SolutionDir>
+    <Description>Premade tasks for use with the SpoiledCat Threading package</Description>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)common\unityreferences.targets" />
   <ItemGroup>
     <ProjectReference Include="..\..\com.spoiledcat.threading\Editor\SpoiledCat.Unity.Threading.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.utilities\Editor\SpoiledCat.Unity.Utilities.csproj" />
   </ItemGroup>
-  <Import Project="$(SolutionDir)common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
+  <Import Project="$(SolutionDir)common\unityreferences.targets" />
+  <Import Project="$(SolutionDir)common\packaging.targets" />
 </Project>

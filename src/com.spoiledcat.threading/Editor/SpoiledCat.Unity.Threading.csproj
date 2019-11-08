@@ -2,10 +2,11 @@
   <PropertyGroup>
     <TargetFrameworks>net471;netcoreapp2.2</TargetFrameworks>
     <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\..\</SolutionDir>
+    <Description>A friendly threaded task system for Unity</Description>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)common\unityreferences.targets" />
   <ItemGroup>
     <ProjectReference Include="..\..\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
   </ItemGroup>
-  <Import Project="$(SolutionDir)common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
+  <Import Project="$(SolutionDir)common\unityreferences.targets" />
+  <Import Project="$(SolutionDir)common\packaging.targets" />
 </Project>

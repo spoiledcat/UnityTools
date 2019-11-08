@@ -2,13 +2,14 @@
   <PropertyGroup>
     <TargetFrameworks>net471;netcoreapp2.2</TargetFrameworks>
     <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\..\</SolutionDir>
+    <Description>A manager that handles running processes and returning their output</Description>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)common\unityreferences.targets" />
   <ItemGroup>
     <ProjectReference Include="..\..\com.spoiledcat.environment\Editor\SpoiledCat.Unity.Environment.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.simpleio\Editor\SpoiledCat.Unity.SimpleIO.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.threading\Editor\SpoiledCat.Unity.Threading.csproj" />
   </ItemGroup>
-  <Import Project="$(SolutionDir)common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
+  <Import Project="$(SolutionDir)common\unityreferences.targets" />
+  <Import Project="$(SolutionDir)common\packaging.targets" />
 </Project>

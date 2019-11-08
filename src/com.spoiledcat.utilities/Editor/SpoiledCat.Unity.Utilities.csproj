@@ -2,8 +2,8 @@
   <PropertyGroup>
     <TargetFrameworks>net471;netcoreapp2.2</TargetFrameworks>
     <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\..\</SolutionDir>
+    <Description>Handy utilities primitives like string extension methods and unzip tools</Description>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)common\unityreferences.targets" />
   <ItemGroup>
     <ProjectReference Include="..\..\com.spoiledcat.environment\Editor\SpoiledCat.Unity.Environment.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
@@ -11,5 +11,6 @@
     <ProjectReference Include="..\..\com.spoiledcat.sharpziplib\Editor\SpoiledCat.Unity.SharpZipLib.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.simplejson\Editor\SpoiledCat.Unity.SimpleJson.csproj" />
   </ItemGroup>
-  <Import Project="$(SolutionDir)common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
+  <Import Project="$(SolutionDir)common\unityreferences.targets" />
+  <Import Project="$(SolutionDir)common\packaging.targets" />
 </Project>

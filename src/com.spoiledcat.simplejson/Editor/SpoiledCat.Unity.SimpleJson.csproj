@@ -2,7 +2,8 @@
   <PropertyGroup>
     <TargetFrameworks>net471;netcoreapp2.2</TargetFrameworks>
     <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\..\</SolutionDir>
+    <Description>A fork of SimpleJson, a powerful yet simple json (de)serializer with support for Unity and custom types</Description>
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\unityreferences.targets" />
-  <Import Project="$(SolutionDir)common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
+  <Import Project="$(SolutionDir)common\packaging.targets" />
 </Project>

@@ -2,7 +2,8 @@
   <PropertyGroup>
     <TargetFrameworks>net471;netcoreapp2.2</TargetFrameworks>
     <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\..\</SolutionDir>
+    <Description>A simple IO abstraction layer</Description>
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\unityreferences.targets" />
-  <Import Project="$(SolutionDir)common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />
+  <Import Project="$(SolutionDir)common\packaging.targets" />
 </Project>

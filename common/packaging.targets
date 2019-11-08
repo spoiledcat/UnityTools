@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <VersionFiles Include="$(IntermediateOutputPath)\$(AssemblyName).Version$(DefaultLanguageSourceExtension)" />
+    <None Include="$(SolutionDir)common\icon.png" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="icon.png" />
   </ItemGroup>
 
   <!-- Assemble all sources into a folder called (PackageName) -->
@@ -47,7 +48,8 @@
 
   </Target>
 
-  <Target Name="UpdatePackageJson" DependsOnTargets="CopySourcesToPackmanPackage" AfterTargets="CopySourcesToPackmanPackage">
+  <Target Name="UpdatePackageJson" DependsOnTargets="CopySourcesToPackmanPackage" AfterTargets="CopySourcesToPackmanPackage"
+     Condition=" '$(TargetFramework)' == 'net471' " >
 
     <FileUpdate
       Files="$(PublishTo)$(PackageName)\package.json"
@@ -117,7 +119,7 @@
   <Target Name="StampPackageTestVersion"
     DependsOnTargets="CopyTestsToPackmanPackage"
     AfterTargets="CopyTestsToPackmanPackage"
-    Condition="Exists('$(PackageSourceRoot)\Tests')">
+    Condition="Exists('$(PackageSourceRoot)\Tests') and '$(TargetFramework)' == 'net471' " >
 
     <FileUpdate
       Files="$(PublishTo)$(PackageTestName)\package.json"
@@ -141,7 +143,9 @@
 
 
   <!-- Helper to get the updated version from the Nerdbank.GitVersioning nuget task -->
-  <Target Name="CheckIfVersionChanged" BeforeTargets="GenerateAssemblyVersionInfo" AfterTargets="GetBuildVersion" Returns="$(VersionHasChanged)">
+  <Target Name="CheckIfVersionChanged" BeforeTargets="GenerateAssemblyVersionInfo" AfterTargets="GetBuildVersion"
+    Returns="$(VersionHasChanged)"
+    Condition="'$(Language)' != ''">
     <PropertyGroup>
       <VersionSourceFile>$(IntermediateOutputPath)\$(AssemblyName).Version$(DefaultLanguageSourceExtension)</VersionSourceFile>
       <NewVersionSourceFile>$(VersionSourceFile).newnew</NewVersionSourceFile>
