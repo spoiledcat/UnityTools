@@ -49,26 +49,22 @@
 
   <Target Name="UpdatePackageJson" DependsOnTargets="CopySourcesToPackmanPackage" AfterTargets="CopySourcesToPackmanPackage">
 
-    <FileUpdate 
-      Files="$(PublishTo)$(PackageName)\package.json" 
-      Regex="&quot;version&quot;: &quot;.*&quot;" 
+    <FileUpdate
+      Files="$(PublishTo)$(PackageName)\package.json"
+      Regex="&quot;version&quot;: &quot;.*&quot;"
       ReplacementText="&quot;version&quot;: &quot;$(NuGetPackageVersion)&quot;">
       <Output TaskParameter="AllItemsUpdated" PropertyName="FileWasStamped" />
     </FileUpdate>
 
-    <FileUpdate 
-      Files="$(PublishTo)$(PackageName)\package.json" 
-      Regex="(&quot;com\.spoiledcat\..*&quot;): &quot;.*&quot;" 
+    <FileUpdate
+      Condition="'$(FileWasStamped)' == 'true' "
+      Files="$(PublishTo)$(PackageName)\package.json"
+      Regex="(&quot;.*&quot;): &quot;0\.0\.0-placeholder&quot;"
       ReplacementText="$1: &quot;$(NuGetPackageVersion)&quot;" />
 
-    <FileUpdate 
-      Files="$(PublishTo)$(PackageName)\package.json" 
-      Regex="(&quot;com\.spoiledcat\..*&quot;): &quot;.*&quot;" 
-      ReplacementText="$1: &quot;$(NuGetPackageVersion)&quot;" />
-
-    <FileUpdate 
-      Files="$(PublishTo)$(PackageName)\package.json" 
-      Regex="&quot;directory&quot;: &quot;.*&quot;" 
+    <FileUpdate
+      Files="$(PublishTo)$(PackageName)\package.json"
+      Regex="&quot;directory&quot;: &quot;.*&quot;"
       ReplacementText="&quot;directory&quot;: &quot;src/$(PackageName)&quot;" />
 
     <Message Importance="High" Text="Stamping version $(NuGetPackageVersion)" Condition=" '$(FileWasStamped)' == 'true' "/>
@@ -76,7 +72,7 @@
   </Target>
 
 
-  <!-- 
+  <!--
     PACKAGE TESTS
   -->
 
@@ -117,32 +113,28 @@
       SkipUnchangedFiles="true" />
 
   </Target>
-    
+
   <Target Name="StampPackageTestVersion"
     DependsOnTargets="CopyTestsToPackmanPackage"
     AfterTargets="CopyTestsToPackmanPackage"
     Condition="Exists('$(PackageSourceRoot)\Tests')">
 
-    <FileUpdate 
-      Files="$(PublishTo)$(PackageTestName)\package.json" 
-      Regex="&quot;version&quot;: &quot;.*&quot;" 
+    <FileUpdate
+      Files="$(PublishTo)$(PackageTestName)\package.json"
+      Regex="&quot;version&quot;: &quot;.*&quot;"
       ReplacementText="&quot;version&quot;: &quot;$(NuGetPackageVersion)&quot;">
       <Output TaskParameter="AllItemsUpdated" PropertyName="FileWasStamped" />
     </FileUpdate>
 
-    <FileUpdate 
-      Files="$(PublishTo)$(PackageTestName)\package.json" 
-      Regex="(&quot;com\.spoiledcat\..*&quot;): &quot;.*&quot;" 
+    <FileUpdate
+      Condition="'$(FileWasStamped)' == 'true' "
+      Files="$(PublishTo)$(PackageTestName)\package.json"
+      Regex="(&quot;.*&quot;): &quot;0\.0\.0-placeholder&quot;"
       ReplacementText="$1: &quot;$(NuGetPackageVersion)&quot;" />
 
-    <FileUpdate 
-      Files="$(PublishTo)$(PackageTestName)\package.json" 
-      Regex="(&quot;com\.spoiledcat\..*&quot;): &quot;.*&quot;" 
-      ReplacementText="$1: &quot;$(NuGetPackageVersion)&quot;" />
-
-    <FileUpdate 
-      Files="$(PublishTo)$(PackageTestName)\package.json" 
-      Regex="&quot;directory&quot;: &quot;.*&quot;" 
+    <FileUpdate
+      Files="$(PublishTo)$(PackageTestName)\package.json"
+      Regex="&quot;directory&quot;: &quot;.*&quot;"
       ReplacementText="&quot;directory&quot;: &quot;src/$(PackageName)/Tests&quot;" />
 
   </Target>

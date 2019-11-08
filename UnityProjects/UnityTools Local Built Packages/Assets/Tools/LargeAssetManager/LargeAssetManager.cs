@@ -4,7 +4,7 @@ using System.Linq;
 using LocalTools;
 using SpoiledCat.Json;
 using SpoiledCat.Logging;
-using SpoiledCat.NiceIO;
+using SpoiledCat.SimpleIO;
 using SpoiledCat.Threading;
 using SpoiledCat.Utilities;
 using UnityEditor;
@@ -20,15 +20,15 @@ public class LargeAssetManager
 
 	static LargeAssetManager()
 	{
-		PocoJsonSerializerStrategy.RegisterCustomTypeHandler<NPath>(
-			value => (((NPath)value).ToString(SlashMode.Forward), true),
+		PocoJsonSerializerStrategy.RegisterCustomTypeHandler<SPath>(
+			value => (((SPath)value).ToString(SlashMode.Forward), true),
 			(value, type) => {
 				string str = value as string;
 				if (!string.IsNullOrEmpty(str))
 				{
-					return (new NPath(str), true);
+					return (new SPath(str), true);
 				}
-				return (NPath.Default, true);
+				return (SPath.Default, true);
 			});
 
 		PocoJsonSerializerStrategy.RegisterCustomTypeHandler<UriString>(value => (value.ToString(), true),
@@ -66,7 +66,7 @@ public class LargeAssetManager
 	}
 
 
-	public static void UpdateIndexFromFilesInFolder(NPath template, NPath indexPath, NPath path)
+	public static void UpdateIndexFromFilesInFolder(SPath template, SPath indexPath, SPath path)
 	{
 		var runTask = UpdateIndexFromFilesInFolderTask(path, indexPath, template);
 
@@ -80,7 +80,7 @@ public class LargeAssetManager
 			.Start();
 	}
 
-	public static ITask UpdateIndexFromFilesInFolderTask(NPath folderWithFiles, NPath indexFileToGenerate, NPath? indexTemplate = null)
+	public static ITask UpdateIndexFromFilesInFolderTask(SPath folderWithFiles, SPath indexFileToGenerate, SPath? indexTemplate = null)
 	{
 		Index? templateIndex = null;
 		if (indexTemplate.HasValue && indexTemplate.Value.FileExists())
@@ -105,7 +105,7 @@ public class LargeAssetManager
 			else
 			{
 				asset.LocalPath = file;
-				asset.Path = file.FileNameWithoutExtension.ToNPath();
+				asset.Path = file.FileNameWithoutExtension.ToSPath();
 				asset.NeedsUnzip = file.ExtensionWithDot == ".zip" ? true : false;
 				asset.Url = $"{DefaultWebServerUrl}:{DefaultWebServerPort}/assets/{dt}/{file.FileName}";
 			}
@@ -173,11 +173,11 @@ public class LargeAssetManager
 	{
 		var index = Index.Load("index.json");
 
-		var downloads = "Downloads".ToNPath().MakeAbsolute();
+		var downloads = "Downloads".ToSPath().MakeAbsolute();
 		List<Asset> assetList = new List<Asset>();
 		foreach (var asset in index.Assets.Where(x => x.NeedsUnzip))
 		{
-			NPath file = downloads.Combine(asset.Filename);
+			SPath file = downloads.Combine(asset.Filename);
 			if (file.FileExists())
 				assetList.Add(new Asset(asset, downloads.Combine(asset.Filename)));
 		}
@@ -197,14 +197,14 @@ public class LargeAssetManager
 
 	private static TaskQueue<Asset> CalculateWhatNeedsToBeDownloaded(Index index)
 	{
-		var downloads = "Downloads".ToNPath().MakeAbsolute();
+		var downloads = "Downloads".ToSPath().MakeAbsolute();
 		List<Asset> downloadList = new List<Asset>();
 
 		TaskQueue<Asset> t = new TaskQueue<Asset>(TaskManager) { Message = "Calculating hashes..." };
 		foreach (var entry in index.Assets)
 		{
 			t.Queue(new FuncTask<Asset, Asset>(TaskManager, (_, asset) => {
-				NPath file;
+				SPath file;
 				if (asset.NeedsUnzip)
 				{
 					file = downloads.Combine(asset.Filename);
@@ -261,9 +261,9 @@ public class LargeAssetManager
 			});
 	}
 
-	public static TaskQueue<NPath> Unzip(List<Asset> assetList)
+	public static TaskQueue<SPath> Unzip(List<Asset> assetList)
 	{
-		var unzipper = new TaskQueue<NPath>(TaskManager);
+		var unzipper = new TaskQueue<SPath>(TaskManager);
 		foreach (var asset in assetList.Where(x => x.NeedsUnzip))
 		{
 			var unzipStamp = asset.LocalPath.Parent.Combine($".{asset.Filename}");

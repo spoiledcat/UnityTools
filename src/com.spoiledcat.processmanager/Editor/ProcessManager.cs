@@ -12,7 +12,7 @@ using System.Threading;
 namespace SpoiledCat.ProcessManager
 {
 	using Logging;
-	using NiceIO;
+	using SimpleIO;
 	using Unity;
 
 	public class ProcessManager : IProcessManager
@@ -31,7 +31,7 @@ namespace SpoiledCat.ProcessManager
 			CancellationToken = cancellationToken;
 		}
 
-		public static NPath FindExecutableInPath(string executable, bool recurse = false, params NPath[] searchPaths)
+		public static SPath FindExecutableInPath(string executable, bool recurse = false, params SPath[] searchPaths)
 		{
 			Guard.ArgumentNotNullOrWhiteSpace(executable, "executable");
 
@@ -42,7 +42,7 @@ namespace SpoiledCat.ProcessManager
 		}
 
 		public T Configure<T>(T processTask,
-			NPath? workingDirectory = null,
+			SPath? workingDirectory = null,
 			bool withInput = false)
 				where T : IProcessTask
 		{
@@ -69,7 +69,7 @@ namespace SpoiledCat.ProcessManager
 			return processTask;
 		}
 
-		public void RunCommandLineWindow(NPath workingDirectory)
+		public void RunCommandLineWindow(SPath workingDirectory)
 		{
 			var startInfo = new ProcessStartInfo
 			{
@@ -90,7 +90,7 @@ namespace SpoiledCat.ProcessManager
 				// we need to create a temp bash script to set up the environment properly, because
 				// osx terminal app doesn't inherit the PATH env var and there's no way to pass it in
 
-				var envVarFile = NPath.GetTempFilename();
+				var envVarFile = SPath.GetTempFilename();
 				startInfo.FileName = "open";
 				startInfo.Arguments = $"-a Terminal {envVarFile}";
 				startInfo.Configure(DefaultProcessEnvironment, workingDirectory);

@@ -7,7 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\com.spoiledcat.environment\Editor\SpoiledCat.Unity.Environment.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
-    <ProjectReference Include="..\..\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj" />
+    <ProjectReference Include="..\..\com.spoiledcat.simpleio\Editor\SpoiledCat.Unity.SimpleIO.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.threading\Editor\SpoiledCat.Unity.Threading.csproj" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\packaging.targets" Condition=" '$(TargetFramework)' == 'net471' " />

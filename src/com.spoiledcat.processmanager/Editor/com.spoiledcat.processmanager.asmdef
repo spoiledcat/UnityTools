@@ -3,7 +3,7 @@
     "references": [
         "com.spoiledcat.environment",
         "com.spoiledcat.logging",
-        "com.spoiledcat.niceio",
+        "com.spoiledcat.simpleio",
         "com.spoiledcat.threading",
         "com.spoiledcat.utilities"
     ],

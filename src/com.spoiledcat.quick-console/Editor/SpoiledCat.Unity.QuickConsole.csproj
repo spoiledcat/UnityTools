@@ -5,7 +5,7 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\unityreferences.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\..\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj" />
+    <ProjectReference Include="..\..\com.spoiledcat.simpleio\Editor\SpoiledCat.Unity.SimpleIO.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.simplejson\Editor\SpoiledCat.Unity.SimpleJson.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.ui\Editor\SpoiledCat.Unity.UI.csproj" />
   </ItemGroup>

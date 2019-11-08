@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 
 using SpoiledCat.Logging;
-using SpoiledCat.NiceIO;
+using SpoiledCat.SimpleIO;
 using SpoiledCat.Threading;
 
 namespace BaseTests

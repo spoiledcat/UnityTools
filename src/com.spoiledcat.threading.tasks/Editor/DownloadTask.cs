@@ -12,11 +12,11 @@ using System.Threading;
 namespace SpoiledCat.Threading
 {
 	using Logging;
-	using NiceIO;
+	using SimpleIO;
 	using Utilities;
-	public class DownloadTask : TaskBase<NPath>
+	public class DownloadTask : TaskBase<SPath>
 	{
-		public DownloadTask(ITaskManager taskManager, UriString url, NPath targetDirectory, string filename = null, int retryCount = 0)
+		public DownloadTask(ITaskManager taskManager, UriString url, SPath targetDirectory, string filename = null, int retryCount = 0)
 			 : this(taskManager, taskManager?.Token ?? default, url, targetDirectory, filename, retryCount)
 		{}
 
@@ -24,7 +24,7 @@ namespace SpoiledCat.Threading
 			ITaskManager taskManager,
 			CancellationToken token,
 			UriString url,
-			NPath targetDirectory,
+			SPath targetDirectory,
 			string filename = null,
 			int retryCount = 0)
 			: base(taskManager, token)
@@ -47,7 +47,7 @@ namespace SpoiledCat.Threading
 			return base.RunWithReturn(success);
 		}
 
-		protected override NPath RunWithReturn(bool success)
+		protected override SPath RunWithReturn(bool success)
 		{
 			var result = base.RunWithReturn(success);
 			try
@@ -69,7 +69,7 @@ namespace SpoiledCat.Threading
 		/// </summary>
 		/// <param name="success"></param>
 		/// <returns></returns>
-		protected virtual NPath RunDownload(bool success)
+		protected virtual SPath RunDownload(bool success)
 		{
 			Exception exception = null;
 			var attempts = 0;
@@ -119,11 +119,11 @@ namespace SpoiledCat.Threading
 
 		public UriString Url { get; }
 
-		public NPath TargetDirectory { get; }
+		public SPath TargetDirectory { get; }
 
 		public string Filename { get; }
 
-		public NPath Destination => TargetDirectory.Combine(Filename);
+		public SPath Destination => TargetDirectory.Combine(Filename);
 
 		protected int RetryCount { get; }
 	}
@@ -159,19 +159,19 @@ namespace SpoiledCat.Threading
 
 	public class DownloadData
 	{
-		public DownloadData(UriString url, NPath file)
+		public DownloadData(UriString url, SPath file)
 		{
 			Url = url;
 			File = file;
 		}
 
 		public UriString Url { get; }
-		public NPath File { get; }
+		public SPath File { get; }
 	}
 
-	public class Downloader : TaskQueue<NPath, DownloadData>
+	public class Downloader : TaskQueue<SPath, DownloadData>
 	{
-		public event Action<UriString, NPath> OnDownloadComplete;
+		public event Action<UriString, SPath> OnDownloadComplete;
 		public event Action<UriString, Exception> OnDownloadFailed;
 		public event Action<UriString> OnDownloadStart;
 
@@ -270,7 +270,7 @@ namespace SpoiledCat.Threading
 			}
 		}
 
-		public void QueueDownload(UriString url, NPath targetDirectory, string filename = null, int retryCount = 0)
+		public void QueueDownload(UriString url, SPath targetDirectory, string filename = null, int retryCount = 0)
 		{
 			var download = new DownloadTask(TaskManager, url, targetDirectory, filename, retryCount);
 			download.OnStart += t => OnDownloadStart?.Invoke(((DownloadTask)t).Url);

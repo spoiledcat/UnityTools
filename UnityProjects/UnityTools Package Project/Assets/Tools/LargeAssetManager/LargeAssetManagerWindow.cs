@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using SpoiledCat.Logging;
-using SpoiledCat.NiceIO;
+using SpoiledCat.SimpleIO;
 using SpoiledCat.ProcessManager;
 using SpoiledCat.Threading;
 using SpoiledCat.UI;
@@ -76,10 +76,10 @@ public class LargeAssetManagerWindow : BaseWindow
 	private void CreateIndex()
 	{
 		LargeAssetManager.TaskManager = TaskManager;
-		string folder = EditorUtility.OpenFolderPanel("Select Folder with zip files to add to the index", "../../Helpers/Helper.WebServer/files/assets".ToNPath().Resolve(), "");
+		string folder = EditorUtility.OpenFolderPanel("Select Folder with zip files to add to the index", "../../Helpers/Helper.WebServer/files/assets".ToSPath().Resolve(), "");
 		if (!string.IsNullOrEmpty(folder))
 		{
-			LargeAssetManager.UpdateIndexFromFilesInFolder("index-template.json".ToNPath(), "index.json".ToNPath(), folder.ToNPath());
+			LargeAssetManager.UpdateIndexFromFilesInFolder("index-template.json".ToSPath(), "index.json".ToSPath(), folder.ToSPath());
 		}
 	}
 
@@ -114,7 +114,7 @@ public class LargeAssetManagerWindow : BaseWindow
 					if (GUILayout.Button("Start Web Server"))
 					{
 						webServerTask = new ProcessTaskLongRunning(TaskManager, ProcessEnvironment,
-							"Packages/com.spoiledcat.processmanager/Tests/Helpers~/Helper.CommandLine.exe".ToNPath().Resolve(),
+							"Packages/com.spoiledcat.processmanager/Tests/Helpers~/Helper.CommandLine.exe".ToSPath().Resolve(),
 							$"-w -p {webServerPort}").Configure(new ProcessManager(Environment, TaskManager.Token));
 
 

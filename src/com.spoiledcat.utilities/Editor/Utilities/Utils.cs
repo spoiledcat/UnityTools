@@ -10,7 +10,7 @@ using System.IO;
 namespace SpoiledCat.Utilities
 {
 	using Extensions;
-	using NiceIO;
+	using SimpleIO;
 
 	public static class Utils
 	{
@@ -89,7 +89,7 @@ namespace SpoiledCat.Utilities
 			return success;
 		}
 
-		public static bool VerifyFileIntegrity(NPath file, string hash)
+		public static bool VerifyFileIntegrity(SPath file, string hash)
 		{
 			if (!file.IsInitialized || !file.FileExists())
 				return false;

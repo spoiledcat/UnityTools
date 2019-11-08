@@ -10,6 +10,7 @@ fi
 
 CONFIGURATION=""
 PUBLIC=""
+BUILD=0
 
 while (( "$#" )); do
   case "$1" in
@@ -23,6 +24,10 @@ while (( "$#" )); do
     ;;
     -p|--public)
       PUBLIC="/p:PublicRelease=true"
+      shift
+    ;;
+    -b|--build)
+      BUILD=1
       shift
     ;;
     -*|--*=) # unsupported flags
@@ -48,6 +53,23 @@ if [[ x"$OS" == x"Windows" && x"$PUBLIC" != x"" ]]; then
   PUBLIC="/$PUBLIC"
 fi
 
+NPMDIR="$DIR/build/npm/"
+PACKAGEDIR="$DIR/build/packages"
+
 pushd $DIR
+
+if [[ x"$BUILD" == x"1" ]]; then
+  dotnet restore
+  dotnet build --no-restore -c $CONFIGURATION $PUBLIC
+fi
 dotnet pack --no-build --no-restore -c $CONFIGURATION $PUBLIC
+
+mkdir -p "$NPMDIR"
+for j in $PACKAGEDIR/*; do
+  pushd "$j"
+  npm pack
+  mv *.tgz "$NPMDIR"
+  popd
+done
+
 popd

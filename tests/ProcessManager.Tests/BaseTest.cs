@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Threading;
 using SpoiledCat.Logging;
-using SpoiledCat.NiceIO;
+using SpoiledCat.SimpleIO;
 using SpoiledCat.Unity;
 using SpoiledCat.Threading;
 using SpoiledCat.ProcessManager;
@@ -34,7 +34,7 @@ namespace BaseTests
 
 
 		protected void StartTest(out Stopwatch watch, out ILogging logger, out ITaskManager taskManager,
-			out NPath testPath, out IEnvironment environment, out IProcessManager processManager,
+			out SPath testPath, out IEnvironment environment, out IProcessManager processManager,
 			[CallerMemberName] string testName = "test")
 		{
 			logger = new LogFacade(testName, new NUnitLogAdapter(), TracingEnabled);
@@ -42,7 +42,7 @@ namespace BaseTests
 
 			taskManager = TaskManager;
 
-			testPath = NPath.CreateTempDirectory(testName);
+			testPath = SPath.CreateTempDirectory(testName);
 
 			environment = new UnityEnvironment(testName);
 			((UnityEnvironment)environment).SetWorkingDirectory(testPath);
@@ -62,14 +62,14 @@ namespace BaseTests
 			{}
 		}
 
-		protected NPath? testApp;
+		protected SPath? testApp;
 
-		protected NPath TestApp
+		protected SPath TestApp
 		{
 			get
 			{
 				if (!testApp.HasValue)
-					testApp = System.Reflection.Assembly.GetExecutingAssembly().Location.ToNPath().Parent.Combine("Helper.CommandLine.exe");
+					testApp = System.Reflection.Assembly.GetExecutingAssembly().Location.ToSPath().Parent.Combine("Helper.CommandLine.exe");
 				return testApp.Value;
 			}
 		}

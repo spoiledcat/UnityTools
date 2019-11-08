@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace SpoiledCat.ProcessManager
 {
-	using NiceIO;
+	using SimpleIO;
 
 	public interface IProcess
 	{
@@ -26,12 +26,12 @@ namespace SpoiledCat.ProcessManager
 	public interface IProcessManager
 	{
 		T Configure<T>(T processTask,
-			NPath? workingDirectory = null,
+			SPath? workingDirectory = null,
 			bool withInput = false)
 			where T : IProcessTask;
 
 		IProcess Reconnect(IProcess processTask, int i);
-		void RunCommandLineWindow(NPath workingDirectory);
+		void RunCommandLineWindow(SPath workingDirectory);
 		void Stop();
 		CancellationToken CancellationToken { get; }
 		IProcessEnvironment DefaultProcessEnvironment { get; }

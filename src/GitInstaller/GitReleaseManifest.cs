@@ -8,7 +8,7 @@ namespace SpoiledCat.Git
 {
 	using Json;
 	using Logging;
-	using NiceIO;
+	using SimpleIO;
 	using Threading;
 	using Unity;
 	using Utilities;
@@ -62,7 +62,7 @@ namespace SpoiledCat.Git
 			return (assets.FirstOrDefault(x => x.Name.EndsWith(name)), assets.FirstOrDefault(x => x.Name.EndsWith(name + ".sha256")));
 		}
 
-		public static DugiteReleaseManifest Load(NPath path, IEnvironment environment)
+		public static DugiteReleaseManifest Load(SPath path, IEnvironment environment)
 		{
 			var manifest = path.ReadAllText().FromJson<DugiteReleaseManifest>(true, false);
 			var (zipAsset, shaAsset) = manifest.GetAsset(environment);
@@ -78,10 +78,10 @@ namespace SpoiledCat.Git
 			return manifest;
 		}
 
-		public static DugiteReleaseManifest Load(NPath localCacheFile, UriString packageFeed, IEnvironment environment)
+		public static DugiteReleaseManifest Load(SPath localCacheFile, UriString packageFeed, IEnvironment environment)
 		{
 			DugiteReleaseManifest package = null;
-			//NPath localCacheFeed = environment.UserCachePath.Combine("embedded-git.json");
+			//SPath localCacheFeed = environment.UserCachePath.Combine("embedded-git.json");
 			var filename = localCacheFile.FileName;
 			var key = localCacheFile.FileNameWithoutExtension + "_updatelastCheckTime";
 			var now = DateTimeOffset.Now;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using SpoiledCat.Logging;
-using SpoiledCat.NiceIO;
+using SpoiledCat.SimpleIO;
 using SpoiledCat.ProcessManager;
 using SpoiledCat.Threading;
 using SpoiledCat.Unity;
@@ -45,7 +45,7 @@ namespace BaseTests
 		}
 
 		protected void StartTest(out System.Diagnostics.Stopwatch watch, out ILogging logger, out ITaskManager taskManager,
-			out NPath testPath, out IEnvironment environment, out IProcessManager processManager,
+			out SPath testPath, out IEnvironment environment, out IProcessManager processManager,
 			[CallerMemberName] string testName = "test")
 		{
 			logger = new LogFacade(testName, new UnityLogAdapter(), true);
@@ -53,7 +53,7 @@ namespace BaseTests
 
 			taskManager = TaskManager;
 
-			testPath = NPath.CreateTempDirectory(testName);
+			testPath = SPath.CreateTempDirectory(testName);
 
 			environment = new UnityEnvironment(testName);
 			((UnityEnvironment)environment).SetWorkingDirectory(testPath);
@@ -65,15 +65,15 @@ namespace BaseTests
 			watch.Start();
 		}
 
-		protected NPath? testApp;
+		protected SPath? testApp;
 
-		protected NPath TestApp
+		protected SPath TestApp
 		{
 			get
 			{
 				if (!testApp.HasValue)
 				{
-					testApp = "Packages/com.spoiledcat.processmanager/Tests/Helpers~/Helper.CommandLine.exe".ToNPath().Resolve();
+					testApp = "Packages/com.spoiledcat.processmanager/Tests/Helpers~/Helper.CommandLine.exe".ToSPath().Resolve();
 					if (!testApp.Value.FileExists())
 					{
 						UnityEngine.Debug.LogException(new InvalidOperationException("Test helper binaries are missing. Build the UnityTools.sln solution once with `dotnet build` in order to set up the tests."));

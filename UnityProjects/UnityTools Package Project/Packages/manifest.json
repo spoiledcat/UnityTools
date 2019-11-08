@@ -18,7 +18,7 @@
   "dependencies": {
     "com.spoiledcat.environment": "1.0.22",
     "com.spoiledcat.logging": "1.0.22",
-    "com.spoiledcat.niceio": "1.0.22",
+    "com.spoiledcat.simpleio": "1.0.22",
     "com.spoiledcat.processmanager": "1.0.22",
     "com.spoiledcat.quick-console": "1.0.22",
     "com.spoiledcat.sharpziplib": "1.0.22",

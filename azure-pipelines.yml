@@ -53,7 +53,7 @@ steps:
 #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 #   inputs:
 #     command: 'publish'
-#     workingDir: 'build/packages/com.spoiledcat.niceio'
+#     workingDir: 'build/packages/com.spoiledcat.simpleio'
 #     publishEndpoint: 'registry'
 
 # - task: Npm@1

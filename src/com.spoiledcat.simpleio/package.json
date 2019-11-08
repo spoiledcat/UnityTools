@@ -1,7 +1,7 @@
 {
-    "name": "com.spoiledcat.niceio",
-    "displayName": "SpoiledCat NiceIO",
-    "description": "A nice IO abstraction",
+    "name": "com.spoiledcat.simple",
+    "displayName": "SpoiledCat SimpleIO",
+    "description": "A simple IO abstraction",
     "version": "0.0.0-placeholder",
     "license" : "MIT",
     "author": {

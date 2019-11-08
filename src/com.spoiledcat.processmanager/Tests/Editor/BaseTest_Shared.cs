@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using SpoiledCat.NiceIO;
+using SpoiledCat.SimpleIO;
 using SpoiledCat.Threading;
 using SpoiledCat.Extensions;
 using SpoiledCat.Logging;
@@ -22,7 +22,7 @@ namespace BaseTests
 		private ITaskManager TaskManager { get; }
 
 		protected void StopTest(Stopwatch watch, ILogging logger, ITaskManager taskManager,
-			NPath testPath, IEnvironment environment, IProcessManager processManager)
+			SPath testPath, IEnvironment environment, IProcessManager processManager)
 		{
 			watch.Stop();
 			logger.Trace($"END:{watch.ElapsedMilliseconds}ms");

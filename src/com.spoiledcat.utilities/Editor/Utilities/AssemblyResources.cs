@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace SpoiledCat.Utilities
 {
-	using NiceIO;
+	using SimpleIO;
 	using Extensions;
 	using Unity;
 
@@ -22,7 +22,7 @@ namespace SpoiledCat.Utilities
 
 	public class AssemblyResources
 	{
-		public static NPath ToFile(ResourceType resourceType, string resource, NPath destinationPath, IEnvironment environment)
+		public static SPath ToFile(ResourceType resourceType, string resource, SPath destinationPath, IEnvironment environment)
 		{
 			var target = destinationPath.Combine(resource);
 			var source = TryGetFile(resourceType, resource, environment);
@@ -31,7 +31,7 @@ namespace SpoiledCat.Utilities
 				target.DeleteIfExists();
 				return source.Copy(target);
 			}
-			return NPath.Default;
+			return SPath.Default;
 		}
 
 		public static Stream ToStream(ResourceType resourceType, string resource, IEnvironment environment)
@@ -90,7 +90,7 @@ namespace SpoiledCat.Utilities
 			if (stream != null)
 				return stream;
 
-			NPath possiblePath = environment.ExtensionInstallPath.Combine(type, os, resource);
+			SPath possiblePath = environment.ExtensionInstallPath.Combine(type, os, resource);
 			if (possiblePath.FileExists())
 			{
 				return new MemoryStream(possiblePath.ReadAllBytes());
@@ -98,7 +98,7 @@ namespace SpoiledCat.Utilities
 			return null;
 		}
 
-		private static NPath TryGetFile(ResourceType resourceType, string resource, IEnvironment environment)
+		private static SPath TryGetFile(ResourceType resourceType, string resource, IEnvironment environment)
 		{
 			/*
 				This function attempts to get files embedded in the callers assembly.
@@ -114,17 +114,17 @@ namespace SpoiledCat.Utilities
 			var stream = TryGetResource(resourceType, type, os, resource);
 			if (stream != null)
 			{
-				var target = NPath.GetTempFilename();
+				var target = SPath.GetTempFilename();
 				return target.WriteAllBytes(stream.ToByteArray());
 			}
 
-			NPath possiblePath = environment.ExtensionInstallPath.Combine(type, os, resource);
+			SPath possiblePath = environment.ExtensionInstallPath.Combine(type, os, resource);
 			if (possiblePath.FileExists())
 			{
 				return possiblePath;
 			}
 
-			return NPath.Default;
+			return SPath.Default;
 		}
 	}
 }

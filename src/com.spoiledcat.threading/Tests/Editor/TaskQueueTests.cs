@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using BaseTests;
 using SpoiledCat.Extensions;
-using SpoiledCat.NiceIO;
+using SpoiledCat.SimpleIO;
 using SpoiledCat.Threading;
 
 namespace ThreadingTests
@@ -99,9 +99,9 @@ namespace ThreadingTests
 			StartTest(out var watch, out var logger, out var taskManager);
 
 			Assert.Throws<ArgumentNullException>(() => new TaskQueue<string, double>(taskManager));
-			// NPath has an implicit operator to string, but we cannot verify this without using
+			// SPath has an implicit operator to string, but we cannot verify this without using
 			// reflection, so a converter is required
-			Assert.Throws<ArgumentNullException>(() => new TaskQueue<NPath, string>(taskManager));
+			Assert.Throws<ArgumentNullException>(() => new TaskQueue<SPath, string>(taskManager));
 
 			StopTest(watch, logger, taskManager);
 		}

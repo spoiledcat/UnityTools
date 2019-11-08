@@ -4,19 +4,19 @@ using System.Linq;
 
 namespace SpoiledCat.Git
 {
-	using NiceIO;
+	using SimpleIO;
 	using ProcessManager;
 
 	public class GitProcessEnvironment : ProcessEnvironment
 	{
 		public static IProcessEnvironment Instance { get; private set; }
 		public new IGitEnvironment Environment => base.Environment as IGitEnvironment;
-		private NPath basePath;
-		private NPath gitBinary;
-		private NPath libExecPath;
+		private SPath basePath;
+		private SPath gitBinary;
+		private SPath libExecPath;
 		private string[] envPath;
 
-		public GitProcessEnvironment(IGitEnvironment environment, NPath repositoryRoot)
+		public GitProcessEnvironment(IGitEnvironment environment, SPath repositoryRoot)
 			: base(environment, FindRepositoryRoot(repositoryRoot))
 		{
 			Instance = this;
@@ -25,7 +25,7 @@ namespace SpoiledCat.Git
 
 		public void Reset(GitInstaller.GitInstallationState state = null)
 		{
-			basePath = gitBinary = libExecPath = NPath.Default;
+			basePath = gitBinary = libExecPath = SPath.Default;
 			envPath = null;
 
 			if (!Environment.GitInstallationPath.IsInitialized && !((state?.GitInstallationPath.IsInitialized) ?? false))
@@ -36,21 +36,21 @@ namespace SpoiledCat.Git
 
 			basePath = ResolveBasePath();
 			envPath = CreateEnvPath().ToArray();
-			if (ResolveGitExecPath(out NPath p))
+			if (ResolveGitExecPath(out SPath p))
 				libExecPath = p;
 		}
 
-		private static NPath FindRepositoryRoot(NPath repositoryRoot)
+		private static SPath FindRepositoryRoot(SPath repositoryRoot)
 		{
 			if (repositoryRoot.IsInitialized)
 				return repositoryRoot;
-			var ret = NPath.CurrentDirectory.RecursiveParents.FirstOrDefault(d => d.Exists(".git"));
+			var ret = SPath.CurrentDirectory.RecursiveParents.FirstOrDefault(d => d.Exists(".git"));
 			if (ret.IsInitialized)
 				return ret;
-			return NPath.CurrentDirectory;
+			return SPath.CurrentDirectory;
 		}
 
-		public override void Configure(ProcessStartInfo psi, NPath? workingDirectory = null)
+		public override void Configure(ProcessStartInfo psi, SPath? workingDirectory = null)
 		{
 			base.Configure(psi, workingDirectory);
 
@@ -104,13 +104,13 @@ namespace SpoiledCat.Git
 		}
 
 
-		public bool ResolveGitExecPath(out NPath path)
+		public bool ResolveGitExecPath(out SPath path)
 		{
 			path = ResolveBasePath().Combine("libexec", "git-core");
 			return path.DirectoryExists();
 		}
 
-		private NPath ResolveBasePath()
+		private SPath ResolveBasePath()
 		{
 			var path = Environment.GitInstallationPath;
 			if (Environment.IsWindows)

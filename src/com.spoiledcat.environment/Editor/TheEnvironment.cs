@@ -11,7 +11,7 @@ using UnityEditor;
 
 namespace SpoiledCat.Unity
 {
-	using NiceIO;
+	using SimpleIO;
 
 	public sealed class TheEnvironment : ScriptableSingleton<TheEnvironment>
 	{
@@ -34,17 +34,17 @@ namespace SpoiledCat.Unity
 			Save(true);
 		}
 
-		private NPath DetermineInstallationPath()
+		private SPath DetermineInstallationPath()
 		{
 #if UNITY_EDITOR
 			// Juggling to find out where we got installed
 			var shim = CreateInstance<RunLocationShim>();
 			var script = MonoScript.FromScriptableObject(shim);
-			var scriptPath = Application.dataPath.ToNPath().Parent.Combine(AssetDatabase.GetAssetPath(script).ToNPath());
+			var scriptPath = Application.dataPath.ToSPath().Parent.Combine(AssetDatabase.GetAssetPath(script).ToSPath());
 			DestroyImmediate(shim);
 			return scriptPath.Parent;
 #else
-			return Application.dataPath.ToNPath();
+			return Application.dataPath.ToSPath();
 #endif
 		}
 
@@ -69,12 +69,12 @@ namespace SpoiledCat.Unity
 					}
 
 					environment.Initialize(
-						unityAssetsPath.ToNPath(), extensionInstallPath.ToNPath()
+						unityAssetsPath.ToSPath(), extensionInstallPath.ToSPath()
 #if UNITY_EDITOR
 						,
 						unityVersion,
-						unityApplication.ToNPath(),
-						unityApplicationContents.ToNPath()
+						unityApplication.ToSPath(),
+						unityApplicationContents.ToSPath()
 #endif
 					);
 					Flush();

@@ -18,7 +18,7 @@ using Object = UnityEngine.Object;
 namespace SpoiledCat
 {
 	using Json;
-	using NiceIO;
+	using SimpleIO;
 	using UI;
 	using Extensions;
 
@@ -360,7 +360,7 @@ namespace SpoiledCat
 			"System.Linq",
 			"System.IO",
 			"SpoiledCat.Json",
-			"SpoiledCat.NiceIO",
+			"SpoiledCat.SimpleIO",
 		};
 
 		private Dictionary<string, (string className, string methodName, string source, Assembly assembly)>
@@ -451,7 +451,7 @@ namespace SpoiledCat
 		{
 			(string source, string className, string methodName) = GenerateSource(args, csharp);
 
-			compilerParameters.OutputAssembly = $"Temp/assembly_{className}.dll".ToNPath().ToString();
+			compilerParameters.OutputAssembly = $"Temp/assembly_{className}.dll".ToSPath().ToString();
 			CompilerResults r = compiler.CompileAssemblyFromSource(compilerParameters, source);
 
 			if (!r.Errors.HasErrors)

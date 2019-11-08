@@ -12,7 +12,7 @@ namespace SpoiledCat.Unity
 {
 	using Json;
 	using Logging;
-	using NiceIO;
+	using SimpleIO;
 
 	public interface ISettings
 	{
@@ -23,7 +23,7 @@ namespace SpoiledCat.Unity
 		void Set<T>(string key, T value);
 		void Unset(string key);
 		void Rename(string oldKey, string newKey);
-		NPath SettingsPath { get; set; }
+		SPath SettingsPath { get; set; }
 	}
 
 	public abstract class BaseSettings : ISettings
@@ -35,7 +35,7 @@ namespace SpoiledCat.Unity
 		public abstract void Rename(string oldKey, string newKey);
 		public abstract void Set<T>(string key, T value);
 		public abstract void Unset(string key);
-		public NPath SettingsPath { get; set; }
+		public SPath SettingsPath { get; set; }
 
 		protected virtual string SettingsFileName { get; set; }
 	}
@@ -161,7 +161,7 @@ namespace SpoiledCat.Unity
 		{
 			EnsureCachePath(path);
 
-			var npath = path.ToNPath();
+			var npath = path.ToSPath();
 			if (!npath.FileExists())
 			{
 				cacheData = new Dictionary<string, object>();
@@ -192,7 +192,7 @@ namespace SpoiledCat.Unity
 		{
 			EnsureCachePath(path);
 
-			var npath = path.ToNPath();
+			var npath = path.ToSPath();
 			try
 			{
 				var data = cacheData.ToJson();
@@ -209,7 +209,7 @@ namespace SpoiledCat.Unity
 
 		private void EnsureCachePath(string path)
 		{
-			var npath = path.ToNPath();
+			var npath = path.ToSPath();
 			if (npath.FileExists())
 				return;
 			npath.EnsureParentDirectoryExists();

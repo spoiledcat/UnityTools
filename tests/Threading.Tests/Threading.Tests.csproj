@@ -15,7 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
-    <ProjectReference Include="..\..\src\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj" />
+    <ProjectReference Include="..\..\src\com.spoiledcat.simpleio\Editor\SpoiledCat.Unity.SimpleIO.csproj" />
     <ProjectReference Include="..\..\src\com.spoiledcat.processmanager\Editor\SpoiledCat.Unity.ProcessManager.csproj" />
     <ProjectReference Include="..\..\src\com.spoiledcat.threading.tasks\Editor\SpoiledCat.Unity.Threading.Tasks.csproj" />
     <ProjectReference Include="..\..\src\com.spoiledcat.threading\Editor\SpoiledCat.Unity.Threading.csproj" />

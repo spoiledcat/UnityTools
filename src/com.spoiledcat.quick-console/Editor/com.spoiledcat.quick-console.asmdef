@@ -3,7 +3,7 @@
     "references": [
         "com.spoiledcat.simplejson",
         "com.spoiledcat.ui",
-        "com.spoiledcat.niceio"
+        "com.spoiledcat.simpleio"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

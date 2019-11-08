@@ -6,7 +6,7 @@
 
 namespace SpoiledCat.ProcessManager
 {
-	using NiceIO;
+	using SimpleIO;
 	using System;
 	using System.Collections.Generic;
 	using Threading;
@@ -14,7 +14,7 @@ namespace SpoiledCat.ProcessManager
 	public class SimpleProcessTask : ProcessTask<string>
 	{
 		public SimpleProcessTask(ITaskManager taskManager, IProcessManager processManager,
-			string executable, string arguments, NPath? workingDirectory = null,
+			string executable, string arguments, SPath? workingDirectory = null,
 			IOutputProcessor<string> processor = null)
 			: base(taskManager, processManager.DefaultProcessEnvironment,
 				  executable, arguments, processor ?? new SimpleOutputProcessor())
@@ -29,7 +29,7 @@ namespace SpoiledCat.ProcessManager
 			ITaskManager taskManager, IProcessManager processManager,
 			string executable, string arguments,
 			Func<string, T> processor,
-			NPath? workingDirectory = null
+			SPath? workingDirectory = null
 		)
 			 : base(taskManager, taskManager?.Token ?? default,
 				processManager.DefaultProcessEnvironment,
@@ -49,7 +49,7 @@ namespace SpoiledCat.ProcessManager
 			ITaskManager taskManager, IProcessManager processManager,
 			string executable, string arguments,
 			IOutputProcessor<T> outputProcessor,
-			NPath? workingDirectory = null
+			SPath? workingDirectory = null
 		)
 			 : base(taskManager, taskManager?.Token ?? default,
 				processManager.DefaultProcessEnvironment,
@@ -63,7 +63,7 @@ namespace SpoiledCat.ProcessManager
 	{
 		public SimpleListProcessTask(
 			ITaskManager taskManager, IProcessManager processManager,
-			string executable, string arguments, NPath? workingDirectory = null,
+			string executable, string arguments, SPath? workingDirectory = null,
 			IOutputProcessor<string, List<string>> processor = null
 		)
 			 : base(taskManager, taskManager?.Token ?? default,
@@ -78,7 +78,7 @@ namespace SpoiledCat.ProcessManager
 	public class FirstNonNullLineProcessTask : SimpleProcessTask
 	{
 		public FirstNonNullLineProcessTask(ITaskManager taskManager, IProcessManager processManager,
-			string executable, string arguments, NPath? workingDirectory = null)
+			string executable, string arguments, SPath? workingDirectory = null)
 			: base(taskManager, processManager, executable, arguments, workingDirectory,
 				  new FirstNonNullLineOutputProcessor<string>())
 		{

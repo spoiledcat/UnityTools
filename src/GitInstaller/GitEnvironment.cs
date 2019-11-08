@@ -1,30 +1,30 @@
 ﻿namespace SpoiledCat.Git
 {
-	using NiceIO;
+	using SimpleIO;
 	using Unity;
 
 	public interface IGitEnvironment : IEnvironment
 	{
-		NPath GitInstallationPath { get; }
-		NPath GitExecutablePath { get; }
-		NPath GitLfsInstallationPath { get; }
-		NPath GitLfsExecutablePath { get; }
+		SPath GitInstallationPath { get; }
+		SPath GitExecutablePath { get; }
+		SPath GitLfsInstallationPath { get; }
+		SPath GitLfsExecutablePath { get; }
 
 		void Resolve(GitInstaller.GitInstallationState defaults);
 	}
 
 	public class GitEnvironment : UnityEnvironment, IGitEnvironment
 	{
-		public NPath GitInstallationPath { get; private set; }
-		public NPath GitExecutablePath { get; private set; }
-		public NPath GitLfsInstallationPath { get; private set; }
-		public NPath GitLfsExecutablePath { get; private set; }
+		public SPath GitInstallationPath { get; private set; }
+		public SPath GitExecutablePath { get; private set; }
+		public SPath GitLfsInstallationPath { get; private set; }
+		public SPath GitLfsExecutablePath { get; private set; }
 
 
 		public GitEnvironment(string applicationName, string logFile) : base(applicationName, logFile)
 		{ }
 
-		public override void Initialize(string unityVersion, NPath extensionInstallPath, NPath EditorApplication_applicationPath, NPath EditorApplication_applicationContentsPath, NPath Application_dataPath)
+		public override void Initialize(string unityVersion, SPath extensionInstallPath, SPath EditorApplication_applicationPath, SPath EditorApplication_applicationContentsPath, SPath Application_dataPath)
 		{
 			base.Initialize(unityVersion, extensionInstallPath, EditorApplication_applicationPath, EditorApplication_applicationContentsPath, Application_dataPath);
 			Resolve(new GitInstaller.GitInstallationState(new GitInstaller.GitInstallDetails(UserCachePath, this)));
@@ -33,24 +33,24 @@
 		public void Resolve(GitInstaller.GitInstallationState state)
 		{
 
-			if (ResolvePaths("git", state.GitExecutablePath, out NPath gitExecPath, out NPath gitInstallPath))
+			if (ResolvePaths("git", state.GitExecutablePath, out SPath gitExecPath, out SPath gitInstallPath))
 			{
 				GitExecutablePath = gitExecPath;
 				GitInstallationPath = gitInstallPath;
 			}
 			else
-				GitExecutablePath = GitInstallationPath = NPath.Default;
+				GitExecutablePath = GitInstallationPath = SPath.Default;
 
-			if (GitInstallationPath != state.GitInstallationPath && ResolvePaths("git-lfs", state.GitLfsExecutablePath, out NPath gitLfsExecPath, out NPath gitLfsInstallPath)) {
+			if (GitInstallationPath != state.GitInstallationPath && ResolvePaths("git-lfs", state.GitLfsExecutablePath, out SPath gitLfsExecPath, out SPath gitLfsInstallPath)) {
 				GitLfsExecutablePath = gitLfsExecPath;
 				GitLfsInstallationPath = gitLfsExecPath;
 			} else
-				GitLfsExecutablePath = GitLfsInstallationPath = NPath.Default;
+				GitLfsExecutablePath = GitLfsInstallationPath = SPath.Default;
 		}
 
-		private bool ResolvePaths(string execName, NPath pathToExecutable, out NPath execPath, out NPath installPath)
+		private bool ResolvePaths(string execName, SPath pathToExecutable, out SPath execPath, out SPath installPath)
 		{
-			execPath = installPath = NPath.Default;
+			execPath = installPath = SPath.Default;
 
 			if (pathToExecutable.DirectoryExists())
 				pathToExecutable = pathToExecutable.Combine(execName + ExecutableExtension);

@@ -18,7 +18,7 @@
     "dependencies": {
         "com.spoiledcat.environment": "0.0.0-placeholder",
         "com.spoiledcat.logging": "0.0.0-placeholder",
-        "com.spoiledcat.niceio": "0.0.0-placeholder",
+        "com.spoiledcat.simpleio": "0.0.0-placeholder",
         "com.spoiledcat.sharpziplib": "0.0.0-placeholder",
         "com.spoiledcat.simplejson": "0.0.0-placeholder"
     }

@@ -1,17 +1,17 @@
 namespace SpoiledCat.ProcessManager
 {
-	using NiceIO;
+	using SimpleIO;
 	using Threading;
 	using Unity;
 
-	public class FindExecTask : SimpleProcessTask<NPath>
+	public class FindExecTask : SimpleProcessTask<SPath>
 	{
 		public FindExecTask(ITaskManager taskManager, IProcessManager processManager,
 			string execToFind, IEnvironment environment)
 			: base(taskManager, processManager,
 				  environment.IsWindows ? "where" : "which",
 				  execToFind,
-				  new FirstNonNullLineOutputProcessor<NPath>(line => new NPath(line)))
+				  new FirstNonNullLineOutputProcessor<SPath>(line => new SPath(line)))
 		{
 			processManager.Configure(this);
 		}

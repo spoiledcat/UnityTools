@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.threading.tasks",
     "references": [
         "com.spoiledcat.logging",
-        "com.spoiledcat.niceio",
+        "com.spoiledcat.simpleio",
         "com.spoiledcat.utilities",
         "com.spoiledcat.threading"
     ],

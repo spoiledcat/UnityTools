@@ -9,7 +9,7 @@
 	using Extensions;
 	using Logging;
 	using Mono.Options;
-	using NiceIO;
+	using SimpleIO;
 	using TestWebServer;
 	using Threading;
 	using Utilities;
@@ -20,7 +20,7 @@
 
 		private static string ReadAllTextIfFileExists(this string path)
 		{
-			var file = path.ToNPath();
+			var file = path.ToSPath();
 			if (!file.IsInitialized || !file.FileExists())
 			{
 				return null;
@@ -28,11 +28,11 @@
 			return file.ReadAllText();
 		}
 
-		private static void RunWebServer(NPath path, int port)
+		private static void RunWebServer(SPath path, int port)
 		{
 			if (!path.IsInitialized)
 			{
-				path = typeof(Program).Assembly.Location.ToNPath().Parent.Combine("files");
+				path = typeof(Program).Assembly.Location.ToSPath().Parent.Combine("files");
 			}
 
 			var evt = new ManualResetEventSlim(false);
@@ -59,7 +59,7 @@
 
 		private static HttpServer RunWebServer(int port)
 		{
-			var path = typeof(Program).Assembly.Location.ToNPath().Parent.Combine("files");
+			var path = typeof(Program).Assembly.Location.ToSPath().Parent.Combine("files");
 			var server = new HttpServer(path, port);
 			var thread = new Thread(() => { server.Start(); });
 
@@ -81,8 +81,8 @@
 			var readInputToEof = false;
 			var lines = new List<string>();
 			var runWebServer = false;
-			NPath outfile = NPath.Default;
-			NPath path = NPath.Default;
+			SPath outfile = SPath.Default;
+			SPath path = SPath.Default;
 			string releaseNotes = null;
 			var webServerPort = -1;
 			var generateVersion = false;
@@ -118,11 +118,11 @@
 				.Add("v=|version=", v => version = v)
 				.Add("gen-package", "Pass --version --url --path --md5 --rn --msg to generate a package", v => generatePackage = true)
 				.Add("u=|url=", v => url = v)
-				.Add("path=", v => path = v.ToNPath())
+				.Add("path=", v => path = v.ToSPath())
 				.Add("rn=", "Path to file with release notes", v => releaseNotes = v.ReadAllTextIfFileExists())
 				.Add("msg=", "Path to file with message for package", v => msg = v.ReadAllTextIfFileExists())
 				.Add("readVersion=", v => readVersion = v)
-				.Add("o=|outfile=", v => outfile = v.ToNPath().MakeAbsolute())
+				.Add("o=|outfile=", v => outfile = v.ToSPath().MakeAbsolute())
 				.Add("h=", "Host", v => host = v)
 				.Add("help", v => p.WriteOptionDescriptions(Console.Out))
 				.Add("b|block", v => block = true)
@@ -134,7 +134,7 @@
 				extra.Remove("usage");
 				p.Parse(extra);
 
-				path = extra[extra.Count - 1].ToNPath();
+				path = extra[extra.Count - 1].ToSPath();
 				var server = RunWebServer(webServerPort);
 				var webRequest = (HttpWebRequest)WebRequest.Create(new UriString("http://localhost:" + webServerPort + "/api/usage/unity"));
 				webRequest.Method = "POST";

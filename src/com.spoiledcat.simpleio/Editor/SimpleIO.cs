@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <license file="NiceIO.cs">
+// <license file="SimpleIO.cs">
 //
 // The MIT License(MIT)
 // =====================
@@ -42,21 +42,21 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace SpoiledCat.NiceIO
+namespace SpoiledCat.SimpleIO
 {
 	[Serializable]
 	[DebuggerDisplay("{DebuggerDisplay,nq}")]
 
-	public struct NPath : IEquatable<NPath>, IComparable
+	public struct SPath : IEquatable<SPath>, IComparable
 	{
-		public static NPath Default;
+		public static SPath Default;
 
 		private readonly string[] _elements;
 		private readonly string _driveLetter;
 
 		#region construction
 
-		public NPath(string path)
+		public SPath(string path)
 		{
 			if (path == null)
 				throw new ArgumentNullException("path");
@@ -80,14 +80,14 @@ namespace SpoiledCat.NiceIO
 			}
 		}
 
-		public static (NPath, bool) TryParse(string path)
+		public static (SPath, bool) TryParse(string path)
 		{
-			if (path == null) return (NPath.Default, false);
-			var p = new NPath(path);
+			if (path == null) return (SPath.Default, false);
+			var p = new SPath(path);
 			return (p, !p.IsEmpty || p.IsRoot);
 		}
 
-		private NPath(string[] elements, bool isRelative, string driveLetter)
+		private SPath(string[] elements, bool isRelative, string driveLetter)
 		{
 			_elements = elements;
 			IsRelative = isRelative;
@@ -146,24 +146,24 @@ namespace SpoiledCat.NiceIO
 			return split[0].Length != 0 || !split.Any(s => s.Length > 0);
 		}
 
-		public NPath Combine(params string[] append)
+		public SPath Combine(params string[] append)
 		{
-			return Combine(append.Select(a => new NPath(a)).ToArray());
+			return Combine(append.Select(a => new SPath(a)).ToArray());
 		}
 
-		public NPath Combine(params NPath[] append)
+		public SPath Combine(params SPath[] append)
 		{
 			ThrowIfNotInitialized();
 
 			if (!append.All(p => p.IsRelative))
 				throw new ArgumentException("You cannot .Combine a non-relative path");
 
-			return new NPath(
+			return new SPath(
 				ParseSplitStringIntoElements(_elements.Concat(append.SelectMany(p => p._elements)), IsRelative),
 				IsRelative, _driveLetter);
 		}
 
-		public NPath Parent {
+		public SPath Parent {
 			get {
 				ThrowIfNotInitialized();
 
@@ -172,11 +172,11 @@ namespace SpoiledCat.NiceIO
 
 				var newElements = _elements.Take(_elements.Length - 1).ToArray();
 
-				return new NPath(newElements, IsRelative, _driveLetter);
+				return new SPath(newElements, IsRelative, _driveLetter);
 			}
 		}
 
-		public NPath RelativeTo(NPath path)
+		public SPath RelativeTo(SPath path)
 		{
 			ThrowIfNotInitialized();
 
@@ -187,7 +187,7 @@ namespace SpoiledCat.NiceIO
 						"Path.RelativeTo() was invoked with two paths that are on different volumes. invoked on: " +
 						ToString() + " asked to be made relative to: " + path);
 
-				NPath commonParent = Default;
+				SPath commonParent = Default;
 				foreach (var parent in RecursiveParents)
 				{
 					commonParent = path.RecursiveParents.FirstOrDefault(otherParent => otherParent == parent);
@@ -206,15 +206,15 @@ namespace SpoiledCat.NiceIO
 						ToString() + " asked to be made relative to: " + path);
 
 				var depthDiff = path.Depth - commonParent.Depth;
-				return new NPath(
+				return new SPath(
 					Enumerable.Repeat("..", depthDiff).Concat(_elements.Skip(commonParent.Depth)).ToArray(), true,
 					null);
 			}
 
-			return new NPath(_elements.Skip(path._elements.Length).ToArray(), true, null);
+			return new SPath(_elements.Skip(path._elements.Length).ToArray(), true, null);
 		}
 
-		public NPath GetCommonParent(NPath path)
+		public SPath GetCommonParent(SPath path)
 		{
 			ThrowIfNotInitialized();
 
@@ -223,8 +223,8 @@ namespace SpoiledCat.NiceIO
 				if (!IsRelative && !path.IsRelative && _driveLetter != path._driveLetter)
 					return Default;
 
-				NPath commonParent = Default;
-				foreach (var parent in new List<NPath> { this }.Concat(RecursiveParents))
+				SPath commonParent = Default;
+				foreach (var parent in new List<SPath> { this }.Concat(RecursiveParents))
 				{
 					commonParent = path.RecursiveParents.FirstOrDefault(otherParent => otherParent == parent);
 					if (commonParent.IsInitialized)
@@ -238,7 +238,7 @@ namespace SpoiledCat.NiceIO
 			return path;
 		}
 
-		public NPath ChangeExtension(string extension)
+		public SPath ChangeExtension(string extension)
 		{
 			ThrowIfNotInitialized();
 			ThrowIfRoot();
@@ -248,7 +248,7 @@ namespace SpoiledCat.NiceIO
 				FileSystem.ChangeExtension(_elements[_elements.Length - 1], WithDot(extension));
 			if (extension == string.Empty)
 				newElements[newElements.Length - 1] = newElements[newElements.Length - 1].TrimEnd('.');
-			return new NPath(newElements, IsRelative, _driveLetter);
+			return new SPath(newElements, IsRelative, _driveLetter);
 		}
 
 		#endregion construction
@@ -303,10 +303,10 @@ namespace SpoiledCat.NiceIO
 			{
 				return Exists();
 			}
-			return Exists(new NPath(append));
+			return Exists(new SPath(append));
 		}
 
-		public bool Exists(NPath append)
+		public bool Exists(SPath append)
 		{
 			ThrowIfNotInitialized();
 			if (!append.IsInitialized)
@@ -325,10 +325,10 @@ namespace SpoiledCat.NiceIO
 			ThrowIfNotInitialized();
 			if (String.IsNullOrEmpty(append))
 				return DirectoryExists();
-			return DirectoryExists(new NPath(append));
+			return DirectoryExists(new SPath(append));
 		}
 
-		public bool DirectoryExists(NPath append)
+		public bool DirectoryExists(SPath append)
 		{
 			ThrowIfNotInitialized();
 			if (!append.IsInitialized)
@@ -347,10 +347,10 @@ namespace SpoiledCat.NiceIO
 			ThrowIfNotInitialized();
 			if (String.IsNullOrEmpty(append))
 				return FileExists();
-			return FileExists(new NPath(append));
+			return FileExists(new SPath(append));
 		}
 
-		public bool FileExists(NPath append)
+		public bool FileExists(SPath append)
 		{
 			ThrowIfNotInitialized();
 			if (!append.IsInitialized)
@@ -418,7 +418,7 @@ namespace SpoiledCat.NiceIO
 			return sb.ToString();
 		}
 
-		public static implicit operator string(NPath path)
+		public static implicit operator string(SPath path)
 		{
 			return path.ToString();
 		}
@@ -438,19 +438,19 @@ namespace SpoiledCat.NiceIO
 
 		public override bool Equals(Object other)
 		{
-			if (other is NPath)
+			if (other is SPath)
 			{
-				return Equals((NPath)other);
+				return Equals((SPath)other);
 			}
 			return false;
 		}
 
-		public bool Equals(NPath p)
+		public bool Equals(SPath p)
 		{
 			if (p.IsInitialized != IsInitialized)
 				return false;
 
-			// return early if we're comparing two NPath.Default instances
+			// return early if we're comparing two SPath.Default instances
 			if (!IsInitialized)
 				return true;
 
@@ -470,7 +470,7 @@ namespace SpoiledCat.NiceIO
 			return true;
 		}
 
-		public static bool operator ==(NPath lhs, NPath rhs)
+		public static bool operator ==(SPath lhs, SPath rhs)
 		{
 			return lhs.Equals(rhs);
 		}
@@ -495,13 +495,13 @@ namespace SpoiledCat.NiceIO
 
 		public int CompareTo(object other)
 		{
-			if (!(other is NPath))
+			if (!(other is SPath))
 				return -1;
 
-			return ToString().CompareTo(((NPath)other).ToString());
+			return ToString().CompareTo(((SPath)other).ToString());
 		}
 
-		public static bool operator !=(NPath lhs, NPath rhs)
+		public static bool operator !=(SPath lhs, SPath rhs)
 		{
 			return !(lhs.Equals(rhs));
 		}
@@ -535,35 +535,35 @@ namespace SpoiledCat.NiceIO
 
 		#region directory enumeration
 
-		public IEnumerable<NPath> Files(string filter, bool recurse = false)
+		public IEnumerable<SPath> Files(string filter, bool recurse = false)
 		{
 			return FileSystem
 				.GetFiles(MakeAbsolute(), filter,
-					recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).Select(s => new NPath(s));
+					recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).Select(s => new SPath(s));
 		}
 
-		public IEnumerable<NPath> Files(bool recurse = false)
+		public IEnumerable<SPath> Files(bool recurse = false)
 		{
 			return Files("*", recurse);
 		}
 
-		public IEnumerable<NPath> Contents(string filter, bool recurse = false)
+		public IEnumerable<SPath> Contents(string filter, bool recurse = false)
 		{
 			return Files(filter, recurse).Concat(Directories(filter, recurse));
 		}
 
-		public IEnumerable<NPath> Contents(bool recurse = false)
+		public IEnumerable<SPath> Contents(bool recurse = false)
 		{
 			return Contents("*", recurse);
 		}
 
-		public IEnumerable<NPath> Directories(string filter, bool recurse = false)
+		public IEnumerable<SPath> Directories(string filter, bool recurse = false)
 		{
 			return FileSystem.GetDirectories(MakeAbsolute(), filter,
-				recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).Select(s => new NPath(s));
+				recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).Select(s => new SPath(s));
 		}
 
-		public IEnumerable<NPath> Directories(bool recurse = false)
+		public IEnumerable<SPath> Directories(bool recurse = false)
 		{
 			return Directories("*", recurse);
 		}
@@ -572,7 +572,7 @@ namespace SpoiledCat.NiceIO
 
 		#region filesystem writing operations
 
-		public NPath CreateFile()
+		public SPath CreateFile()
 		{
 			ThrowIfNotInitialized();
 			ThrowIfRelative();
@@ -582,12 +582,12 @@ namespace SpoiledCat.NiceIO
 			return this;
 		}
 
-		public NPath CreateFile(string file)
+		public SPath CreateFile(string file)
 		{
-			return CreateFile(new NPath(file));
+			return CreateFile(new SPath(file));
 		}
 
-		public NPath CreateFile(NPath file)
+		public SPath CreateFile(SPath file)
 		{
 			ThrowIfNotInitialized();
 			if (!file.IsRelative)
@@ -596,7 +596,7 @@ namespace SpoiledCat.NiceIO
 			return Combine(file).CreateFile();
 		}
 
-		public NPath CreateDirectory()
+		public SPath CreateDirectory()
 		{
 			ThrowIfNotInitialized();
 			ThrowIfRelative();
@@ -610,12 +610,12 @@ namespace SpoiledCat.NiceIO
 			return this;
 		}
 
-		public NPath CreateDirectory(string directory)
+		public SPath CreateDirectory(string directory)
 		{
-			return CreateDirectory(new NPath(directory));
+			return CreateDirectory(new SPath(directory));
 		}
 
-		public NPath CreateDirectory(NPath directory)
+		public SPath CreateDirectory(SPath directory)
 		{
 			ThrowIfNotInitialized();
 			if (!directory.IsRelative)
@@ -624,22 +624,22 @@ namespace SpoiledCat.NiceIO
 			return Combine(directory).CreateDirectory();
 		}
 
-		public NPath Copy(string dest)
+		public SPath Copy(string dest)
 		{
-			return Copy(new NPath(dest));
+			return Copy(new SPath(dest));
 		}
 
-		public NPath Copy(string dest, Func<NPath, bool> fileFilter)
+		public SPath Copy(string dest, Func<SPath, bool> fileFilter)
 		{
-			return Copy(new NPath(dest), fileFilter);
+			return Copy(new SPath(dest), fileFilter);
 		}
 
-		public NPath Copy(NPath dest)
+		public SPath Copy(SPath dest)
 		{
 			return Copy(dest, p => true);
 		}
 
-		public NPath Copy(NPath dest, Func<NPath, bool> fileFilter)
+		public SPath Copy(SPath dest, Func<SPath, bool> fileFilter)
 		{
 			ThrowIfNotInitialized();
 			ThrowIfNotInitialized(dest);
@@ -653,17 +653,17 @@ namespace SpoiledCat.NiceIO
 			return CopyWithDeterminedDestination(dest, fileFilter);
 		}
 
-		public NPath MakeAbsolute()
+		public SPath MakeAbsolute()
 		{
 			ThrowIfNotInitialized();
 
 			if (!IsRelative)
 				return this;
 
-			return NPath.CurrentDirectory.Combine(this);
+			return SPath.CurrentDirectory.Combine(this);
 		}
 
-		NPath CopyWithDeterminedDestination(NPath absoluteDestination, Func<NPath, bool> fileFilter)
+		SPath CopyWithDeterminedDestination(SPath absoluteDestination, Func<SPath, bool> fileFilter)
 		{
 			if (absoluteDestination.IsRelative)
 				throw new ArgumentException("absoluteDestination must be absolute");
@@ -732,7 +732,7 @@ namespace SpoiledCat.NiceIO
 				Delete(deleteMode);
 		}
 
-		public NPath DeleteContents()
+		public SPath DeleteContents()
 		{
 			ThrowIfNotInitialized();
 			ThrowIfRelative();
@@ -764,35 +764,35 @@ namespace SpoiledCat.NiceIO
 			return EnsureDirectoryExists();
 		}
 
-		public static NPath CreateTempDirectory(string myprefix)
+		public static SPath CreateTempDirectory(string myprefix)
 		{
 			var random = new Random();
 			while (true)
 			{
-				var candidate = new NPath(FileSystem.TempPath+ "/" + myprefix + "_" + random.Next());
+				var candidate = new SPath(FileSystem.TempPath+ "/" + myprefix + "_" + random.Next());
 				if (!candidate.Exists())
 					return candidate.CreateDirectory();
 			}
 		}
 
-		public static NPath GetTempFilename(string myprefix = "")
+		public static SPath GetTempFilename(string myprefix = "")
 		{
 			var random = new Random();
 			var prefix = FileSystem.TempPath+ "/" + (String.IsNullOrEmpty(myprefix) ? "" : myprefix + "_");
 			while (true)
 			{
-				var candidate = new NPath(prefix + random.Next());
+				var candidate = new SPath(prefix + random.Next());
 				if (!candidate.Exists())
 					return candidate;
 			}
 		}
 
-		public NPath Move(string dest)
+		public SPath Move(string dest)
 		{
-			return Move(new NPath(dest));
+			return Move(new SPath(dest));
 		}
 
-		public NPath Move(NPath dest)
+		public SPath Move(SPath dest)
 		{
 			ThrowIfNotInitialized();
 			ThrowIfNotInitialized(dest);
@@ -828,7 +828,7 @@ namespace SpoiledCat.NiceIO
 				"Move() called on a path that doesn't exist: " + MakeAbsolute().ToString());
 		}
 
-		public NPath WriteAllText(string contents)
+		public SPath WriteAllText(string contents)
 		{
 			ThrowIfNotInitialized();
 			EnsureParentDirectoryExists();
@@ -842,7 +842,7 @@ namespace SpoiledCat.NiceIO
 			return FileSystem.ReadAllText(MakeAbsolute());
 		}
 
-		public NPath WriteAllText(string contents, Encoding encoding)
+		public SPath WriteAllText(string contents, Encoding encoding)
 		{
 			ThrowIfNotInitialized();
 			EnsureParentDirectoryExists();
@@ -856,7 +856,7 @@ namespace SpoiledCat.NiceIO
 			return FileSystem.ReadAllText(MakeAbsolute(), encoding);
 		}
 
-		public NPath WriteLines(string[] contents)
+		public SPath WriteLines(string[] contents)
 		{
 			ThrowIfNotInitialized();
 			EnsureParentDirectoryExists();
@@ -864,7 +864,7 @@ namespace SpoiledCat.NiceIO
 			return this;
 		}
 
-		public NPath WriteAllLines(string[] contents)
+		public SPath WriteAllLines(string[] contents)
 		{
 			ThrowIfNotInitialized();
 			EnsureParentDirectoryExists();
@@ -878,7 +878,7 @@ namespace SpoiledCat.NiceIO
 			return FileSystem.ReadAllLines(MakeAbsolute());
 		}
 
-		public NPath WriteAllBytes(byte[] contents)
+		public SPath WriteAllBytes(byte[] contents)
 		{
 			ThrowIfNotInitialized();
 			EnsureParentDirectoryExists();
@@ -905,7 +905,7 @@ namespace SpoiledCat.NiceIO
 		}
 
 
-		public IEnumerable<NPath> CopyFiles(NPath destination, bool recurse, Func<NPath, bool> fileFilter = null)
+		public IEnumerable<SPath> CopyFiles(SPath destination, bool recurse, Func<SPath, bool> fileFilter = null)
 		{
 			ThrowIfNotInitialized();
 			ThrowIfNotInitialized(destination);
@@ -916,7 +916,7 @@ namespace SpoiledCat.NiceIO
 				.Select(file => file.Copy(destination.Combine(file.RelativeTo(_this)))).ToArray();
 		}
 
-		public IEnumerable<NPath> MoveFiles(NPath destination, bool recurse, Func<NPath, bool> fileFilter = null)
+		public IEnumerable<SPath> MoveFiles(SPath destination, bool recurse, Func<SPath, bool> fileFilter = null)
 		{
 			ThrowIfNotInitialized();
 			ThrowIfNotInitialized(destination);
@@ -935,47 +935,47 @@ namespace SpoiledCat.NiceIO
 
 		#region special paths
 
-		private static NPath currentDirectory;
-		public static NPath CurrentDirectory {
+		private static SPath currentDirectory;
+		public static SPath CurrentDirectory {
 			get {
 				if (!currentDirectory.IsInitialized)
-					currentDirectory = new NPath(FileSystem.CurrentDirectory);
+					currentDirectory = new SPath(FileSystem.CurrentDirectory);
 				return currentDirectory;
 			}
 		}
 
-		private static NPath homeDirectory;
-		public static NPath HomeDirectory {
+		private static SPath homeDirectory;
+		public static SPath HomeDirectory {
 			get {
 				if (!homeDirectory.IsInitialized)
-					homeDirectory = new NPath(FileSystem.HomeDirectory);
+					homeDirectory = new SPath(FileSystem.HomeDirectory);
 				return homeDirectory;
 			}
 		}
 
-		private static NPath localAppData;
-		public static NPath LocalAppData {
+		private static SPath localAppData;
+		public static SPath LocalAppData {
 			get {
 				if (!localAppData.IsInitialized)
-					localAppData = new NPath(FileSystem.LocalAppData);
+					localAppData = new SPath(FileSystem.LocalAppData);
 				return localAppData;
 			}
 		}
 
-		private static NPath commonAppData;
-		public static NPath CommonAppData {
+		private static SPath commonAppData;
+		public static SPath CommonAppData {
 			get {
 				if (!commonAppData.IsInitialized)
-					commonAppData = new NPath(FileSystem.CommonAppData);
+					commonAppData = new SPath(FileSystem.CommonAppData);
 				return commonAppData;
 			}
 		}
 
-		private static NPath systemTemp;
-		public static NPath SystemTemp {
+		private static SPath systemTemp;
+		public static SPath SystemTemp {
 			get {
 				if (!systemTemp.IsInitialized)
-					systemTemp = new NPath(FileSystem.TempPath);
+					systemTemp = new SPath(FileSystem.TempPath);
 				return systemTemp;
 			}
 		}
@@ -1002,12 +1002,12 @@ namespace SpoiledCat.NiceIO
 				throw new InvalidOperationException("You are attemping an operation on an null path");
 		}
 
-		private static void ThrowIfNotInitialized(NPath path)
+		private static void ThrowIfNotInitialized(SPath path)
 		{
 			path.ThrowIfNotInitialized();
 		}
 
-		public NPath EnsureDirectoryExists(string append = "")
+		public SPath EnsureDirectoryExists(string append = "")
 		{
 			ThrowIfNotInitialized();
 
@@ -1019,10 +1019,10 @@ namespace SpoiledCat.NiceIO
 				CreateDirectory();
 				return this;
 			}
-			return EnsureDirectoryExists(new NPath(append));
+			return EnsureDirectoryExists(new SPath(append));
 		}
 
-		public NPath EnsureDirectoryExists(NPath append)
+		public SPath EnsureDirectoryExists(SPath append)
 		{
 			ThrowIfNotInitialized();
 			ThrowIfNotInitialized(append);
@@ -1035,7 +1035,7 @@ namespace SpoiledCat.NiceIO
 			return combined;
 		}
 
-		public NPath EnsureParentDirectoryExists()
+		public SPath EnsureParentDirectoryExists()
 		{
 			ThrowIfNotInitialized();
 
@@ -1044,7 +1044,7 @@ namespace SpoiledCat.NiceIO
 			return parent;
 		}
 
-		public NPath FileMustExist()
+		public SPath FileMustExist()
 		{
 			ThrowIfNotInitialized();
 
@@ -1054,7 +1054,7 @@ namespace SpoiledCat.NiceIO
 			return this;
 		}
 
-		public NPath DirectoryMustExist()
+		public SPath DirectoryMustExist()
 		{
 			ThrowIfNotInitialized();
 
@@ -1066,10 +1066,10 @@ namespace SpoiledCat.NiceIO
 
 		public bool IsChildOf(string potentialBasePath)
 		{
-			return IsChildOf(new NPath(potentialBasePath));
+			return IsChildOf(new SPath(potentialBasePath));
 		}
 
-		public bool IsChildOf(NPath potentialBasePath)
+		public bool IsChildOf(SPath potentialBasePath)
 		{
 			ThrowIfNotInitialized();
 			ThrowIfNotInitialized(potentialBasePath);
@@ -1094,7 +1094,7 @@ namespace SpoiledCat.NiceIO
 			return Parent.IsChildOf(potentialBasePath);
 		}
 
-		public IEnumerable<NPath> RecursiveParents {
+		public IEnumerable<SPath> RecursiveParents {
 			get {
 				ThrowIfNotInitialized();
 				var candidate = this;
@@ -1109,12 +1109,12 @@ namespace SpoiledCat.NiceIO
 			}
 		}
 
-		public NPath ParentContaining(string needle)
+		public SPath ParentContaining(string needle)
 		{
-			return ParentContaining(new NPath(needle));
+			return ParentContaining(new SPath(needle));
 		}
 
-		public NPath ParentContaining(NPath needle)
+		public SPath ParentContaining(SPath needle)
 		{
 			ThrowIfNotInitialized();
 			ThrowIfNotInitialized(needle);
@@ -1123,7 +1123,7 @@ namespace SpoiledCat.NiceIO
 			return RecursiveParents.FirstOrDefault(p => p.Exists(needle));
 		}
 
-		static bool AlwaysTrue(NPath p)
+		static bool AlwaysTrue(SPath p)
 		{
 			return true;
 		}
@@ -1172,12 +1172,12 @@ namespace SpoiledCat.NiceIO
 #endif
 		static class Extensions
 	{
-		public static IEnumerable<NPath> Copy(this IEnumerable<NPath> self, string dest)
+		public static IEnumerable<SPath> Copy(this IEnumerable<SPath> self, string dest)
 		{
-			return Copy(self, new NPath(dest));
+			return Copy(self, new SPath(dest));
 		}
 
-		public static IEnumerable<NPath> Copy(this IEnumerable<NPath> self, NPath dest)
+		public static IEnumerable<SPath> Copy(this IEnumerable<SPath> self, SPath dest)
 		{
 			if (dest.IsRelative)
 				throw new ArgumentException("When copying multiple files, the destination cannot be a relative path");
@@ -1185,12 +1185,12 @@ namespace SpoiledCat.NiceIO
 			return self.Select(p => p.Copy(dest.Combine(p.FileName))).ToArray();
 		}
 
-		public static IEnumerable<NPath> Move(this IEnumerable<NPath> self, string dest)
+		public static IEnumerable<SPath> Move(this IEnumerable<SPath> self, string dest)
 		{
-			return Move(self, new NPath(dest));
+			return Move(self, new SPath(dest));
 		}
 
-		public static IEnumerable<NPath> Move(this IEnumerable<NPath> self, NPath dest)
+		public static IEnumerable<SPath> Move(this IEnumerable<SPath> self, SPath dest)
 		{
 			if (dest.IsRelative)
 				throw new ArgumentException("When moving multiple files, the destination cannot be a relative path");
@@ -1198,38 +1198,38 @@ namespace SpoiledCat.NiceIO
 			return self.Select(p => p.Move(dest.Combine(p.FileName))).ToArray();
 		}
 
-		public static IEnumerable<NPath> Delete(this IEnumerable<NPath> self)
+		public static IEnumerable<SPath> Delete(this IEnumerable<SPath> self)
 		{
 			foreach (var p in self)
 				p.Delete();
 			return self;
 		}
 
-		public static IEnumerable<string> InQuotes(this IEnumerable<NPath> self, SlashMode forward = SlashMode.Native)
+		public static IEnumerable<string> InQuotes(this IEnumerable<SPath> self, SlashMode forward = SlashMode.Native)
 		{
 			return self.Select(p => p.InQuotes(forward));
 		}
 
-		public static NPath ToNPath(this string path)
+		public static SPath ToSPath(this string path)
 		{
 			if (path == null)
-				return NPath.Default;
-			return new NPath(path);
+				return SPath.Default;
+			return new SPath(path);
 		}
 
-		public static NPath Resolve(this NPath path)
+		public static SPath Resolve(this SPath path)
 		{
 			if (!path.IsInitialized || !path.Exists())
 				return path;
 
 			// because Unity sometimes lies about where things are
-			string fullPath = NPath.FileSystem.GetFullPath(path.ToString());
-			if (!NPath.IsUnix)
-				return fullPath.ToNPath();
-			return NPath.FileSystem.Resolve(fullPath).ToNPath();
+			string fullPath = SPath.FileSystem.GetFullPath(path.ToString());
+			if (!SPath.IsUnix)
+				return fullPath.ToSPath();
+			return SPath.FileSystem.Resolve(fullPath).ToSPath();
 		}
 
-		public static NPath CreateTempDirectory(this NPath baseDir, string myprefix = "")
+		public static SPath CreateTempDirectory(this SPath baseDir, string myprefix = "")
 		{
 			var random = new Random();
 			while (true)
@@ -1358,21 +1358,21 @@ namespace SpoiledCat.NiceIO
 				case Environment.SpecialFolder.LocalApplicationData:
 					if (localAppData == null)
 					{
-						if (NPath.IsMac)
-							localAppData = NPath.HomeDirectory.Combine("Library", "Application Support");
+						if (SPath.IsMac)
+							localAppData = SPath.HomeDirectory.Combine("Library", "Application Support");
 						else
-							localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).ToNPath();
+							localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).ToSPath();
 					}
 					return localAppData;
 				case Environment.SpecialFolder.CommonApplicationData:
 					if (commonAppData == null)
 					{
-						if (NPath.IsWindows)
-							commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData).ToNPath();
+						if (SPath.IsWindows)
+							commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData).ToSPath();
 						else
 						{
 							// there is no such thing on the mac that is guaranteed to be user accessible (/usr/local might not be)
-							commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToNPath();
+							commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToSPath();
 						}
 					}
 					return commonAppData;
@@ -1473,7 +1473,7 @@ namespace SpoiledCat.NiceIO
 				yield break;
 
 
-			if (NPath.IsUnix)
+			if (SPath.IsUnix)
 			{
 				try
 				{
@@ -1487,7 +1487,7 @@ namespace SpoiledCat.NiceIO
 			{
 				var realdir = dir;
 
-				if (NPath.IsUnix)
+				if (SPath.IsUnix)
 				{
 					try
 					{
@@ -1691,10 +1691,10 @@ namespace SpoiledCat.NiceIO
 			{
 				if (homeDirectory == null)
 				{
-					if (NPath.IsUnix)
-						homeDirectory = new NPath(Environment.GetEnvironmentVariable("HOME"));
+					if (SPath.IsUnix)
+						homeDirectory = new SPath(Environment.GetEnvironmentVariable("HOME"));
 					else
-						homeDirectory = new NPath(Environment.GetEnvironmentVariable("USERPROFILE"));
+						homeDirectory = new SPath(Environment.GetEnvironmentVariable("USERPROFILE"));
 				}
 				return homeDirectory;
 			}

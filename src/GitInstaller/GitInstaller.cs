@@ -4,7 +4,7 @@ using System.Threading;
 namespace SpoiledCat.Git
 {
 	using Logging;
-	using NiceIO;
+	using SimpleIO;
 	using Threading;
 	using Utilities;
 	using ProcessManager;
@@ -340,7 +340,7 @@ namespace SpoiledCat.Git
 
 		public GitInstallationState ExtractGit(GitInstallationState state)
 		{
-			var tempZipExtractPath = NPath.CreateTempDirectory("git_zip_extract_zip_paths");
+			var tempZipExtractPath = SPath.CreateTempDirectory("git_zip_extract_zip_paths");
 
 			if (state.GitZipExists && !state.GitIsValid)
 			{
@@ -378,10 +378,10 @@ namespace SpoiledCat.Git
 			public bool GitIsValid { get; set; }
 			public bool GitLfsIsValid { get; set; }
 			public bool GitZipExists { get; set; }
-			public NPath GitInstallationPath { get; set; }
-			public NPath GitExecutablePath { get; set; }
-			public NPath GitLfsInstallationPath { get; set; }
-			public NPath GitLfsExecutablePath { get; set; }
+			public SPath GitInstallationPath { get; set; }
+			public SPath GitExecutablePath { get; set; }
+			public SPath GitLfsInstallationPath { get; set; }
+			public SPath GitLfsExecutablePath { get; set; }
 			public DateTimeOffset GitLastCheckTime { get; set; }
 			public bool IsCustomGitPath { get; set; }
 			public TheVersion GitVersion { get; set; }
@@ -416,7 +416,7 @@ namespace SpoiledCat.Git
 
 			public const string GitDirectory = "git";
 
-			public GitInstallDetails(NPath baseDataPath, IEnvironment environment)
+			public GitInstallDetails(SPath baseDataPath, IEnvironment environment)
 			{
 				ZipPath = baseDataPath.Combine("downloads");
 				ZipPath.EnsureDirectoryExists();
@@ -424,15 +424,15 @@ namespace SpoiledCat.Git
 				GitInstallationPath = baseDataPath.Combine(GitDirectory);
 				GitExecutablePath = GitInstallationPath.Combine(environment.IsWindows ? "cmd" : "bin", "git" + UnityEnvironment.ExecutableExtension);
 				//GitLfsExecutablePath = GitExecutablePath.Parent.Combine("git-lfs" + UnityEnvironment.ExecutableExtension);
-				GitLfsExecutablePath = NPath.Default;
+				GitLfsExecutablePath = SPath.Default;
 				GitPackageFeed = packageFeed;
 			}
 
-			public NPath ZipPath { get; }
-			public NPath GitZipPath { get; set; }
-			public NPath GitInstallationPath { get; }
-			public NPath GitExecutablePath { get; }
-			public NPath GitLfsExecutablePath { get; }
+			public SPath ZipPath { get; }
+			public SPath GitZipPath { get; set; }
+			public SPath GitInstallationPath { get; }
+			public SPath GitExecutablePath { get; }
+			public SPath GitLfsExecutablePath { get; }
 			public UriString GitPackageFeed { get; set; }
 		}
 	}

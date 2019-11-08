@@ -6,7 +6,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Environment", "src\com.spoi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logging", "src\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj", "{AAE57A75-EC73-4C1A-9095-6B943AA15BC7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NiceIO", "src\com.spoiledcat.niceio\Editor\SpoiledCat.Unity.NiceIO.csproj", "{BA3EC028-1970-4F51-95B5-2C18C7706924}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIO", "src\com.spoiledcat.simpleio\Editor\SpoiledCat.Unity.SimpleIO.csproj", "{BA3EC028-1970-4F51-95B5-2C18C7706924}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleJson", "src\com.spoiledcat.simplejson\Editor\SpoiledCat.Unity.SimpleJson.csproj", "{2A572465-DE6D-42FA-BC88-C846D6931B5F}"
 EndProject

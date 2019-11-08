@@ -14,21 +14,21 @@ using System.Threading;
 namespace SpoiledCat.ProcessManager
 {
 	using Logging;
-	using NiceIO;
+	using SimpleIO;
 	using Threading;
 	using Extensions;
 
 	public static class ProcessTaskExtensions
 	{
 		public static T Configure<T>(this T task, IProcessManager processManager,
-			 NPath? workingDirectory = null,
+			 SPath? workingDirectory = null,
 			 bool withInput = false)
 			 where T : IProcessTask
 		{
 			return processManager.Configure(task, workingDirectory, withInput);
 		}
 
-		public static void Configure(this ProcessStartInfo psi, IProcessEnvironment processEnvironment, NPath? workingDirectory = null)
+		public static void Configure(this ProcessStartInfo psi, IProcessEnvironment processEnvironment, SPath? workingDirectory = null)
 		{
 			processEnvironment.Configure(psi, workingDirectory);
 		}
@@ -533,7 +533,7 @@ namespace SpoiledCat.ProcessManager
 			ProcessArguments = arguments;
 			ProcessName = executable;
 		}
-		
+
 		public virtual void Configure(ProcessStartInfo psi)
 		{
 			Guard.ArgumentNotNull(psi, "psi");

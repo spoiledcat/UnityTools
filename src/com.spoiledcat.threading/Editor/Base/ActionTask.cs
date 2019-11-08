@@ -118,7 +118,7 @@ namespace SpoiledCat.Threading
 
 		/// <summary>
 		/// If <typeparamref name="TTaskResult"/> is not assignable to <typeparamref name="TResult"/>, you must pass a
-		/// method to convert between the two. Implicit conversions don't count (so even though NPath has an implicit
+		/// method to convert between the two. Implicit conversions don't count (so even though SPath has an implicit
 		/// conversion to string, you still need to pass in a converter)
 		/// </summary>
 		/// <param name="taskManager"></param>
@@ -129,7 +129,7 @@ namespace SpoiledCat.Threading
 
 		/// <summary>
 		/// If <typeparamref name="TTaskResult"/> is not assignable to <typeparamref name="TResult"/>, you must pass a
-		/// method to convert between the two. Implicit conversions don't count (so even though NPath has an implicit
+		/// method to convert between the two. Implicit conversions don't count (so even though SPath has an implicit
 		/// conversion to string, you still need to pass in a converter)
 		/// </summary>
 		/// <param name="token"></param>

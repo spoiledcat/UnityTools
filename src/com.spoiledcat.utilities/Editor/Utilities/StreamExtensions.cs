@@ -8,7 +8,7 @@ using System.IO;
 namespace SpoiledCat.Extensions
 {
 	using System;
-	using NiceIO;
+	using SimpleIO;
 
 	public static class StreamExtensions
 	{
@@ -28,14 +28,14 @@ namespace SpoiledCat.Extensions
 		}
 	}
 
-	public static class NPathExtensions
+	public static class SPathExtensions
 	{
-		public static string ToMD5(this NPath path)
+		public static string ToMD5(this SPath path)
 		{
 			byte[] computeHash;
 			using (var hash = System.Security.Cryptography.MD5.Create())
 			{
-				using (var stream = NPath.FileSystem.OpenRead(path))
+				using (var stream = SPath.FileSystem.OpenRead(path))
 				{
 					computeHash = hash.ComputeHash(stream);
 				}
@@ -44,12 +44,12 @@ namespace SpoiledCat.Extensions
 			return BitConverter.ToString(computeHash).Replace("-", string.Empty).ToLower();
 		}
 
-		public static string ToSha256(this NPath path)
+		public static string ToSha256(this SPath path)
 		{
 			byte[] computeHash;
 			using (var hash = System.Security.Cryptography.SHA256.Create())
 			{
-				using (var stream = NPath.FileSystem.OpenRead(path))
+				using (var stream = SPath.FileSystem.OpenRead(path))
 				{
 					computeHash = hash.ComputeHash(stream);
 				}

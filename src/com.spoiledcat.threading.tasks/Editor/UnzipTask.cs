@@ -9,23 +9,23 @@ using System.Threading;
 
 namespace SpoiledCat.Threading
 {
-	using NiceIO;
+	using SimpleIO;
 	using Utilities;
 
-	public class UnzipTask : TaskBase<NPath>
+	public class UnzipTask : TaskBase<SPath>
 	{
 		private readonly string archiveFilePath;
-		private readonly NPath extractedPath;
+		private readonly SPath extractedPath;
 		private readonly IFileSystem fileSystem;
 		private readonly IZipHelper zipHelper;
 		private ProgressReporter progressReporter = new ProgressReporter();
 		private Dictionary<string, TaskData> tasks = new Dictionary<string, TaskData>();
 
-		public UnzipTask(ITaskManager taskManager, NPath archiveFilePath, NPath extractedPath)
-			: this(taskManager, taskManager?.Token ?? default, archiveFilePath, extractedPath, null, NPath.FileSystem)
+		public UnzipTask(ITaskManager taskManager, SPath archiveFilePath, SPath extractedPath)
+			: this(taskManager, taskManager?.Token ?? default, archiveFilePath, extractedPath, null, SPath.FileSystem)
 		{}
 
-		public UnzipTask(ITaskManager taskManager, CancellationToken token, NPath archiveFilePath, NPath extractedPath,
+		public UnzipTask(ITaskManager taskManager, CancellationToken token, SPath archiveFilePath, SPath extractedPath,
 			IZipHelper zipHelper, IFileSystem fileSystem)
 			: base(taskManager, token)
 		{
@@ -38,12 +38,12 @@ namespace SpoiledCat.Threading
 			progressReporter.OnProgress += progress.UpdateProgress;
 		}
 
-		protected NPath BaseRun(bool success)
+		protected SPath BaseRun(bool success)
 		{
 			return base.RunWithReturn(success);
 		}
 
-		protected override NPath RunWithReturn(bool success)
+		protected override SPath RunWithReturn(bool success)
 		{
 			var ret = BaseRun(success);
 			try
@@ -58,7 +58,7 @@ namespace SpoiledCat.Threading
 			return ret;
 		}
 
-		protected virtual NPath RunUnzip(bool success)
+		protected virtual SPath RunUnzip(bool success)
 		{
 			Logger.Trace("Unzip File: {0} to Path: {1}", archiveFilePath, extractedPath);
 

@@ -8,12 +8,12 @@ using System.Diagnostics;
 namespace SpoiledCat.ProcessManager
 {
 	using Logging;
-	using NiceIO;
+	using SimpleIO;
 	using Unity;
 
 	public interface IProcessEnvironment
 	{
-		void Configure(ProcessStartInfo psi, NPath? workingDirectory = null);
+		void Configure(ProcessStartInfo psi, SPath? workingDirectory = null);
 		IEnvironment Environment { get; }
 	}
 
@@ -25,14 +25,14 @@ namespace SpoiledCat.ProcessManager
 			Environment = environment;
 		}
 
-		public virtual void Configure(ProcessStartInfo psi, NPath? workingDirectory = null)
+		public virtual void Configure(ProcessStartInfo psi, SPath? workingDirectory = null)
 		{
 			Guard.ArgumentNotNull(psi, "psi");
 			workingDirectory = workingDirectory ?? Environment.WorkingDirectory;
 
 			psi.WorkingDirectory = workingDirectory;
-			psi.EnvironmentVariables["HOME"] = NPath.HomeDirectory;
-			psi.EnvironmentVariables["TMP"] = psi.EnvironmentVariables["TEMP"] = NPath.SystemTemp;
+			psi.EnvironmentVariables["HOME"] = SPath.HomeDirectory;
+			psi.EnvironmentVariables["TMP"] = psi.EnvironmentVariables["TEMP"] = SPath.SystemTemp;
 
 			var path = Environment.Path;
 			psi.EnvironmentVariables["PROCESS_WORKINGDIR"] = workingDirectory;
