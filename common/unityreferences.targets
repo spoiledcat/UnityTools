@@ -10,10 +10,14 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <HubSecondaryInstallPathFile>$(AppData)\UnityHub\secondaryInstallPath.json</HubSecondaryInstallPathFile>
+    <HubDefaultEditorFile>$(AppData)\UnityHub\defaultEditor.json</HubDefaultEditorFile>
+    <HubDefaultEditor Condition="'$(HubDefaultEditor)' == ''"></HubDefaultEditor>
     <WhatOS Condition="Exists('\Applications') and !Exists('c:\Windows')">mac</WhatOS>
     <WhatOS Condition="'$(WhatOS)' != 'mac'">win</WhatOS>
     <HubInstallDir Condition="'$(HubInstallDir)' == '' and '$(WhatOS)' == 'win'">C:\Program Files\Unity\Hub\Editor</HubInstallDir>
     <HubInstallDir Condition="'$(HubInstallDir)' == '' and '$(WhatOS)' == 'mac'">\Applications\Unity\Hub\Editor</HubInstallDir>
+    <HubInstallDir Condition="!Exists('$(HubInstallDir)')"></HubInstallDir>
     <UnityDir Condition="$(UnityDir) == '' and Exists('$(SolutionDir)\script\lib\Managed\UnityEditor.dll')">$(SolutionDir)script\lib\</UnityDir>
     <UnityDir Condition="$(UnityDir) == '' and Exists('$(SolutionDir)\lib\Managed\UnityEditor.dll')">$(SolutionDir)lib\</UnityDir>
     <UnityDir Condition="$(UnityDir) == '' and Exists('\Applications\Unity\Unity.app\Contents\Managed\UnityEditor.dll')">\Applications\Unity\Unity.app\Contents\</UnityDir>
@@ -29,10 +33,43 @@
     <CallTarget Targets="FindUnity"/>
   </Target>
 
-  <!-- Common includes and references -->
-  <Target Name="FindUnity">
+  <Target Name="FindHub"
+    Condition="'$(HubInstallDir)' == '' and '$(UnityDir)' == '' and Exists('$(HubSecondaryInstallPathFile)')"
+    Returns="$(HubInstallDir);$(HubDefaultEditor)">
 
-    <ItemGroup>
+    <ReadLinesFromFile File="$(HubSecondaryInstallPathFile)">
+      <Output TaskParameter="Lines" ItemName="item1" />
+    </ReadLinesFromFile>
+
+    <ReadLinesFromFile File="$(HubDefaultEditorFile)" Condition="Exists('$(HubDefaultEditorFile)')">
+      <Output TaskParameter="Lines" ItemName="item2" />
+    </ReadLinesFromFile>
+
+    <PropertyGroup>
+      <HubInstallDir>@(item1->Replace('"', ''))</HubInstallDir>
+      <HubInstallDir Condition=" !Exists('$(HubInstallDir)') "></HubInstallDir>
+
+      <HubDefaultEditor>@(item2->Replace('"', ''))</HubDefaultEditor>
+      <HubDefaultEditor Condition=" !Exists('$(HubInstallDir)\$(HubDefaultEditor)') "></HubDefaultEditor>
+    </PropertyGroup>
+
+  </Target>
+
+  <!-- Common includes and references -->
+  <Target Name="FindUnity" DependsOnTargets="FindHub" AfterTargets="FindHub">
+
+    <ItemGroup Condition="'$(UnityDir)' == '' and '$(HubDefaultEditor)' != '' ">
+      <FilesFoundInPath Condition="'$(WhatOS)' == 'win'" Include="$(HubInstallDir)\$(HubDefaultEditor)\Editor\Data\Managed\UnityEditor.dll" />
+      <FilesFoundInPath Condition="'$(WhatOS)' == 'mac'" Include="$(HubInstallDir)\$(HubDefaultEditor)\Unity.App\Contents\Managed\UnityEditor.dll" />
+      <BaseDirs Condition="'$(WhatOS)' == 'win'" Include="@(FilesFoundInPath->Replace('Managed\UnityEditor.dll', ''))" />
+      <BaseDirs Condition="'$(WhatOS)' == 'mac'" Include="@(FilesFoundInPath->Replace('Managed/UnityEditor.dll', ''))" />
+
+      <HubDefaultEditor Condition=" '$(BaseDirs)' == '' "></HubDefaultEditor>
+    </ItemGroup>
+
+    <Message Condition="'$(UnityDir)' == '' and '$(HubDefaultEditor)' != '' " Text="Using Hub default editor v$(HubDefaultEditor)" />
+
+    <ItemGroup Condition="'$(UnityDir)' == '' and '$(HubDefaultEditor)' == '' ">
       <FilesFoundInPath Condition="'$(WhatOS)' == 'win'" Include="$(HubInstallDir)\*\Editor\Data\Managed\UnityEditor.dll" />
       <FilesFoundInPath Condition="'$(WhatOS)' == 'mac'" Include="$(HubInstallDir)\*\Unity.App\Contents\Managed\UnityEditor.dll" />
       <BaseDirs Condition="'$(WhatOS)' == 'win'" Include="@(FilesFoundInPath->Replace('Managed\UnityEditor.dll', ''))" />
@@ -42,6 +79,8 @@
     <PropertyGroup>
       <UnityDir Condition="$(UnityDir) == ''">%(BaseDirs.Identity)</UnityDir>
     </PropertyGroup>
+
+    <Message Condition="'$(HubDefaultEditor)' == '' " Text="Using editor at $(UnityDir)" />
 
     <ItemGroup Condition="'$(UnityDir)' != ''">
       <Reference Remove="UnityEditor;UnityEngine" />
