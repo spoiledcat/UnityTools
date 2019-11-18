@@ -15,18 +15,11 @@ install:
 - ps: scripts\Get-Deps.ps1
 
 before_build:
-- dotnet --info
+# - dotnet --info
 - appveyor-retry dotnet restore -v Minimal
 
 build_script:
-- ps: |
-    if ($env:APPVEYOR_REPO_TAG -eq "true") {
-      # always stamp builds triggered from tags with a public version
-      dotnet build --no-restore -c $env:CONFIGURATION /p:PublicRelease=true
-    } else {
-      # let the version.json decide if it's a public build or not based on the branch name
-      dotnet build --no-restore -c $env:CONFIGURATION
-    }
+- ps: dotnet build --no-restore -c $env:CONFIGURATION
 
 test:
   assemblies:
@@ -38,13 +31,7 @@ test:
 
 after_test:
 - ps: |
-    if ($env:APPVEYOR_REPO_TAG -eq "true") {
-      # always stamp builds triggered from tags with a public version
-      dotnet pack --no-build --no-restore -c $env:CONFIGURATION /p:PublicRelease=true
-    } else {
-      # let the version.json decide if it's a public build or not based on the branch name
-      dotnet pack --no-build --no-restore -c $env:CONFIGURATION
-    }
+    dotnet pack --no-build --no-restore -c $env:CONFIGURATION
     scripts\Pack-Packages.ps1
 
 artifacts:
@@ -53,21 +40,21 @@ artifacts:
 - path: build\**\*.tgz
   name: Npm
 
-deploy:
-  provider: NuGet
-  server:                  # remove to push to NuGet.org
-  api_key:
-    secure: KNFSKb7s+3+79G+FOMmubE+llHdsyV+3ApSqqgrbia5DM4RCzKDEIXaQGPqip9bf
-  skip_symbols: true
-  symbol_server:           # remove to push symbols to SymbolSource.org
-  artifact: /.*\.nupkg/
-  on:
-    APPVEYOR_REPO_TAG: true
+# deploy:
+#   provider: NuGet
+#   server:                  # remove to push to NuGet.org
+#   api_key:
+#     secure: KNFSKb7s+3+79G+FOMmubE+llHdsyV+3ApSqqgrbia5DM4RCzKDEIXaQGPqip9bf
+#   skip_symbols: true
+#   symbol_server:           # remove to push symbols to SymbolSource.org
+#   artifact: /.*\.nupkg/
+#   on:
+#     APPVEYOR_REPO_TAG: true
 
-after_deploy:
-  - ps: |
-      if ($env:APPVEYOR_REPO_TAG -eq "true") {
-        npm config set //registry.spoiledcat.com/:_authToken $env:NPM_TOKEN
-        npm config set always-auth true
-        scripts\Publish-ToNpm.ps1
-      }
+# after_deploy:
+#   - ps: |
+#       if ($env:APPVEYOR_REPO_TAG -eq "true") {
+#         npm config set //registry.spoiledcat.com/:_authToken $env:NPM_TOKEN
+#         npm config set always-auth true
+#         scripts\Publish-ToNpm.ps1
+#       }

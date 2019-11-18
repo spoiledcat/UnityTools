@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <PublishTo Condition="'$(PublishTo)' == '' ">$(SolutionDir)build\packages\</PublishTo>
-    <PackageSourceRoot>$(MSBuildProjectDirectory)\..\</PackageSourceRoot>
+    <PackageSourceRoot Condition="'$(PackageSourceRoot)' == ''">$(MSBuildProjectDirectory)\..\</PackageSourceRoot>
     <PackageSourceRootFull>$([System.IO.Path]::GetFullPath($(PackageSourceRoot)))</PackageSourceRootFull>
     <PackageName>$([System.IO.Path]::GetDirectoryName($(PackageSourceRootFull)))</PackageName>
     <PackageName>$([System.IO.Path]::GetFileName($(PackageName)))</PackageName>
@@ -11,6 +11,10 @@
     <PackageSubFolder Condition="'$(PackageSubFolder)' != '$(PackageName)'">\$(PackageSubFolder)\</PackageSubFolder>
     <PackageTestName>$(PackageName).tests</PackageTestName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SpoiledCat.MSBuild.Tasks.FileUpdate" Version="1.0.13" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+  </ItemGroup>
 
   <ItemGroup>
     <VersionFiles Include="$(IntermediateOutputPath)\$(AssemblyName).Version$(DefaultLanguageSourceExtension)" />
