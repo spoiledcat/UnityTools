@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+  <PropertyGroup>
+    <PackageTestName>$(PackageName).tests</PackageTestName>
+    <PackageTestSubFolder>\Tests\Helpers~\</PackageTestSubFolder>
+  </PropertyGroup>
+
   <Target Name="CopyHelperBinariesToPackage"
       DependsOnTargets="AfterBuild;EnumerateHelperBinaries"
       AfterTargets="AfterBuild"
       Inputs="@(BinariesToCopy)"
-      Outputs="@(BinariesToCopy->'$(PublishTo)$(PackageName)$(PackageSubFolder)%(RecursiveDir)%(Filename)%(Extension)');@(BinariesToCopy->'$(SolutionDir)$(PackageSource)$(PackageName)$(PackageSubFolder)%(RecursiveDir)%(Filename)%(Extension)')"
+      Outputs="@(BinariesToCopy->'$(PublishTo)$(PackageTestName)$(PackageSubFolder)%(RecursiveDir)%(Filename)%(Extension)');@(BinariesToCopy->'$(SolutionDir)$(PackageSource)$(PackageName)$(PackageTestSubFolder)%(RecursiveDir)%(Filename)%(Extension)')"
       >
 
     <MakeDir Directories="$(PublishTo)$(PackageTestName)$(PackageSubFolder);$(SolutionDir)$(PackageSource)$(PackageName)$(PackageSubFolder)" />
@@ -16,7 +21,7 @@
 
     <Copy
       SourceFiles="@(BinariesToCopy)"
-      DestinationFiles="@(BinariesToCopy->'$(SolutionDir)$(PackageSource)$(PackageName)$(PackageSubFolder)%(RecursiveDir)%(Filename)%(Extension)')"
+      DestinationFiles="@(BinariesToCopy->'$(SolutionDir)$(PackageSource)$(PackageName)$(PackageTestSubFolder)%(RecursiveDir)%(Filename)%(Extension)')"
       SkipUnchangedFiles="true"
       />
 

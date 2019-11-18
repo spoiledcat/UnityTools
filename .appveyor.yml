@@ -19,7 +19,7 @@ before_build:
 - appveyor-retry dotnet restore -v Minimal
 
 build_script:
-- ps: dotnet build --no-restore -c $env:CONFIGURATION
+- dotnet build --no-restore -c %CONFIGURATION%
 
 test:
   assemblies:
@@ -40,21 +40,21 @@ artifacts:
 - path: build\**\*.tgz
   name: Npm
 
-# deploy:
-#   provider: NuGet
-#   server:                  # remove to push to NuGet.org
-#   api_key:
-#     secure: KNFSKb7s+3+79G+FOMmubE+llHdsyV+3ApSqqgrbia5DM4RCzKDEIXaQGPqip9bf
-#   skip_symbols: true
-#   symbol_server:           # remove to push symbols to SymbolSource.org
-#   artifact: /.*\.nupkg/
-#   on:
-#     APPVEYOR_REPO_TAG: true
+deploy:
+  provider: NuGet
+  server:                  # remove to push to NuGet.org
+  api_key:
+    secure: KNFSKb7s+3+79G+FOMmubE+llHdsyV+3ApSqqgrbia5DM4RCzKDEIXaQGPqip9bf
+  skip_symbols: true
+  symbol_server:           # remove to push symbols to SymbolSource.org
+  artifact: /.*\.nupkg/
+  on:
+    APPVEYOR_REPO_TAG: true
 
-# after_deploy:
-#   - ps: |
-#       if ($env:APPVEYOR_REPO_TAG -eq "true") {
-#         npm config set //registry.spoiledcat.com/:_authToken $env:NPM_TOKEN
-#         npm config set always-auth true
-#         scripts\Publish-ToNpm.ps1
-#       }
+after_deploy:
+  - ps: |
+      if ($env:APPVEYOR_REPO_TAG -eq "true") {
+        npm config set //registry.spoiledcat.com/:_authToken $env:NPM_TOKEN
+        npm config set always-auth true
+        scripts\Publish-ToNpm.ps1
+      }

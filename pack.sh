@@ -53,23 +53,10 @@ if [[ x"$OS" == x"Windows" && x"$PUBLIC" != x"" ]]; then
   PUBLIC="/$PUBLIC"
 fi
 
-NPMDIR="$DIR/build/npm/"
-PACKAGEDIR="$DIR/build/packages"
-
-pushd $DIR
-
+pushd $DIR >/dev/null 2>&1
 if [[ x"$BUILD" == x"1" ]]; then
   dotnet restore
   dotnet build --no-restore -c $CONFIGURATION $PUBLIC
 fi
 dotnet pack --no-build --no-restore -c $CONFIGURATION $PUBLIC
-
-mkdir -p "$NPMDIR"
-for j in $PACKAGEDIR/*; do
-  pushd "$j"
-  npm pack
-  mv *.tgz "$NPMDIR"
-  popd
-done
-
-popd
+popd >/dev/null 2>&1

@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <RepoRoot Condition=" '$(RepoRoot)' == '' ">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</RepoRoot>
+  </PropertyGroup>
+</Project>

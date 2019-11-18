@@ -1,7 +1,7 @@
 {
     "name": "com.spoiledcat.ui",
     "references": [
-        "GUID:354f3f42ad547974db67e633b313dbf4"
+        "com.spoiledcat.threading"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

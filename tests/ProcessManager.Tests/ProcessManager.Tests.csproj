@@ -2,11 +2,10 @@
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
     <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\</SolutionDir>
-    <PublishTo>$(SolutionDir)build\packages\</PublishTo>
+    <PublishTo>$(RepoRoot)build\packages\</PublishTo>
     <PackageSource>src\</PackageSource>
     <PackageName>com.spoiledcat.processmanager</PackageName>
     <PackageSubFolder>\Helpers~\</PackageSubFolder>
-    <PackageTestName>com.spoiledcat.processmanager.tests</PackageTestName>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>

@@ -1,5 +1,7 @@
 <Project>
   <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</RepoRoot>
     <LangVersion>7.3</LangVersion>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <NoWarn>NU5104</NoWarn>
