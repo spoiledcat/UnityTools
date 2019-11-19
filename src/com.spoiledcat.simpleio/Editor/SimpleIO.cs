@@ -1219,12 +1219,12 @@ namespace SpoiledCat.SimpleIO
 
 		public static SPath Resolve(this SPath path)
 		{
-			if (!path.IsInitialized || !path.Exists())
+			if (!path.IsInitialized)
 				return path;
 
 			// because Unity sometimes lies about where things are
 			string fullPath = SPath.FileSystem.GetFullPath(path.ToString());
-			if (!SPath.IsUnix)
+			if (!SPath.IsUnix || !fullPath.ToSPath().Exists())
 				return fullPath.ToSPath();
 			return SPath.FileSystem.Resolve(fullPath).ToSPath();
 		}

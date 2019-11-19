@@ -345,7 +345,7 @@ namespace SpoiledCat.Threading
 			private readonly int maximumConcurrencyLevel;
 			/// <summary>Whether a Task is currently being processed on this thread.</summary>
 			private readonly ThreadLocal<bool> processingTaskOnCurrentThread = new ThreadLocal<bool>();
-			private readonly Queue<Task> tasks;
+			private readonly Queue<Task> tasks = new Queue<Task>();
 
 			/// <summary>Initializes the scheduler.</summary>
 			/// <param name="interleave">The parent interleave.</param>

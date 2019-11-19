@@ -76,6 +76,10 @@ namespace BaseTests
 					testApp = "Packages/com.spoiledcat.processmanager/Tests/Helpers~/Helper.CommandLine.exe".ToSPath().Resolve();
 					if (!testApp.Value.FileExists())
 					{
+						testApp = "Packages/com.spoiledcat.processmanager.tests/Helpers~/Helper.CommandLine.exe".ToSPath().Resolve();
+					}
+					if (!testApp.Value.FileExists())
+					{
 						UnityEngine.Debug.LogException(new InvalidOperationException("Test helper binaries are missing. Build the UnityTools.sln solution once with `dotnet build` in order to set up the tests."));
 					}
 				}

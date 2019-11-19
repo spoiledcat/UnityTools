@@ -93,7 +93,7 @@ namespace ThreadingTests
 		{
 			StartTest(out var watch, out var logger, out var taskManager);
 
-			var task1 = new TPLTask(taskManager, Task.FromResult(true));
+			var task1 = new TPLTask(taskManager, () => Task.FromResult(true));
 			var task2 = new TestActionTask(taskManager, _ => {});
 			var task3 = new TestActionTask(taskManager, _ => {});
 
@@ -155,7 +155,7 @@ namespace ThreadingTests
 			Action<ITask<int>, int, bool, Exception> onEndInt = (t, _, __, ___) => logger.Trace($"OnEnd {t.Name}");
 
 
-			innerChainTask1 = new TPLTask(taskManager, Task.FromResult(true)) { Name = nameof(innerChainTask1) };
+			innerChainTask1 = new TPLTask(taskManager, () => Task.FromResult(true)) { Name = nameof(innerChainTask1) };
 			innerChainTask1.OnStart += t => {
 				onStart(t);
 				callOrder.Add(nameof(innerChainTask1));

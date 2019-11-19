@@ -3,6 +3,10 @@ using NUnit.Framework;
 
 namespace ThreadingTests
 {
+	using System.Threading;
+	using System.Threading.Tasks;
+	using BaseTests;
+
 	// Unity does not support async/await tests, but it does
 	// have a special type of test with a [CustomUnityTest] attribute
 	// which mimicks a coroutine in EditMode. This attribute is
@@ -14,15 +18,15 @@ namespace ThreadingTests
 	partial class TaskToActionTask
 	{
 		[Test]
-		public void CanWrapATask_()
+		public async Task CanWrapATask_()
 		{
-			RunTest(CanWrapATask);
+			await RunTest(CanWrapATask);
 		}
 
 		[Test]
-		public void Inlining_()
+		public async Task Inlining_()
 		{
-			RunTest(Inlining);
+			await RunTest(Inlining);
 		}
 	}
 }

@@ -54,12 +54,24 @@ namespace BaseTests
 			watch.Start();
 		}
 
-
-		protected void RunTest(Func<IEnumerator> testMethodToRun)
+		protected async Task RunTest(Func<IEnumerator> testMethodToRun)
 		{
-			var test = testMethodToRun();
-			while (test.MoveNext())
-			{}
+			var scheduler = ThreadingHelper.GetUIScheduler(new TestThreadSynchronizationContext(default));
+			var taskStart = new Task<IEnumerator>(testMethodToRun);
+			taskStart.Start(scheduler);
+			var e = await RunOn(testMethodToRun, scheduler);
+			while (await RunOn(s => ((IEnumerator)s).MoveNext(), e, scheduler))
+			{ }
+		}
+
+		private Task<T> RunOn<T>(Func<T> method, TaskScheduler scheduler)
+		{
+			return Task<T>.Factory.StartNew(method, CancellationToken.None, TaskCreationOptions.None, scheduler);
+		}
+
+		private Task<T> RunOn<T>(Func<object, T> method, object state, TaskScheduler scheduler)
+		{
+			return Task<T>.Factory.StartNew(method, state, CancellationToken.None, TaskCreationOptions.None, scheduler);
 		}
 
 		protected SPath? testApp;

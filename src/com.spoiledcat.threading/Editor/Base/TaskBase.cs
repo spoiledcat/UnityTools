@@ -901,6 +901,7 @@ namespace SpoiledCat.Threading
 		Concurrent,
 		Exclusive,
 		UI,
-		LongRunning
+		LongRunning,
+		ThreadPool
 	}
 }

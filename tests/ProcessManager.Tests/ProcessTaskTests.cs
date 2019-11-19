@@ -6,35 +6,35 @@ namespace ProcessManagerTests
 	public partial class ProcessTaskTests
 	{
 		[Test]
-		public void NestedProcessShouldChainCorrectly_()
+		public async Task NestedProcessShouldChainCorrectly_()
 		{
-			RunTest(NestedProcessShouldChainCorrectly);
+			await RunTest(NestedProcessShouldChainCorrectly);
 		}
 
 		[Test]
 		// not sure why this is flip flopping in appveyor
 		[Category("DoNotRunOnAppVeyor")]
-		public void MultipleFinallyOrder_()
+		public async Task MultipleFinallyOrder_()
 		{
-			RunTest(MultipleFinallyOrder);
+			await RunTest(MultipleFinallyOrder);
 		}
 
 		[Test]
-		public void ProcessOnStartOnEndTaskOrder_()
+		public async Task ProcessOnStartOnEndTaskOrder_()
 		{
-			RunTest(ProcessOnStartOnEndTaskOrder);
+			await RunTest(ProcessOnStartOnEndTaskOrder);
 		}
 
 		[Test]
-		public void ProcessReadsFromStandardInput_()
+		public async Task ProcessReadsFromStandardInput_()
 		{
-			RunTest(ProcessReadsFromStandardInput);
+			await RunTest(ProcessReadsFromStandardInput);
 		}
 
 		[Test]
-		public void ProcessReturningErrorThrowsException_()
+		public async Task ProcessReturningErrorThrowsException_()
 		{
-			RunTest(ProcessReturningErrorThrowsException);
+			await RunTest(ProcessReturningErrorThrowsException);
 		}
 	}
 }

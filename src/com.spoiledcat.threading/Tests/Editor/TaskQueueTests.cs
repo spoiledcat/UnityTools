@@ -22,7 +22,7 @@ namespace ThreadingTests
 			var expected = new double[] { 2.1, Math.PI, 1.0 };
 			var queue = new TaskQueue<string, double>(taskManager, task => Double.Parse(task.Result));
 			vals.All(s => {
-				queue.Queue(new TPLTask<string>(taskManager, Task.FromResult<string>(s)));
+				queue.Queue(new TPLTask<string>(taskManager, () => Task.FromResult<string>(s)));
 				return true;
 			});
 			var ret = queue.RunSynchronously();

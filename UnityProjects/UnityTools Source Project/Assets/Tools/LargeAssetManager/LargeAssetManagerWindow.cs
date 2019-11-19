@@ -140,7 +140,7 @@ public class LargeAssetManagerWindow : BaseWindow
 				{
 					var oldTaskManager = TaskManager;
 					TaskManager = new TaskManager().Initialize();
-					new TPLTask(TaskManager, ((TaskManager)oldTaskManager).Stop());
+					new TPLTask(TaskManager, ((TaskManager)oldTaskManager).Stop);
 				}
 			}
 		}

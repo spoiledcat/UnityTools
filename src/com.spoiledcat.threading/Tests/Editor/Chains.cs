@@ -22,7 +22,11 @@ namespace ThreadingTests
 			var expectedOutput = new List<string> { "one name" };
 			var exceptionMessage = $"{nameof(CatchAlwaysRunsBeforeFinally)} an exception";
 
-			var task = new FuncTask<string>(taskManager, _ => "one name") { Affinity = TaskAffinity.UI, Name = $"{nameof(CatchAlwaysRunsBeforeFinally)} Task 1" }
+			var task = new FuncTask<string>(taskManager, _ => {
+
+				           return "one name";
+
+			           }) { Affinity = TaskAffinity.UI, Name = $"{nameof(CatchAlwaysRunsBeforeFinally)} Task 1" }
 					   .Then((s, d) => output.Add(d), $"{nameof(CatchAlwaysRunsBeforeFinally)} Task 2")
 					   .Then(_ => throw new Exception(exceptionMessage))
 					   .Then(new FuncTask<string>(taskManager, _ => "another name") { Affinity = TaskAffinity.Exclusive, Name = $"{nameof(CatchAlwaysRunsBeforeFinally)} Task 3" })
