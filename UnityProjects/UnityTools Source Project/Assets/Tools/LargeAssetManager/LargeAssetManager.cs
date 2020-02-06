@@ -6,6 +6,7 @@ using SpoiledCat.Json;
 using SpoiledCat.Logging;
 using SpoiledCat.SimpleIO;
 using SpoiledCat.Threading;
+using SpoiledCat.Threading.Helpers;
 using SpoiledCat.Utilities;
 using UnityEditor;
 
@@ -121,7 +122,7 @@ public class LargeAssetManager
 		hashTask.Progress(progress => ShowProgress(progress.Message, progress.InnerProgress?.Message, progress.Percentage));
 
 		var runTask = hashTask
-			.Then((success, list) => {
+			.Then(list => {
 				Index newIndex = default;
 				if (indexFileToGenerate.FileExists())
 				{
@@ -231,7 +232,7 @@ public class LargeAssetManager
 	public static ITask<List<Asset>> DownloadIfNeeded(Index index)
 	{
 		return CalculateWhatNeedsToBeDownloaded(index)
-			.Then((_, downloadList) => {
+			.Then(downloadList => {
 
 				if (!downloadList.Any(x => x.NeedsDownload))
 				{
@@ -296,7 +297,7 @@ public class LargeAssetManager
 		return unzipper;
 	}
 
-	private static void RunUnzip(bool success, List<Asset> assetList)
+	private static void RunUnzip(List<Asset> assetList)
 	{
 		if (assetList == null || assetList.Count == 0)
 			return;

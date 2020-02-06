@@ -1,6 +1,6 @@
-#!/bin/sh -eu
+#!/bin/bash -eu
 { set +x; } 2>/dev/null
-SOURCE="${BASH_SOURCE[0]}"
+SOURCE=$0
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
 OS="Mac"
@@ -8,47 +8,45 @@ if [[ -e "/c/" ]]; then
   OS="Windows"
 fi
 
-CONFIGURATION=""
+CONFIGURATION=Release
 PUBLIC=""
+UNITYBUILD=0
 
 while (( "$#" )); do
   case "$1" in
     -d|--debug)
       CONFIGURATION="Debug"
-      shift
     ;;
     -r|--release)
       CONFIGURATION="Release"
-      shift
+    ;;
+    -n|--unity)
+      UNITYBUILD=1
     ;;
     -p|--public)
-      PUBLIC="/p:PublicRelease=true"
+      PUBLIC="-p:PublicRelease=true"
+    ;;
+    -c)
       shift
+      CONFIGURATION=$1
     ;;
     -*|--*=) # unsupported flags
       echo "Error: Unsupported flag $1" >&2
       exit 1
-      ;;
-    *) # preserve positional arguments
-      if [[ x"$CONFIGURATION" != x"" ]]; then
-        echo "Invalid argument $1"
-        exit -1
-      fi
-      CONFIGURATION="$1"
-      shift
-      ;;
+    ;;
   esac
+  shift
 done
 
-if [[ x"$CONFIGURATION" == x"" ]]; then
-  CONFIGURATION="Debug"
-fi
-
-if [[ x"$OS" == x"Windows" && x"$PUBLIC" != x"" ]]; then
-  PUBLIC="/$PUBLIC"
+if [[ x"$UNITYBUILD" == x"1" ]]; then
+  CONFIGURATION="${CONFIGURATION}Unity"
 fi
 
 pushd $DIR >/dev/null 2>&1
-dotnet restore
+
+if [[ x"${APPVEYOR:-}" == x"" ]]; then
+  dotnet restore
+fi
 dotnet build --no-restore -c $CONFIGURATION $PUBLIC
+
 popd >/dev/null 2>&1

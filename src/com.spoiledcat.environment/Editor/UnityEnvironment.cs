@@ -30,38 +30,7 @@ namespace SpoiledCat.Extensions
 
 namespace SpoiledCat.Unity
 {
-	using Logging;
 	using SimpleIO;
-
-	public interface IEnvironment
-	{
-		IEnvironment Initialize(SPath assetsPath, SPath extensionInstallPath, string unityVersion = null, SPath unityApplicationPath = default, SPath unityApplicationContentsPath = default);
-		string ExpandEnvironmentVariables(string name);
-		string GetEnvironmentVariable(string v);
-		string GetSpecialFolder(Environment.SpecialFolder folder);
-		string GetEnvironmentVariableKey(string name);
-
-		string Path { get; set; }
-		string NewLine { get; }
-		bool IsWindows { get; }
-		bool IsLinux { get; }
-		bool IsMac { get; }
-		bool Is32Bit { get; }
-		string UnityVersion { get; }
-		SPath UnityApplication { get; }
-		SPath UnityApplicationContents { get; }
-		SPath UnityAssetsPath { get; }
-		SPath UnityProjectPath { get; }
-		SPath ExtensionInstallPath { get; }
-		SPath UserCachePath { get; set; }
-		SPath SystemCachePath { get; set; }
-		SPath LogPath { get; }
-		ISettings LocalSettings { get; }
-		ISettings SystemSettings { get; }
-		ISettings UserSettings { get; }
-		string ApplicationName { get; }
-		SPath WorkingDirectory { get; }
-	}
 
 	public class UnityEnvironment : IEnvironment
 	{
@@ -75,41 +44,39 @@ namespace SpoiledCat.Unity
 		{
 			ApplicationName = applicationName;
 
-			UserCachePath = SPath.LocalAppData.Combine(applicationName);
-			SystemCachePath = SPath.CommonAppData.Combine(applicationName);
-			LogPath = IsMac ? SPath.HomeDirectory.Combine("Library/Logs").Combine(applicationName) : UserCachePath;
-			LogPath = LogPath.Combine(logFile);
-			LogPath.EnsureParentDirectoryExists();
+			LocalAppData = GetFolder(Folders.LocalApplicationData);
+			CommonAppData = GetFolder(Folders.CommonApplicationData);
+			UserCachePath = LocalAppData.Combine(ApplicationName);
+			SystemCachePath = CommonAppData.Combine(ApplicationName);
+			LogPath = GetFolder(Folders.Logs).Combine(ApplicationName, logFile);
 		}
 
 		public virtual IEnvironment Initialize(
-			SPath Application_dataPath,
-			SPath extensionInstallPath,
+			string projectPath,
+			string extensionInstallPath,
 			string unityVersion = null,
-			SPath EditorApplication_applicationPath = default,
-			SPath EditorApplication_applicationContentsPath = default
+			string EditorApplication_applicationPath = default,
+			string EditorApplication_applicationContentsPath = default
 		)
 		{
-			ExtensionInstallPath = extensionInstallPath;
-			UnityApplication = EditorApplication_applicationPath;
-			UnityApplicationContents = EditorApplication_applicationContentsPath;
-			UnityAssetsPath = Application_dataPath;
-			UnityProjectPath = UnityAssetsPath.Parent;
+			UserCachePath.EnsureDirectoryExists();
+			SystemCachePath.EnsureDirectoryExists();
+			LogPath.EnsureDirectoryExists();
+
+			UnityProjectPath = projectPath.ToSPath();
+			ExtensionInstallPath = extensionInstallPath.ToSPath();
 			UnityVersion = unityVersion;
+			if (!string.IsNullOrEmpty(EditorApplication_applicationPath))
+				UnityApplication = EditorApplication_applicationPath.ToSPath();
+			if (!string.IsNullOrEmpty(EditorApplication_applicationContentsPath))
+				UnityApplicationContents = EditorApplication_applicationContentsPath.ToSPath();
+
 			UserSettings = new UserSettings(this);
 			LocalSettings = new LocalSettings(this);
 			SystemSettings = new SystemSettings(this);
-			WorkingDirectory = SPath.CurrentDirectory;
 
 			return this;
 		}
-
-		public void SetWorkingDirectory(SPath workingDirectory)
-		{
-			WorkingDirectory = workingDirectory;
-		}
-
-		public string GetSpecialFolder(Environment.SpecialFolder folder) => SPath.FileSystem.GetFolderPath(folder);
 
 		public string ExpandEnvironmentVariables(string name)
 		{
@@ -134,17 +101,46 @@ namespace SpoiledCat.Unity
 										.FirstOrDefault(k => string.Compare(name, k, true, CultureInfo.InvariantCulture) == 0) ?? name;
 		}
 
+		public SPath GetFolder(Folders folder)
+		{
+			switch (folder)
+			{
+				case Folders.LocalApplicationData:
+				{
+					if (IsMac)
+						return SPath.HomeDirectory.Combine("Library", "Application Support");
+				}
+					break;
+				case Folders.CommonApplicationData:
+				{
+					return Environment.GetFolderPath(
+						IsLinux
+							? Environment.SpecialFolder.ApplicationData
+							: Environment.SpecialFolder.CommonApplicationData
+					).ToSPath();
+				}
+				case Folders.Logs:
+				{
+					if (IsMac)
+						return SPath.HomeDirectory.Combine("Library/Logs");
+				}
+					break;
+			}
+			return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).ToSPath();
+		}
+
 		public string ApplicationName { get; }
+		public SPath LocalAppData { get; set; }
+		public SPath CommonAppData { get; set; }
 		public SPath LogPath { get; }
+
 		public string UnityVersion { get; set; }
 		public SPath UnityApplication { get; set; }
 		public SPath UnityApplicationContents { get; set; }
-		public SPath UnityAssetsPath { get; set; }
 		public SPath UnityProjectPath { get; set; }
-		public SPath ExtensionInstallPath { get; set; }
 		public SPath UserCachePath { get; set; }
 		public SPath SystemCachePath { get; set; }
-		public SPath WorkingDirectory { get; private set; }
+		public SPath ExtensionInstallPath { get; set;  }
 
 		public string Path { get; set; } = Environment.GetEnvironmentVariable(GetEnvironmentVariableKeyInternal("PATH"));
 
@@ -154,17 +150,47 @@ namespace SpoiledCat.Unity
 		public ISettings SystemSettings { get; protected set; }
 		public ISettings UserSettings { get; protected set; }
 
-		public bool IsWindows => OnWindows;
-		public bool IsLinux => OnLinux;
-		public bool IsMac => OnMac;
 		public bool Is32Bit => IntPtr.Size == 4;
 
-		public static bool OnWindows => SPath.IsWindows;
+		public string ExecutableExtension => IsWindows ? ".exe" : string.Empty;
 
-		public static bool OnLinux => SPath.IsLinux;
-		public static bool OnMac => SPath.IsMac;
+		private bool? isLinux;
+		private bool? isMac;
+		private bool? isWindows;
+		public bool IsWindows
+		{
+			get
+			{
+				if (isWindows.HasValue)
+					return isWindows.Value;
+				return Environment.OSVersion.Platform != PlatformID.Unix && Environment.OSVersion.Platform != PlatformID.MacOSX;
+			}
+			set => isWindows = value;
+		}
 
-		public static string ExecutableExtension => OnWindows ? ".exe" : string.Empty;
-		public static ILogging Logger { get; } = LogHelper.GetLogger<UnityEnvironment>();
+		public bool IsLinux
+		{
+			get
+			{
+				if (isLinux.HasValue)
+					return isLinux.Value;
+				return Environment.OSVersion.Platform == PlatformID.Unix && Directory.Exists("/proc");
+			}
+			set => isLinux = value;
+		}
+
+		public bool IsMac
+		{
+			get
+			{
+				if (isMac.HasValue)
+					return isMac.Value;
+				// most likely it'll return the proper id but just to be on the safe side, have a fallback
+				return Environment.OSVersion.Platform == PlatformID.MacOSX ||
+						(Environment.OSVersion.Platform == PlatformID.Unix && !Directory.Exists("/proc"));
+			}
+			set => isMac = value;
+		}
+
 	}
 }

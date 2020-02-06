@@ -2,24 +2,27 @@
   "dependencies": {
     "com.spoiledcat.environment": "file:../../../src/com.spoiledcat.environment",
     "com.spoiledcat.logging": "file:../../../src/com.spoiledcat.logging",
-    "com.spoiledcat.simpleio": "file:../../../src/com.spoiledcat.simpleio",
-    "com.spoiledcat.processmanager": "file:../../../src/com.spoiledcat.processmanager",
     "com.spoiledcat.quick-console": "file:../../../src/com.spoiledcat.quick-console",
     "com.spoiledcat.sharpziplib": "file:../../../src/com.spoiledcat.sharpziplib",
+    "com.spoiledcat.simpleio": "file:../../../src/com.spoiledcat.simpleio",
     "com.spoiledcat.simplejson": "file:../../../src/com.spoiledcat.simplejson",
-    "com.spoiledcat.threading.tasks": "file:../../../src/com.spoiledcat.threading.tasks",
     "com.spoiledcat.threading": "file:../../../src/com.spoiledcat.threading",
+    "com.spoiledcat.threading.tasks": "file:../../../src/com.spoiledcat.threading.tasks",
     "com.spoiledcat.ui": "file:../../../src/com.spoiledcat.ui",
     "com.spoiledcat.utilities": "file:../../../src/com.spoiledcat.utilities",
-    "com.unity.package-manager-ui": "2.1.2",
-    "com.unity.test-framework": "0.0.4-preview",
+    "com.unity.2d.sprite": "1.0.0",
+    "com.unity.2d.tilemap": "1.0.0",
+    "com.unity.ide.rider": "1.1.4",
+    "com.unity.ide.vscode": "1.1.4",
+    "com.unity.test-framework": "1.1.9",
+    "com.unity.ugui": "1.0.0",
+    "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.imageconversion": "1.0.0",
     "com.unity.modules.imgui": "1.0.0",
     "com.unity.modules.jsonserialize": "1.0.0",
     "com.unity.modules.ui": "1.0.0"
   },
   "testables": [
-      "com.spoiledcat.threading",
-      "com.spoiledcat.processmanager"
+    "com.spoiledcat.threading"
   ]
 }

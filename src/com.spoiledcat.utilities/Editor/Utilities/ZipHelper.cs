@@ -180,7 +180,7 @@ namespace SpoiledCat.Utilities
 			}
 			catch (Exception ex)
 			{
-				LogHelper.Error(ex, "Error setting file attributes in " + fullZipToPath);
+				LogHelper.GetLogger<ZipHelper>().Error(ex, "Error setting file attributes in " + fullZipToPath);
 			}
 
 			return fullZipToPath;

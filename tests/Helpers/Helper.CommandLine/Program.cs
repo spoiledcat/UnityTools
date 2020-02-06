@@ -12,7 +12,8 @@
 	using SimpleIO;
 	using TestWebServer;
 	using Threading;
-	using Utilities;
+	using Threading.Helpers;
+	using Utils = Utilities.Utils;
 
 	static class Program
 	{
@@ -71,7 +72,7 @@
 		private static int Main(string[] args)
 		{
 			LogHelper.LogAdapter = new ConsoleLogAdapter();
-			Logger = LogHelper.GetLogger();
+			Logger = LogHelper.GetLogger("CommandLine");
 
 			var retCode = 0;
 			string data = null;

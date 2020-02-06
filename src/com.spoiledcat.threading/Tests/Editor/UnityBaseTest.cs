@@ -7,6 +7,9 @@ using Debug = UnityEngine.Debug;
 
 namespace BaseTests
 {
+	using System;
+	using SpoiledCat.SimpleIO;
+
 	// Unity does not support async/await tests, but it does
 	// have a special type of test with a [CustomUnityTest] attribute
 	// which mimicks a coroutine in EditMode. This attribute is
@@ -18,40 +21,54 @@ namespace BaseTests
 	{ }
 
 
-	public partial class BaseTest
+	public partial class BaseTest : IDisposable
 	{
 		private LogAdapterBase existingLogger;
 		private bool existingTracing;
 
-		public BaseTest()
+        internal TestData StartTest([CallerMemberName] string testName = "test") => new TestData(testName, new LogFacade(testName, new UnityLogAdapter(), false));
+
+        public BaseTest()
 		{
 			// set up the logger so it doesn't write exceptions to the unity log, the test runner doesn't like it
 			existingLogger = LogHelper.LogAdapter;
 			existingTracing = LogHelper.TracingEnabled;
 			LogHelper.TracingEnabled = false;
 			LogHelper.LogAdapter = new NullLogAdapter();
-
-			TaskManager = new TaskManager().Initialize();
-
-			Debug.Log($"Starting test fixture. Main thread is {TaskManager.UIThread}");
 		}
 
 		public void Dispose()
 		{
-			TaskManager?.Dispose();
 			LogHelper.LogAdapter = existingLogger;
 			LogHelper.TracingEnabled = existingTracing;
 		}
 
-		protected void StartTest(out Stopwatch watch, out ILogging logger, out ITaskManager taskManager, [CallerMemberName] string testName = "test")
+		internal SPath? testApp;
+
+		internal SPath TestApp
 		{
-			logger = new LogFacade(testName, new UnityLogAdapter(), true);
-			watch = new Stopwatch();
-
-			taskManager = TaskManager;
-
-			logger.Trace("START");
-			watch.Start();
+			get
+			{
+				if (!testApp.HasValue)
+				{
+					testApp = "Packages/com.spoiledcat.threading/Tests/Helpers~/Helper.CommandLine.exe".ToSPath().Resolve();
+					if (!testApp.Value.FileExists())
+					{
+						testApp = "Packages/com.spoiledcat.threading.tests/Helpers~/Helper.CommandLine.exe".ToSPath().Resolve();
+						if (!testApp.Value.FileExists())
+						{
+							testApp = "Packages/com.spoiledcat.threading.tests/Tests/Helpers~/Helper.CommandLine.exe".ToSPath().Resolve();
+							if (!testApp.Value.FileExists())
+							{
+								Debug.LogException(new InvalidOperationException(
+									"Test helper binaries are missing. Build the UnityTools.sln solution once with `dotnet build` in order to set up the tests."));
+								testApp = SPath.Default;
+							}
+						}
+					}
+				}
+				return testApp.Value;
+			}
 		}
-	}
+    }
 }

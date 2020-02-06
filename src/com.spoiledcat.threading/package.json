@@ -17,6 +17,8 @@
         "registry":"https://registry.spoiledcat.com/"
     },
     "dependencies": {
-        "com.spoiledcat.logging": "0.0.0-placeholder"
+        "com.spoiledcat.logging": "0.0.0-placeholder",
+        "com.spoiledcat.simpleio": "0.0.0-placeholder",
+        "com.spoiledcat.environment": "0.0.0-placeholder"
     }
 }

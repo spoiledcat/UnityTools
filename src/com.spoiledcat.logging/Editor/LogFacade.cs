@@ -13,10 +13,11 @@ namespace SpoiledCat.Logging
 	{
 		private readonly LogAdapterBase logger;
 		private bool? traceEnabled;
+		private bool? verbose;
 
 		public bool TracingEnabled
 		{
-			get => traceEnabled.HasValue ? traceEnabled.Value : LogHelper.TracingEnabled;
+			get => traceEnabled ?? LogHelper.TracingEnabled;
 			set
 			{
 				if (traceEnabled.HasValue)
@@ -26,7 +27,17 @@ namespace SpoiledCat.Logging
 			}
 		}
 
-		public bool Verbose { get => LogHelper.Verbose; set => LogHelper.Verbose = value; }
+		public bool Verbose
+		{
+			get => verbose ?? LogHelper.Verbose;
+			set
+			{
+				if (verbose.HasValue)
+					verbose = value;
+				else
+					LogHelper.Verbose = value;
+			}
+		}
 
 		private readonly string context;
 
@@ -36,11 +47,12 @@ namespace SpoiledCat.Logging
 			logger = LogHelper.LogAdapter;
 		}
 
-		public LogFacade(string context, LogAdapterBase logger, bool traceEnabled = false)
+		public LogFacade(string context, LogAdapterBase logger, bool traceEnabled = false, bool verbose = false)
 		{
 			this.context = context;
 			this.logger = logger;
 			this.traceEnabled = traceEnabled;
+			this.verbose = verbose;
 		}
 
 		public void Info(string message)
@@ -50,9 +62,8 @@ namespace SpoiledCat.Logging
 
 		public void Debug(string message)
 		{
-#if DEVELOPER_BUILD
+			if (!Verbose) return;
 			logger.Debug(context, message);
-#endif
 		}
 
 		public void Trace(string message)
@@ -83,30 +94,26 @@ namespace SpoiledCat.Logging
 
 		public void Debug(string format, params object[] objects)
 		{
-#if DEVELOPER_BUILD
+			if (!Verbose) return;
 			Debug(string.Format(format, objects));
-#endif
 		}
 
 		public void Debug(Exception ex, string message)
 		{
-#if DEVELOPER_BUILD
-			Debug(string.Concat(message, Environment.NewLine, Verbose ? ex.GetExceptionMessage() : ex.GetExceptionMessageShort()));
-#endif
+			if (!Verbose) return;
+			Debug(string.Concat(message, Environment.NewLine, ex.GetExceptionMessage()));
 		}
 
 		public void Debug(Exception ex)
 		{
-#if DEVELOPER_BUILD
+			if (!Verbose) return;
 			Debug(ex, string.Empty);
-#endif
 		}
 
 		public void Debug(Exception ex, string format, params object[] objects)
 		{
-#if DEVELOPER_BUILD
+			if (!Verbose) return;
 			Debug(ex, String.Format(format, objects));
-#endif
 		}
 
 		public void Trace(string format, params object[] objects)

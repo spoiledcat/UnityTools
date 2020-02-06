@@ -15,5 +15,8 @@
     },
     "publishConfig": {
         "registry":"https://registry.spoiledcat.com/"
+    },
+    "dependencies": {
+        "com.spoiledcat.threading": "0.0.0-placeholder"
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using SpoiledCat.Logging;
 using SpoiledCat.SimpleIO;
-using SpoiledCat.ProcessManager;
 using SpoiledCat.Threading;
 using SpoiledCat.UI;
 using SpoiledCat.Unity;
@@ -28,8 +27,8 @@ public class LargeAssetManagerWindow : BaseWindow
 		}
 	}
 
-	private IProcessEnvironment processEnvironment;
-	private IProcessEnvironment ProcessEnvironment => processEnvironment ?? (processEnvironment = new ProcessEnvironment(Environment));
+	private IProcessManager processManager;
+	private IProcessManager ProcessManager => processManager ?? (processManager = new ProcessManager(Environment));
 
 	[MenuItem("Tools/Show")]
 	static void Menu_Show()
@@ -113,9 +112,9 @@ public class LargeAssetManagerWindow : BaseWindow
 				{
 					if (GUILayout.Button("Start Web Server"))
 					{
-						webServerTask = new ProcessTaskLongRunning(TaskManager, ProcessEnvironment,
-							"Packages/com.spoiledcat.processmanager/Tests/Helpers~/Helper.CommandLine.exe".ToSPath().Resolve(),
-							$"-w -p {webServerPort}").Configure(new ProcessManager(Environment, TaskManager.Token));
+						webServerTask = new DotNetProcessTask(TaskManager, ProcessManager,
+							"Packages/com.spoiledcat.threading/Tests/Helpers~/Helper.CommandLine.exe".ToSPath().Resolve(),
+							$"-w -p {webServerPort}");
 
 
 						webServerTask.FinallyInUI((success, exception) => {
@@ -139,8 +138,14 @@ public class LargeAssetManagerWindow : BaseWindow
 				if (GUILayout.Button("Restart everything"))
 				{
 					var oldTaskManager = TaskManager;
+					var oldProcessManager = processManager;
 					TaskManager = new TaskManager().Initialize();
-					new TPLTask(TaskManager, ((TaskManager)oldTaskManager).Stop());
+					processManager = new ProcessManager(Environment);
+
+					TaskManager.With(() => {
+						oldProcessManager.Dispose();
+						oldTaskManager.Dispose();
+					}).Start();
 				}
 			}
 		}

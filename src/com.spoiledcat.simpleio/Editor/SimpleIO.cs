@@ -44,39 +44,46 @@ using System.Text;
 
 namespace SpoiledCat.SimpleIO
 {
+	using System.Globalization;
+	using System.Runtime.CompilerServices;
+
 	[Serializable]
 	[DebuggerDisplay("{DebuggerDisplay,nq}")]
 
-	public struct SPath : IEquatable<SPath>, IComparable
+#if SIMPLEIO_INTERNAL
+	internal
+#else
+	public
+#endif
+		struct SPath : IEquatable<SPath>, IComparable
 	{
 		public static SPath Default;
 
-		private readonly string[] _elements;
-		private readonly string _driveLetter;
+		[NonSerialized] private readonly string[] elements;
+		[NonSerialized] private readonly string driveLetter;
 
 		#region construction
 
 		public SPath(string path)
 		{
-			if (path == null)
-				throw new ArgumentNullException("path");
+			EnsureNotNull(path, "path");
 
 			IsInitialized = true;
 
-			path = ParseDriveLetter(path, out _driveLetter);
+			path = ParseDriveLetter(path, out driveLetter);
 
 			if (path == "/")
 			{
 				IsRelative = false;
-				_elements = new string[] {};
+				elements = new string[] {};
 			}
 			else
 			{
 				var split = path.Split('/', '\\');
 
-				IsRelative = _driveLetter == null && IsRelativeFromSplitString(split);
+				IsRelative = driveLetter == null && IsRelativeFromSplitString(split);
 
-				_elements = ParseSplitStringIntoElements(split.Where(s => s.Length > 0).ToArray(), IsRelative);
+				elements = ParseSplitStringIntoElements(split.Where(s => s.Length > 0).ToArray(), IsRelative);
 			}
 		}
 
@@ -89,9 +96,9 @@ namespace SpoiledCat.SimpleIO
 
 		private SPath(string[] elements, bool isRelative, string driveLetter)
 		{
-			_elements = elements;
+			this.elements = elements;
 			IsRelative = isRelative;
-			_driveLetter = driveLetter;
+			this.driveLetter = driveLetter;
 			IsInitialized = true;
 		}
 
@@ -159,20 +166,20 @@ namespace SpoiledCat.SimpleIO
 				throw new ArgumentException("You cannot .Combine a non-relative path");
 
 			return new SPath(
-				ParseSplitStringIntoElements(_elements.Concat(append.SelectMany(p => p._elements)), IsRelative),
-				IsRelative, _driveLetter);
+				ParseSplitStringIntoElements(elements.Concat(append.SelectMany(p => p.elements)), IsRelative),
+				IsRelative, driveLetter);
 		}
 
 		public SPath Parent {
 			get {
 				ThrowIfNotInitialized();
 
-				if (_elements.Length == 0)
+				if (elements.Length == 0)
 					throw new InvalidOperationException("Parent is called on an empty path");
 
-				var newElements = _elements.Take(_elements.Length - 1).ToArray();
+				var newElements = elements.Take(elements.Length - 1).ToArray();
 
-				return new SPath(newElements, IsRelative, _driveLetter);
+				return new SPath(newElements, IsRelative, driveLetter);
 			}
 		}
 
@@ -182,7 +189,7 @@ namespace SpoiledCat.SimpleIO
 
 			if (!IsChildOf(path))
 			{
-				if (!IsRelative && !path.IsRelative && _driveLetter != path._driveLetter)
+				if (!IsRelative && !path.IsRelative && driveLetter != path.driveLetter)
 					throw new ArgumentException(
 						"Path.RelativeTo() was invoked with two paths that are on different volumes. invoked on: " +
 						ToString() + " asked to be made relative to: " + path);
@@ -207,11 +214,11 @@ namespace SpoiledCat.SimpleIO
 
 				var depthDiff = path.Depth - commonParent.Depth;
 				return new SPath(
-					Enumerable.Repeat("..", depthDiff).Concat(_elements.Skip(commonParent.Depth)).ToArray(), true,
+					Enumerable.Repeat("..", depthDiff).Concat(elements.Skip(commonParent.Depth)).ToArray(), true,
 					null);
 			}
 
-			return new SPath(_elements.Skip(path._elements.Length).ToArray(), true, null);
+			return new SPath(elements.Skip(path.elements.Length).ToArray(), true, null);
 		}
 
 		public SPath GetCommonParent(SPath path)
@@ -220,7 +227,7 @@ namespace SpoiledCat.SimpleIO
 
 			if (!IsChildOf(path))
 			{
-				if (!IsRelative && !path.IsRelative && _driveLetter != path._driveLetter)
+				if (!IsRelative && !path.IsRelative && driveLetter != path.driveLetter)
 					return Default;
 
 				SPath commonParent = Default;
@@ -243,12 +250,12 @@ namespace SpoiledCat.SimpleIO
 			ThrowIfNotInitialized();
 			ThrowIfRoot();
 
-			var newElements = (string[])_elements.Clone();
+			var newElements = (string[])elements.Clone();
 			newElements[newElements.Length - 1] =
-				FileSystem.ChangeExtension(_elements[_elements.Length - 1], WithDot(extension));
-			if (extension == string.Empty)
+				FileSystem.ChangeExtension(elements[elements.Length - 1], WithDot(extension));
+			if (string.IsNullOrEmpty(extension))
 				newElements[newElements.Length - 1] = newElements[newElements.Length - 1].TrimEnd('.');
-			return new SPath(newElements, IsRelative, _driveLetter);
+			return new SPath(newElements, IsRelative, driveLetter);
 		}
 
 		#endregion construction
@@ -262,7 +269,7 @@ namespace SpoiledCat.SimpleIO
 				ThrowIfNotInitialized();
 				ThrowIfRoot();
 
-				return _elements.Last();
+				return elements.Last();
 			}
 		}
 
@@ -277,14 +284,14 @@ namespace SpoiledCat.SimpleIO
 		public IEnumerable<string> Elements {
 			get {
 				ThrowIfNotInitialized();
-				return _elements;
+				return elements;
 			}
 		}
 
 		public int Depth {
 			get {
 				ThrowIfNotInitialized();
-				return _elements.Length;
+				return elements.Length;
 			}
 		}
 
@@ -364,7 +371,7 @@ namespace SpoiledCat.SimpleIO
 				if (IsRoot)
 					throw new ArgumentException("A root directory does not have an extension");
 
-				var last = _elements.Last();
+				var last = elements.Last();
 				var index = last.LastIndexOf(".");
 				if (index < 0) return String.Empty;
 				return last.Substring(index);
@@ -392,22 +399,22 @@ namespace SpoiledCat.SimpleIO
 				return String.Empty;
 
 			// Check if it's linux root /
-			if (IsRoot && string.IsNullOrEmpty(_driveLetter))
+			if (IsRoot && string.IsNullOrEmpty(driveLetter))
 				return Slash(slashMode).ToString();
 
-			if (IsRelative && _elements.Length == 0)
+			if (IsRelative && elements.Length == 0)
 				return ".";
 
 			var sb = new StringBuilder();
-			if (_driveLetter != null)
+			if (driveLetter != null)
 			{
-				sb.Append(_driveLetter);
+				sb.Append(driveLetter);
 				sb.Append(":");
 			}
 			if (!IsRelative)
 				sb.Append(Slash(slashMode));
 			var first = true;
-			foreach (var element in _elements)
+			foreach (var element in elements)
 			{
 				if (!first)
 					sb.Append(Slash(slashMode));
@@ -457,14 +464,14 @@ namespace SpoiledCat.SimpleIO
 			if (p.IsRelative != IsRelative)
 				return false;
 
-			if (!string.Equals(p._driveLetter, _driveLetter, PathStringComparison))
+			if (!string.Equals(p.driveLetter, driveLetter, PathStringComparison))
 				return false;
 
-			if (p._elements.Length != _elements.Length)
+			if (p.elements.Length != elements.Length)
 				return false;
 
-			for (var i = 0; i != _elements.Length; i++)
-				if (!string.Equals(p._elements[i], _elements[i], PathStringComparison))
+			for (var i = 0; i != elements.Length; i++)
+				if (!string.Equals(p.elements[i], elements[i], PathStringComparison))
 					return false;
 
 			return true;
@@ -485,10 +492,10 @@ namespace SpoiledCat.SimpleIO
 				if (!IsInitialized)
 					return hash;
 				hash = hash * 23 + IsRelative.GetHashCode();
-				foreach (var element in _elements)
+				foreach (var element in elements)
 					hash = hash * 23 + (IsUnix ? element : element.ToUpperInvariant()).GetHashCode();
-				if (_driveLetter != null)
-					hash = hash * 23 + (IsUnix ? _driveLetter : _driveLetter.ToUpperInvariant()).GetHashCode();
+				if (driveLetter != null)
+					hash = hash * 23 + (IsUnix ? driveLetter : driveLetter.ToUpperInvariant()).GetHashCode();
 				return hash;
 			}
 		}
@@ -498,7 +505,7 @@ namespace SpoiledCat.SimpleIO
 			if (!(other is SPath))
 				return -1;
 
-			return ToString().CompareTo(((SPath)other).ToString());
+			return string.Compare(ToString(), ((SPath)other).ToString(), StringComparison.InvariantCulture);
 		}
 
 		public static bool operator !=(SPath lhs, SPath rhs)
@@ -521,7 +528,7 @@ namespace SpoiledCat.SimpleIO
 		public bool IsEmpty {
 			get {
 				ThrowIfNotInitialized();
-				return _elements.Length == 0;
+				return elements.Length == 0;
 			}
 		}
 
@@ -912,8 +919,11 @@ namespace SpoiledCat.SimpleIO
 
 			destination.EnsureDirectoryExists();
 			var _this = this;
-			return Files(recurse).Where(fileFilter ?? AlwaysTrue)
-				.Select(file => file.Copy(destination.Combine(file.RelativeTo(_this)))).ToArray();
+
+			return Files(recurse)
+				   .Where(fileFilter ?? AlwaysTrue)
+				   .Select(file => file.Copy(destination.Combine(file.RelativeTo(_this))))
+				   .ToArray();
 		}
 
 		public IEnumerable<SPath> MoveFiles(SPath destination, bool recurse, Func<SPath, bool> fileFilter = null)
@@ -927,8 +937,11 @@ namespace SpoiledCat.SimpleIO
 
 			destination.EnsureDirectoryExists();
 			var _this = this;
-			return Files(recurse).Where(fileFilter ?? AlwaysTrue)
-				.Select(file => file.Move(destination.Combine(file.RelativeTo(_this)))).ToArray();
+
+			return Files(recurse)
+				   .Where(fileFilter ?? AlwaysTrue)
+				   .Select(file => file.Move(destination.Combine(file.RelativeTo(_this))))
+				   .ToArray();
 		}
 
 		#endregion
@@ -1080,7 +1093,7 @@ namespace SpoiledCat.SimpleIO
 			// If the other path is the root directory, then anything is a child of it as long as it's not a Windows path
 			if (potentialBasePath.IsRoot)
 			{
-				if (_driveLetter != potentialBasePath._driveLetter)
+				if (driveLetter != potentialBasePath.driveLetter)
 					return false;
 				return true;
 			}
@@ -1128,22 +1141,22 @@ namespace SpoiledCat.SimpleIO
 			return true;
 		}
 
-		private static IFileSystem _fileSystem;
+		private static IFileSystem fileSystem;
 		public static IFileSystem FileSystem {
 			get {
-				if (_fileSystem == null)
+				if (fileSystem == null)
 #if UNITY_4 || UNITY_5 || UNITY_5_3_OR_NEWER
 #if UNITY_EDITOR
-					_fileSystem = new FileSystem(Directory.GetCurrentDirectory());
+					fileSystem = new FileSystem(Directory.GetCurrentDirectory());
 #else
-					_fileSystem = new FileSystem(UnityEngine.Application.dataPath);
+					fileSystem = new FileSystem(UnityEngine.Application.dataPath);
 #endif
 #else
-					_fileSystem = new FileSystem(Directory.GetCurrentDirectory());
+					fileSystem = new FileSystem(Directory.GetCurrentDirectory());
 #endif
-				return _fileSystem;
+				return fileSystem;
 			}
-			set { _fileSystem = value; }
+			set { fileSystem = value; }
 		}
 
 		public static bool IsUnix => FileSystem.IsLinux || FileSystem.IsMac;
@@ -1151,21 +1164,32 @@ namespace SpoiledCat.SimpleIO
 		public static bool IsLinux => FileSystem.IsLinux;
 		public static bool IsMac => FileSystem.IsMac;
 
-		private static StringComparison? _pathStringComparison;
+		private static StringComparison? pathStringComparison;
 		private static StringComparison PathStringComparison {
 			get {
 				// this is lazily evaluated because IsUnix uses the FileSystem object and that can be set
 				// after static constructors happen here
-				if (!_pathStringComparison.HasValue)
-					_pathStringComparison = IsUnix ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
-				return _pathStringComparison.Value;
+				if (!pathStringComparison.HasValue)
+					pathStringComparison = IsUnix ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+				return pathStringComparison.Value;
 			}
+		}
+
+		private static T EnsureNotNull<T>(T value, string name,
+#if !NET_35
+[CallerMemberName]
+#endif
+			string caller = "")
+		{
+			if (value != null) return value;
+			string message = String.Format(CultureInfo.InvariantCulture, "In {0}, '{1}' must not be null", caller, name);
+			throw new ArgumentNullException(name, message);
 		}
 
 		internal string DebuggerDisplay => ToString();
 	}
 
-#if NICEIO_INTERNAL
+#if SIMPLEIO_INTERNAL
 	internal
 #else
 	public
@@ -1241,7 +1265,7 @@ namespace SpoiledCat.SimpleIO
 		}
 	}
 
-#if NICEIO_INTERNAL
+#if SIMPLEIO_INTERNAL
 	internal
 #else
 	public
@@ -1253,7 +1277,7 @@ namespace SpoiledCat.SimpleIO
 		Backward
 	}
 
-#if NICEIO_INTERNAL
+#if SIMPLEIO_INTERNAL
 	internal
 #else
 	public
@@ -1264,7 +1288,7 @@ namespace SpoiledCat.SimpleIO
 		Soft
 	}
 
-#if NICEIO_INTERNAL
+#if SIMPLEIO_INTERNAL
 	internal
 #else
 	public
@@ -1321,7 +1345,7 @@ namespace SpoiledCat.SimpleIO
 	}
 
 
-#if NICEIO_INTERNAL
+#if SIMPLEIO_INTERNAL
 	internal
 #else
 	public
@@ -1337,7 +1361,6 @@ namespace SpoiledCat.SimpleIO
 		private bool? isMac;
 		private bool? isWindows;
 		private string localAppData;
-		private string processDirectory;
 
 		public FileSystem()
 		{}

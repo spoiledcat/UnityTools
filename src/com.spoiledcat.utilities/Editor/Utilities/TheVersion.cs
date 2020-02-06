@@ -77,7 +77,7 @@ namespace SpoiledCat.Utilities
 			var match = regex.Match(theVersion);
 			if (!match.Success)
 			{
-				LogHelper.Error(new ArgumentException("Invalid version: " + theVersion, "theVersion"));
+				LogHelper.GetLogger<TheVersion>().Error(new ArgumentException("Invalid version: " + theVersion, "theVersion"));
 				return this;
 			}
 

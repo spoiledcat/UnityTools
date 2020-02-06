@@ -18,6 +18,7 @@
     },
     "dependencies": {
         "com.spoiledcat.simpleio": "0.0.0-placeholder",
+        "com.spoiledcat.simplejson": "0.0.0-placeholder",
         "com.spoiledcat.ui": "0.0.0-placeholder"
     }
 }

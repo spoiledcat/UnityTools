@@ -2,7 +2,7 @@
 {
 	using SpoiledCat.Json;
 	using SpoiledCat.SimpleIO;
-	using SpoiledCat.Utilities;
+	using SpoiledCat.Threading.Helpers;
 
 	/// <summary>
 	/// SimpleJson serializes private fields in structs

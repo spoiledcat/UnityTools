@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SpoiledCat.Threading
 {
@@ -31,38 +30,70 @@ namespace SpoiledCat.Threading
 	{
 		public delegate T3 FuncO<in T1, T2, out T3>(T1 arg1, out T2 out1);
 
+		private Func<string, T> converter;
 		private readonly FuncO<string, T, bool> handler;
-		private readonly Func<string, T> simpleHandler;
+
+		private static readonly bool IsString = typeof(T) == typeof(string);
 
 		private ILogging logger;
 		public event Action<T> OnEntry;
 
-		public BaseOutputProcessor(FuncO<string, T, bool> handler = null)
+		public BaseOutputProcessor() {}
+
+		public BaseOutputProcessor(FuncO<string, T, bool> handler)
 		{
 			this.handler = handler;
 		}
 
-		public BaseOutputProcessor(Func<string, T> handler)
+		public BaseOutputProcessor(Func<string, T> converter)
 		{
-			this.simpleHandler = handler;
+			this.converter = converter;
 		}
 
 		public void Process(string line)
 		{
-			if (handler != null)
-			{
-				if (handler(line, out T entry))
-					RaiseOnEntry(entry);
-			}
-			else if (simpleHandler != null)
-			{
-				RaiseOnEntry(simpleHandler(line));
-			}
-			else
-				LineReceived(line);
+			LineReceived(line);
 		}
 
-		public virtual void LineReceived(string line) {}
+		protected virtual void LineReceived(string line)
+		{
+			if (ProcessLine(line, out var entry))
+				RaiseOnEntry(entry);
+		}
+
+		protected virtual bool ProcessLine(string line, out T result)
+		{
+			result = default;
+
+			if (handler != null)
+			{
+				if (handler(line, out result))
+					return true;
+				return false;
+			}
+
+			if (converter != null)
+			{
+				// if there's a converter, all results are valid
+				try
+				{
+					result = converter(line);
+					return true;
+				}
+				catch
+				{
+					return false;
+				}
+			}
+
+			// if T is string, no conversion is needed, result is valid
+			if (IsString)
+			{
+				result = (T)(object)line;
+				return true;
+			}
+			return false;
+		}
 
 		protected void RaiseOnEntry(T entry)
 		{
@@ -77,6 +108,61 @@ namespace SpoiledCat.Threading
 	public class BaseOutputProcessor<TData, T> : BaseOutputProcessor<T>, IOutputProcessor<TData, T>
 	{
 		public new event Action<TData> OnEntry;
+		private Func<string, TData> converter;
+		private readonly FuncO<string, TData, bool> handler;
+		private static readonly bool IsString = typeof(TData) == typeof(string);
+
+		public BaseOutputProcessor() {}
+
+		public BaseOutputProcessor(FuncO<string, TData, bool> handler)
+		{
+			this.handler = handler;
+		}
+
+		public BaseOutputProcessor(Func<string, TData> converter)
+		{
+			this.converter = converter;
+		}
+
+		protected override void LineReceived(string line)
+		{
+			if (ProcessLine(line, out var entry))
+				RaiseOnEntry(entry);
+		}
+
+		protected virtual bool ProcessLine(string line, out TData result)
+		{
+			result = default;
+
+			if (handler != null)
+			{
+				if (handler(line, out result))
+					return true;
+				return false;
+			}
+
+			if (converter != null)
+			{
+				// if there's a converter, all results are valid
+				try
+				{
+					result = converter(line);
+					return true;
+				}
+				catch
+				{
+					return false;
+				}
+			}
+
+			// if T is string, no conversion is needed, result is valid
+			if (IsString)
+			{
+				result = (TData)(object)line;
+				return true;
+			}
+			return false;
+		}
 
 		protected virtual void RaiseOnEntry(TData entry)
 		{
@@ -84,8 +170,16 @@ namespace SpoiledCat.Threading
 		}
 	}
 
-	public abstract class BaseOutputListProcessor<T> : BaseOutputProcessor<T, List<T>>
+	public class BaseOutputListProcessor<T> : BaseOutputProcessor<T, List<T>>
 	{
+		public BaseOutputListProcessor() { }
+
+		public BaseOutputListProcessor(FuncO<string, T, bool> handler) : base(handler)
+		{}
+
+		public BaseOutputListProcessor(Func<string, T> converter) : base(converter)
+		{}
+
 		protected override void RaiseOnEntry(T entry)
 		{
 			if (Result == null)
@@ -94,95 +188,6 @@ namespace SpoiledCat.Threading
 			}
 			Result.Add(entry);
 			base.RaiseOnEntry(entry);
-		}
-	}
-
-	/// <summary>
-	/// Takes a string, raises an event with it, discards the result
-	/// </summary>
-	public class RaiseAndDiscardOutputProcessor : BaseOutputProcessor<string>
-	{
-		public override void LineReceived(string line)
-		{
-			if (line == null)
-				return;
-			RaiseOnEntry(line);
-		}
-
-		public override string Result => string.Empty;
-	}
-
-	public class SimpleOutputProcessor : BaseOutputProcessor<string>
-	{
-		private readonly StringBuilder sb = new StringBuilder();
-
-		public override void LineReceived(string line)
-		{
-			if (line == null)
-				return;
-			sb.AppendLine(line);
-			RaiseOnEntry(line);
-		}
-
-		public override string Result { get { return sb.ToString(); } }
-	}
-
-	public class SimpleListOutputProcessor : BaseOutputListProcessor<string>
-	{
-		public override void LineReceived(string line)
-		{
-			if (line == null)
-				return;
-			RaiseOnEntry(line);
-		}
-	}
-
-	public class FirstResultOutputProcessor<T> : BaseOutputProcessor<T>
-	{
-		private readonly FuncO<string, T, bool> handler;
-		private bool isSet = false;
-
-		public FirstResultOutputProcessor(FuncO<string, T, bool> handler)
-			: base()
-		{
-			this.handler = handler;
-		}
-
-		public override void LineReceived(string line)
-		{
-			if (!isSet)
-			{
-				if (handler(line, out T res))
-				{
-					Result = res;
-					isSet = true;
-					RaiseOnEntry(res);
-				}
-			}
-		}
-	}
-
-	public class FirstNonNullLineOutputProcessor<T> : FirstResultOutputProcessor<T>
-	{
-		public FirstNonNullLineOutputProcessor(Func<string, T> converter = null)
-		: base((string line, out T ret) => Parse(line, out ret, converter))
-		{}
-
-		private static bool Parse(string line, out T result, Func<string, T> converter = null)
-		{
-			result = default;
-			if (String.IsNullOrEmpty(line))
-				return false;
-
-			line = line.Trim();
-
-			if (converter != null) {
-				result = converter(line);
-				return true;
-			}
-
-			result = (T)(object)line;
-			return true;
 		}
 	}
 }

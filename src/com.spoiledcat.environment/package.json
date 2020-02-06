@@ -15,5 +15,10 @@
     },
     "publishConfig": {
         "registry":"https://registry.spoiledcat.com/"
+    },
+    "dependencies": {
+        "com.spoiledcat.logging": "0.0.0-placeholder",
+        "com.spoiledcat.simpleio": "0.0.0-placeholder",
+        "com.spoiledcat.simplejson": "0.0.0-placeholder"
     }
 }

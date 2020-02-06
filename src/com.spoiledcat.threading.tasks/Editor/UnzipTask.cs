@@ -53,7 +53,7 @@ namespace SpoiledCat.Threading
 			catch (Exception ex)
 			{
 				if (!RaiseFaultHandlers(ex))
-					ThrownException.Rethrow();
+					Exception.Rethrow();
 			}
 			return ret;
 		}

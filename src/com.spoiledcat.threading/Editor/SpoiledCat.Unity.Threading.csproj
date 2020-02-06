@@ -1,12 +1,51 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFrameworks>net471;netcoreapp2.2</TargetFrameworks>
-    <SolutionDir Condition=" '$(SolutionDir)' == '' ">..\..\..\</SolutionDir>
-    <Description>A friendly threaded task system for Unity</Description>
+    <RootDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\'))</RootDir>
+    <PackageSourceRoot>$(MSBuildProjectDirectory)\..\</PackageSourceRoot>
+    <FullBuild Condition="'$(SolutionName)' == 'UnityTools'">true</FullBuild>
+    <IsPackable Condition="'$(FullBuild)' != 'true'">false</IsPackable>
+    <AssemblyName>$(ProjectName)</AssemblyName>
+    <DefaultNamespace>$(AssemblyName)</DefaultNamespace>
+    <CodeAnalysisRuleSet>$(RootDir)src\rules.ruleset</CodeAnalysisRuleSet>
+    <Configurations>Debug;Release;ReleaseUnity;DebugUnity</Configurations>
   </PropertyGroup>
+
+  <Import Project="$(RootDir)common\packaging.props" />
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <PackageId>$(PackageName)</PackageId>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <PackageId>$(PackageName)</PackageId>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='DebugUnity'">
+    <DefineConstants>DEBUG;TRACE;UNITY_EDITOR</DefineConstants>
+    <PackageId>$(AssemblyName)</PackageId>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='ReleaseUnity'">
+    <DefineConstants>UNITY_EDITOR</DefineConstants>
+    <PackageId>$(AssemblyName)</PackageId>
+  </PropertyGroup>
+
+  <Import Project="$(RootDir)common\unityreferences.targets" Condition="'$(Configuration)'=='DebugUnity' or '$(Configuration)'=='ReleaseUnity'" />
+  <Import Project="$(RootDir)common\packaging.targets" Condition="'$(FullBuild)' == 'true'" />
+
   <ItemGroup>
-    <ProjectReference Include="..\..\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
+    <None Remove="lib\**;**\*.meta;*.DotSettings;*.ncrunch*;**\*.asmdef;bin\**;obj\**;LICENSE.md;version.json;package.json" />
+    <None Include="$(RootDir)icon.png" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="icon.png" Condition="Exists('$(RootDir)icon.png')" />
+    <None Include="$(RootDir)LICENSE.md" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="LICENSE.md" Condition="Exists('$(RootDir)LICENSE.md')" />
   </ItemGroup>
-  <Import Project="$(SolutionDir)common\unityreferences.targets" />
-  <Import Project="$(SolutionDir)common\packaging.targets" />
+
+  <PropertyGroup>
+    <Description>A friendly threaded task system for the Unity Editor.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\com.spoiledcat.environment\Editor\SpoiledCat.Unity.Environment.csproj" />
+    <ProjectReference Include="..\..\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
+    <ProjectReference Include="..\..\com.spoiledcat.simpleio\Editor\SpoiledCat.Unity.SimpleIO.csproj" />
+  </ItemGroup>
+
 </Project>

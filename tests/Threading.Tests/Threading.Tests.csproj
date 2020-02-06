@@ -1,11 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
+    <RootDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\'))</RootDir>
+    <PackageName>com.spoiledcat.threading</PackageName>
+    <PublishTo>$(RootDir)build\packages\</PublishTo>
+    <PackageSource>src\</PackageSource>
+    <PackageSubFolder>\Helpers~\</PackageSubFolder>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <DefineConstants>NUNIT</DefineConstants>
+    <Configurations>Debug;Release;DebugUnity;ReleaseUnity</Configurations>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugUnity|AnyCPU'">
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Compile Include="..\..\src\com.spoiledcat.threading\Tests\**\*.cs" Exclude="..\..\src\com.spoiledcat.threading\Tests\**\UnityBaseTest.cs" />
-    <None Include="..\..\src\com.spoiledcat.threading\Tests\**\UnityBaseTest.cs" Link="UnityOnly\UnityBaseTest.cs" />
+    <Compile Include="..\..\src\$(PackageName)\Tests\Editor\**\*.cs" Link="UnityTests\%(Filename)%(Extension)" Exclude="..\..\src\$(PackageName)\Tests\**\UnityBaseTest.cs" />
+    <None Include="..\..\src\$(PackageName)\Tests\**\UnityBaseTest.cs" Link="UnityTests\UnityBaseTest.cs" />
+    <Compile Include="**\*.cs" Link="NUnitTests\%(Filename)%(Extension)" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="TestResults\**" />
+    <EmbeddedResource Remove="TestResults\**" />
+    <None Remove="TestResults\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(RootDir)LICENSE.md" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="LICENSE.md" />
+  </ItemGroup> 
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="NSubstitute" Version="4.2.1" />
@@ -16,9 +44,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />
     <ProjectReference Include="..\..\src\com.spoiledcat.simpleio\Editor\SpoiledCat.Unity.SimpleIO.csproj" />
-    <ProjectReference Include="..\..\src\com.spoiledcat.processmanager\Editor\SpoiledCat.Unity.ProcessManager.csproj" />
     <ProjectReference Include="..\..\src\com.spoiledcat.threading.tasks\Editor\SpoiledCat.Unity.Threading.Tasks.csproj" />
     <ProjectReference Include="..\..\src\com.spoiledcat.threading\Editor\SpoiledCat.Unity.Threading.csproj" />
+    <ProjectReference Include="..\Helpers\Helper.CommandLine\Helper.CommandLine.csproj" />
+    <ProjectReference Include="..\Helpers\Helper.WebServer\Helper.WebServer.csproj" />
     <ProjectReference Include="..\Helpers\TestBase\TestBase.csproj" />
   </ItemGroup>
+
+  <Import Project="copyhelperbinaries.targets" />
 </Project>

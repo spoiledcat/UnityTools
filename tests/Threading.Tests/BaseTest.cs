@@ -11,7 +11,7 @@ using SpoiledCat.Threading;
 
 namespace BaseTests
 {
-	public partial class BaseTest : IDisposable
+	public partial class BaseTest
 	{
 		public const bool TracingEnabled = false;
 
@@ -19,34 +19,42 @@ namespace BaseTests
 		{
 			LogHelper.LogAdapter = new NUnitLogAdapter();
 			LogHelper.TracingEnabled = TracingEnabled;
-
-			var syncContext = new TestThreadSynchronizationContext(default(CancellationToken));
-			TaskManager = new TaskManager().Initialize(syncContext);
-
-			LogHelper.Trace($"Starting test fixture. Main thread is {TaskManager.UIThread}");
 		}
 
-		public void Dispose()
+		internal TestData StartTest(bool withHttpServer = false,
+			[CallerMemberName] string testName = "test") =>
+				new TestData(testName, new LogFacade(testName, new NUnitLogAdapter(), TracingEnabled),
+					withHttpServer);
+
+		protected async Task RunTest(Func<IEnumerator> testMethodToRun)
 		{
-			TaskManager?.Dispose();
+			var scheduler = ThreadingHelper.GetUIScheduler(new ThreadSynchronizationContext(default));
+			var taskStart = new Task<IEnumerator>(testMethodToRun);
+			taskStart.Start(scheduler);
+			var e = await RunOn(testMethodToRun, scheduler);
+			while (await RunOn(s => ((IEnumerator)s).MoveNext(), e, scheduler))
+			{ }
 		}
 
-		protected void StartTest(out Stopwatch watch, out ILogging logger, out ITaskManager taskManager, [CallerMemberName] string testName = "test")
+		private Task<T> RunOn<T>(Func<T> method, TaskScheduler scheduler)
 		{
-			logger = new LogFacade(testName, new NUnitLogAdapter(), TracingEnabled);
-			watch = new Stopwatch();
-
-			taskManager = TaskManager;
-
-			logger.Trace("START");
-			watch.Start();
+			return Task<T>.Factory.StartNew(method, CancellationToken.None, TaskCreationOptions.None, scheduler);
 		}
 
-		protected void RunTest(Func<IEnumerator> testMethodToRun)
+		private Task<T> RunOn<T>(Func<object, T> method, object state, TaskScheduler scheduler)
 		{
-			var test = testMethodToRun();
-			while (test.MoveNext())
-			{}
+			return Task<T>.Factory.StartNew(method, state, CancellationToken.None, TaskCreationOptions.None, scheduler);
+		}
+
+		protected SPath? testApp;
+		protected SPath TestApp
+		{
+			get
+			{
+				if (!testApp.HasValue)
+					testApp = System.Reflection.Assembly.GetExecutingAssembly().Location.ToSPath().Parent.Combine("Helper.CommandLine.exe");
+				return testApp.Value;
+			}
 		}
 	}
 }

@@ -1,11 +1,10 @@
 {
     "name": "com.spoiledcat.threading",
     "references": [
-        "com.spoiledcat.logging",
+        "com.spoiledcat.environment",
         "com.spoiledcat.simpleio",
-        "com.spoiledcat.utilities"
+        "com.spoiledcat.logging"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -15,5 +14,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

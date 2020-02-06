@@ -139,6 +139,7 @@ namespace SpoiledCat.Tests.TestWebServer
 
 				context.Response.AddHeader("Date", DateTime.Now.ToString("r"));
 				context.Response.AddHeader("Last-Modified", File.GetLastWriteTime(filename).ToString("r"));
+				context.Response.AddHeader("Accept-Ranges", "bytes");
 
 				using (var input = new FileStream(filename, FileMode.Open))
 				{
@@ -168,7 +169,7 @@ namespace SpoiledCat.Tests.TestWebServer
 						if (input.CanSeek && (input.Length > start) && (end <= input.Length))
 						{
 							context.Response.StatusCode = (int)HttpStatusCode.PartialContent;
-							context.Response.Headers.Add("Content-Range", $"{start}-{end}/{input.Length}");
+							context.Response.Headers.Add("Content-Range", $"bytes {start}-{end}/{input.Length}");
 							input.Seek(start, SeekOrigin.Current);
 						}
 						else

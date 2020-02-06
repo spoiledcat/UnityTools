@@ -19,7 +19,6 @@ namespace SpoiledCat.UI
 		[NonSerialized] private bool? firstRunValue;
 
 		[NonSerialized] private bool initialized = false;
-		[NonSerialized] private Guid? instanceId;
 		[SerializeField] private bool firstRun = true;
 		[SerializeField] public string firstRunAtString;
 

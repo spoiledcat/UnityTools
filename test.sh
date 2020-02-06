@@ -1,4 +1,4 @@
-#!/bin/sh -eu
+#!/bin/bash -eu
 { set +x; } 2>/dev/null
 SOURCE="${BASH_SOURCE[0]}"
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
@@ -8,55 +8,57 @@ if [[ -e "/c/" ]]; then
   OS="Windows"
 fi
 
-CONFIGURATION=""
+CONFIGURATION=Release
 PUBLIC=""
 BUILD=0
+UPM=0
+UNITYVERSION=2019.2
 
 while (( "$#" )); do
   case "$1" in
     -d|--debug)
       CONFIGURATION="Debug"
-      shift
     ;;
     -r|--release)
       CONFIGURATION="Release"
-      shift
     ;;
     -p|--public)
-      PUBLIC="/p:PublicRelease=true"
-      shift
+      PUBLIC="-p:PublicRelease=true"
     ;;
     -b|--build)
       BUILD=1
+    ;;
+    -u|--upm)
+      UPM=1
+    ;;
+    -c)
       shift
+      CONFIGURATION=$1
     ;;
     -*|--*=) # unsupported flags
       echo "Error: Unsupported flag $1" >&2
       exit 1
-      ;;
-    *) # preserve positional arguments
-      if [[ x"$CONFIGURATION" != x"" ]]; then
-        echo "Invalid argument $1"
-        exit -1
-      fi
-      CONFIGURATION="$1"
-      shift
-      ;;
+    ;;
   esac
+  shift
 done
 
-if [[ x"$CONFIGURATION" == x"" ]]; then
-  CONFIGURATION="Debug"
-fi
+pushd $DIR >/dev/null 2>&1
 
-if [[ x"$OS" == x"Windows" && x"$PUBLIC" != x"" ]]; then
-  PUBLIC="/$PUBLIC"
-fi
-
-pushd $DIR
 if [[ x"$BUILD" == x"1" ]]; then
-  dotnet restore
+
+  if [[ x"${APPVEYOR:-}" == x"" ]]; then
+    dotnet restore
+  fi
+
   dotnet build --no-restore -c $CONFIGURATION $PUBLIC
 fi
-dotnet test --no-build --no-restore -c $CONFIGURATION $PUBLIC
-popd
+
+dotnet test --no-build --no-restore -c $CONFIGURATION $PUBLIC --logger "trx;LogFileName=dotnet-test-result.trx"
+#dotnet test --no-build --no-restore -c $CONFIGURATION $PUBLIC --logger "trx;LogFileName=dotnet-test-result.trx" --logger "html;LogFileName=dotnet-test-result.html"
+
+if [[ x"$UPM" == x"1" ]]; then
+  powershell scripts/Test-Upm.ps1 -UnityVersion $UNITYVERSION
+fi
+
+popd >/dev/null 2>&1

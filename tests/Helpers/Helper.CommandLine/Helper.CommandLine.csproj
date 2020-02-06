@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFrameworks>net471</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <StartupObject />
+    <Configurations>Debug;Release;DebugUnity;ReleaseUnity</Configurations>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj" />

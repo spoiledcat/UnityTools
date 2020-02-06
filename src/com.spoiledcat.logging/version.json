@@ -1,5 +1,13 @@
 {
   "$schema": "https://raw.githubusercontent.com/AArnott/Nerdbank.GitVersioning/master/src/NerdBank.GitVersioning/version.schema.json",
-  "pathFilters": ["./", ":/extras/com.spoiledcat.logging", "/icon.png","/common/publickey.snk"],
+  "pathFilters": [
+    "../Directory.Build.props",
+    "./",
+    ":/icon.png",
+    ":/common",
+    ":/extras/com.spoiledcat.logging",
+    "!Tests",
+    "!CHANGELOG.md"
+  ],
   "inherit": true
 }
