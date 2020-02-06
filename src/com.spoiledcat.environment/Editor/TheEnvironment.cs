@@ -76,6 +76,7 @@ namespace SpoiledCat.Unity
 #else
 			return System.Reflection.Assembly.GetExecutingAssembly().Location.ToSPath().Parent;
 #endif
+
 		}
 	}
 }

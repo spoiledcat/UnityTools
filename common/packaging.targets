@@ -66,7 +66,6 @@
     </FileUpdate>
 
     <FileUpdate
-      Condition="'$(FileWasStamped)' == 'true' "
       Files="$(PublishTo)$(PackageName)\package.json"
       Regex="(&quot;.*&quot;): &quot;0\.0\.0-placeholder&quot;"
       ReplacementText="$1: &quot;$(NpmVersion)&quot;"
