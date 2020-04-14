@@ -4,6 +4,10 @@
 
 ## [VERSION] - DATE
 
+- Merge back code from editor tasks
+
+## [1.2.20] - 2020-01-01
+
 - Bump .net reference assembly version.
 - Add helper for a completed ITask<T> instance
 
