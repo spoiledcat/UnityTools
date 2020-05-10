@@ -108,11 +108,14 @@ namespace SpoiledCat.Unity
 				case Folders.LocalApplicationData:
 				{
 					if (IsMac)
-						return SPath.HomeDirectory.Combine("Library", "Application Support");
+						return SPath.HomeDirectory.Combine("Library", "Preferences");
 				}
-					break;
+				break;
 				case Folders.CommonApplicationData:
 				{
+					if (IsMac)
+						return SPath.HomeDirectory.Combine("Library", "Application Support");
+
 					return Environment.GetFolderPath(
 						IsLinux
 							? Environment.SpecialFolder.ApplicationData
@@ -122,9 +125,9 @@ namespace SpoiledCat.Unity
 				case Folders.Logs:
 				{
 					if (IsMac)
-						return SPath.HomeDirectory.Combine("Library/Logs");
+						return SPath.HomeDirectory.Combine("Library", "Logs");
 				}
-					break;
+				break;
 			}
 			return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).ToSPath();
 		}
