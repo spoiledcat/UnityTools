@@ -1407,36 +1407,27 @@ namespace SpoiledCat.SimpleIO
 		public bool FileExists(string filename)
 		{
 			if (!Path.IsPathRooted(filename))
-				throw new ArgumentException("FileExists requires a rooted path", "filename");
+				throw new ArgumentException("FileExists requires a rooted path", nameof(filename));
 			return File.Exists(filename);
 		}
 
 		public IEnumerable<string> GetDirectories(string path)
 		{
 			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("GetDirectories requires a rooted path", "path");
+				throw new ArgumentException("GetDirectories requires a rooted path", nameof(path));
 			return Directory.GetDirectories(path);
 		}
 
-		public string Combine(string path1, string path2)
-		{
-			return Path.Combine(path1, path2);
-		}
-
-		public string Combine(string path1, string path2, string path3)
-		{
-			return Path.Combine(Path.Combine(path1, path2), path3);
-		}
-
-		public string GetFullPath(string path)
-		{
-			return Path.GetFullPath(path);
-		}
+		public string Combine(string path1, string path2) => Path.Combine(path1, path2);
+		public string Combine(string path1, string path2, string path3) => Path.Combine(Path.Combine(path1, path2), path3);
+		public string GetFullPath(string path) => Path.GetFullPath(path);
+		public string ChangeExtension(string path, string extension) => Path.ChangeExtension(path, extension);
+		public string GetFileNameWithoutExtension(string fileName) => Path.GetFileNameWithoutExtension(fileName);
 
 		public bool DirectoryExists(string path)
 		{
 			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("DirectoryExists requires a rooted path", "path");
+				throw new ArgumentException("DirectoryExists requires a rooted path", nameof(path));
 			return Directory.Exists(path);
 		}
 
@@ -1449,25 +1440,15 @@ namespace SpoiledCat.SimpleIO
 		public IEnumerable<string> GetDirectories(string path, string pattern)
 		{
 			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("GetDirectories requires a rooted path", "path");
+				throw new ArgumentException("GetDirectories requires a rooted path", nameof(path));
 			return Directory.GetDirectories(path, pattern);
 		}
 
 		public IEnumerable<string> GetDirectories(string path, string pattern, SearchOption searchOption)
 		{
 			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("GetDirectories requires a rooted path", "path");
+				throw new ArgumentException("GetDirectories requires a rooted path", nameof(path));
 			return Directory.GetDirectories(path, pattern, searchOption);
-		}
-
-		public string ChangeExtension(string path, string extension)
-		{
-			return Path.ChangeExtension(path, extension);
-		}
-
-		public string GetFileNameWithoutExtension(string fileName)
-		{
-			return Path.GetFileNameWithoutExtension(fileName);
 		}
 
 		public IEnumerable<string> GetFiles(string path)
@@ -1478,7 +1459,7 @@ namespace SpoiledCat.SimpleIO
 		public IEnumerable<string> GetFiles(string path, string pattern)
 		{
 			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("GetFiles requires a rooted path", "path");
+				throw new ArgumentException("GetFiles requires a rooted path", nameof(path));
 			return Directory.GetFiles(path, pattern);
 		}
 
@@ -1528,137 +1509,120 @@ namespace SpoiledCat.SimpleIO
 			}
 		}
 
+		internal static void ValidatePath(string value, string argName, [CallerMemberName] string caller = null)
+		{
+			if (!Path.IsPathRooted(value))
+				throw new ArgumentException($"{caller} requires a rooted path", argName);
+		}
+
 		public byte[] ReadAllBytes(string path)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("ReadAllBytes requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			return File.ReadAllBytes(path);
 		}
 
 		public void WriteAllBytes(string path, byte[] bytes)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("WriteAllBytes requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			File.WriteAllBytes(path, bytes);
 		}
 
 		public void DirectoryCreate(string path)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("DirectoryCreate requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			Directory.CreateDirectory(path);
 		}
 
 		public void FileCopy(string sourceFileName, string destFileName, bool overwrite)
 		{
-			if (!Path.IsPathRooted(sourceFileName))
-				throw new ArgumentException("FileCopy requires a rooted path", "sourceFileName");
-			if (!Path.IsPathRooted(destFileName))
-				throw new ArgumentException("FileCopy requires a rooted path", "destFileName");
+			ValidatePath(sourceFileName, nameof(sourceFileName));
+			ValidatePath(destFileName, nameof(destFileName));
 			File.Copy(sourceFileName, destFileName, overwrite);
 		}
 
 		public void FileDelete(string path)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("FileDelete requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			File.Delete(path);
 		}
 
 		public void DirectoryDelete(string path, bool recursive)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("DirectoryDelete requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			Directory.Delete(path, recursive);
 		}
 
 		public void FileMove(string sourceFileName, string destFileName)
 		{
-			if (!Path.IsPathRooted(sourceFileName))
-				throw new ArgumentException("FileMove requires a rooted path", "sourceFileName");
-			if (!Path.IsPathRooted(destFileName))
-				throw new ArgumentException("FileMove requires a rooted path", "destFileName");
+			ValidatePath(sourceFileName, nameof(sourceFileName));
+			ValidatePath(destFileName, nameof(destFileName));
 			File.Move(sourceFileName, destFileName);
 		}
 
 		public void DirectoryMove(string source, string dest)
 		{
-			if (!Path.IsPathRooted(source))
-				throw new ArgumentException("DirectoryMove requires a rooted path", "source");
-			if (!Path.IsPathRooted(dest))
-				throw new ArgumentException("DirectoryMove requires a rooted path", "dest");
+			ValidatePath(source, nameof(source));
+			ValidatePath(dest, nameof(dest));
 			Directory.Move(source, dest);
 		}
 
 		public void WriteAllText(string path, string contents)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("WriteAllText requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			File.WriteAllText(path, contents);
 		}
 
 		public void WriteAllText(string path, string contents, Encoding encoding)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("WriteAllText requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			File.WriteAllText(path, contents, encoding);
 		}
 
 		public string ReadAllText(string path)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("ReadAllText requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			return File.ReadAllText(path);
 		}
 
 		public string ReadAllText(string path, Encoding encoding)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("ReadAllText requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			return File.ReadAllText(path, encoding);
 		}
 
 		public void WriteAllLines(string path, string[] contents)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("WriteAllLines requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			File.WriteAllLines(path, contents);
 		}
 
 		public string[] ReadAllLines(string path)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("ReadAllLines requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			return File.ReadAllLines(path);
 		}
 
 		public void WriteLines(string path, string[] contents)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("WriteLines requires a rooted path", "path");
-			using (var fs = File.AppendText(path))
+			ValidatePath(path, nameof(path));
+			using (StreamWriter fs = File.AppendText(path))
 			{
 				foreach (var line in contents)
 					fs.WriteLine(line);
 			}
 		}
 
-		public string GetRandomFileName()
-		{
-			return Path.GetRandomFileName();
-		}
+		public string GetRandomFileName() => Path.GetRandomFileName();
 
 		public Stream OpenRead(string path)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("OpenRead requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			return File.OpenRead(path);
 		}
 
 		public Stream OpenWrite(string path, FileMode mode)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("OpenWrite requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			return new FileStream(path, mode);
 		}
 
@@ -1667,8 +1631,7 @@ namespace SpoiledCat.SimpleIO
 			get => currentDirectory ?? Directory.GetCurrentDirectory();
 			set
 			{
-				if (!Path.IsPathRooted(value))
-					throw new ArgumentException("SetCurrentDirectory requires a rooted path", "directory");
+				ValidatePath(value, nameof(value));
 				currentDirectory = value;
 			}
 		}
@@ -1772,8 +1735,286 @@ namespace SpoiledCat.SimpleIO
 			}
 		}
 
-		public char DirectorySeparatorChar {
-			get { return Path.DirectorySeparatorChar; }
+		public char DirectorySeparatorChar => Path.DirectorySeparatorChar;
+	}
+
+	public class MemoryFileSystem : IFileSystem
+	{
+		private readonly IFileSystem fileSystemImplementation;
+		private readonly Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
+		private readonly HashSet<string> directories = new HashSet<string>();
+
+		public MemoryFileSystem()
+		{
+			fileSystemImplementation = new FileSystem(UnityEngine.Application.dataPath);
+		}
+
+		private string Normalize(string path) => path.ToSPath().ToString(SlashMode.Forward);
+
+		public string ChangeExtension(string path, string extension) => fileSystemImplementation.ChangeExtension(path, extension);
+
+		public string Combine(string path1, string path2) => fileSystemImplementation.Combine(path1, path2);
+
+		public string Combine(string path1, string path2, string path3) => fileSystemImplementation.Combine(path1, path2, path3);
+
+		public void DirectoryCreate(string path)
+		{
+			FileSystem.ValidatePath(path, nameof(path));
+			path = Normalize(path);
+			AddDirectoriesFromPath(path);
+		}
+
+		public void DirectoryDelete(string path, bool recursive)
+		{
+			FileSystem.ValidatePath(path, nameof(path));
+			path = Normalize(path);
+			if (!recursive && directories.Contains(path))
+				directories.Remove(path);
+			else
+				directories.RemoveWhere(x => x.StartsWith(path));
+		}
+
+		public bool DirectoryExists(string path)
+		{
+			FileSystem.ValidatePath(path, nameof(path));
+			path = Normalize(path);
+			return directories.Contains(path);
+		}
+
+		public void DirectoryMove(string from, string to)
+		{
+			FileSystem.ValidatePath(from, nameof(from));
+			FileSystem.ValidatePath(to, nameof(to));
+			from = Normalize(from);
+			to = Normalize(to);
+			directories.Remove(from);
+			AddDirectoriesFromPath(to);
+		}
+
+		public bool ExistingPathIsDirectory(string path)
+		{
+			FileSystem.ValidatePath(path, nameof(path));
+			path = Normalize(path);
+			return directories.Contains(path);
+		}
+
+		public void FileCopy(string sourceFileName, string destFileName, bool overwrite)
+		{
+			FileSystem.ValidatePath(sourceFileName, nameof(sourceFileName));
+			FileSystem.ValidatePath(destFileName, nameof(destFileName));
+
+			sourceFileName = Normalize(sourceFileName);
+			destFileName = Normalize(destFileName);
+			if (!files.ContainsKey(sourceFileName))
+				throw new FileNotFoundException("Source file for copy not found", sourceFileName);
+
+			AddDirectoriesFromFilePath(destFileName);
+			files.Add(destFileName, files[sourceFileName]);
+			files.Remove(sourceFileName);
+		}
+
+		public void FileDelete(string path)
+		{
+			FileSystem.ValidatePath(path, nameof(path));
+			path = Normalize(path);
+			files.Remove(path);
+		}
+
+		public bool FileExists(string path)
+		{
+			FileSystem.ValidatePath(path, nameof(path));
+			path = Normalize(path);
+			return files.ContainsKey(path);
+		}
+
+		public void FileMove(string from, string to)
+		{
+			FileSystem.ValidatePath(from, nameof(from));
+			FileSystem.ValidatePath(to, nameof(to));
+			from = Normalize(from);
+			if (!files.ContainsKey(from))
+				throw new FileNotFoundException("Source file for move not found", from);
+			AddDirectoriesFromFilePath(to);
+			files.Add(to, files[from]);
+			files.Remove(from);
+		}
+
+		public IEnumerable<string> GetDirectories(string path)
+		{
+			throw new NotImplementedException();
+		}
+
+		public IEnumerable<string> GetDirectories(string path, string pattern)
+		{
+			throw new NotImplementedException();
+		}
+
+		public IEnumerable<string> GetDirectories(string path, string pattern, SearchOption searchOption)
+		{
+			throw new NotImplementedException();
+		}
+
+		public string GetFileNameWithoutExtension(string fileName) => fileSystemImplementation.GetFileNameWithoutExtension(fileName);
+
+		public IEnumerable<string> GetFiles(string path)
+		{
+			throw new NotImplementedException();
+		}
+
+		public IEnumerable<string> GetFiles(string path, string pattern)
+		{
+			throw new NotImplementedException();
+		}
+
+		public IEnumerable<string> GetFiles(string path, string pattern, SearchOption searchOption)
+		{
+			throw new NotImplementedException();
+		}
+
+		public string GetFullPath(string path) => fileSystemImplementation.GetFullPath(path);
+
+		public string GetRandomFileName()
+		{
+			throw new NotImplementedException();
+		}
+
+		public string GetFolderPath(Environment.SpecialFolder folder) => fileSystemImplementation.GetFolderPath(folder);
+
+		public Stream OpenRead(string path)
+		{
+			FileSystem.ValidatePath(path, nameof(path));
+			path = Normalize(path);
+			return new MemoryStream(files[path]);
+		}
+
+		public Stream OpenWrite(string path, FileMode mode)
+		{
+			FileSystem.ValidatePath(path, nameof(path));
+			path = Normalize(path);
+			return new MemoryStream(files[path]);
+		}
+
+		public byte[] ReadAllBytes(string path)
+		{
+			FileSystem.ValidatePath(path, nameof(path));
+			path = Normalize(path);
+			return files[path];
+		}
+
+		public string[] ReadAllLines(string path) => ReadAllText(path).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+
+		public string ReadAllText(string path) => ReadAllText(path, Encoding.UTF8);
+
+		public string ReadAllText(string path, Encoding encoding)
+		{
+			FileSystem.ValidatePath(path, nameof(path));
+			path = Normalize(path);
+			return encoding.GetString(files[path]);
+		}
+
+		public void WriteAllBytes(string path, byte[] bytes)
+		{
+			FileSystem.ValidatePath(path, nameof(path));
+			path = Normalize(path);
+			if (!files.ContainsKey(path))
+			{
+				AddDirectoriesFromFilePath(path);
+				files.Add(path, bytes);
+			}
+			else
+				files[path] = bytes;
+		}
+
+		public void WriteAllLines(string path, string[] contents) => WriteAllText(path, string.Join(Environment.NewLine, contents), Encoding.UTF8);
+
+		public void WriteAllText(string path, string contents) => WriteAllText(path, contents, Encoding.UTF8);
+
+		public void WriteAllText(string path, string contents, Encoding encoding) => WriteAllBytes(path, encoding.GetBytes(contents));
+
+		public void WriteLines(string path, string[] contents)
+		{
+			FileSystem.ValidatePath(path, nameof(path));
+			path = Normalize(path);
+			var bytes = Encoding.UTF8.GetBytes(string.Join(Environment.NewLine, contents));
+
+			if (!files.ContainsKey(path))
+			{
+				AddDirectoriesFromFilePath(path);
+				files.Add(path, bytes);
+			}
+			else
+			{
+				var existing = files[path];
+				var b = new byte[existing.Length + bytes.Length];
+				Array.Copy(existing, b, existing.Length);
+				Array.Copy(bytes, 0, b, existing.Length, bytes.Length);
+				files[path] = b;
+			}
+		}
+
+		private void AddDirectoriesFromPath(string path)
+		{
+			var p = path.ToSPath().Parent;
+			while (!p.IsEmpty)
+			{
+				var dir = p.ToString(SlashMode.Forward);
+				if (!directories.Contains(dir))
+					directories.Add(dir);
+				p = p.Parent;
+			}
+		}
+
+		private void AddDirectoriesFromFilePath(string path)
+		{
+			AddDirectoriesFromPath(path.ToSPath().Parent);
+		}
+
+		public string Resolve(string path) => path;
+
+		public char DirectorySeparatorChar => fileSystemImplementation.DirectorySeparatorChar;
+
+		public string TempPath => fileSystemImplementation.TempPath;
+
+		public string CurrentDirectory
+		{
+			get => fileSystemImplementation.CurrentDirectory;
+			set => fileSystemImplementation.CurrentDirectory = value;
+		}
+
+		public string HomeDirectory
+		{
+			get => fileSystemImplementation.HomeDirectory;
+			set => fileSystemImplementation.HomeDirectory = value;
+		}
+
+		public string LocalAppData
+		{
+			get => fileSystemImplementation.LocalAppData;
+			set => fileSystemImplementation.LocalAppData = value;
+		}
+
+		public string CommonAppData
+		{
+			get => fileSystemImplementation.CommonAppData;
+			set => fileSystemImplementation.CommonAppData = value;
+		}
+
+		public bool IsWindows
+		{
+			get => fileSystemImplementation.IsWindows;
+			set => fileSystemImplementation.IsWindows = value;
+		}
+
+		public bool IsLinux
+		{
+			get => fileSystemImplementation.IsLinux;
+			set => fileSystemImplementation.IsLinux = value;
+		}
+
+		public bool IsMac
+		{
+			get => fileSystemImplementation.IsMac;
+			set => fileSystemImplementation.IsMac = value;
 		}
 	}
 }
