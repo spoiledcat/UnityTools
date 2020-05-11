@@ -1146,7 +1146,11 @@ namespace SpoiledCat.SimpleIO
 			get {
 				if (fileSystem == null)
 #if UNITY_4 || UNITY_5 || UNITY_5_3_OR_NEWER
+#if UNITY_EDITOR
+					fileSystem = new FileSystem(Directory.GetCurrentDirectory());
+#else
 					fileSystem = new FileSystem(UnityEngine.Application.dataPath);
+#endif
 #else
 					fileSystem = new FileSystem(Directory.GetCurrentDirectory());
 #endif
