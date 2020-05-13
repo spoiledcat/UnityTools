@@ -1746,7 +1746,16 @@ namespace SpoiledCat.SimpleIO
 
 		public MemoryFileSystem()
 		{
-			fileSystemImplementation = new FileSystem(UnityEngine.Application.dataPath);
+#if UNITY_4 || UNITY_5 || UNITY_5_3_OR_NEWER
+#if UNITY_EDITOR
+					fileSystemImplementation = new FileSystem(Directory.GetCurrentDirectory());
+#else
+					fileSystemImplementation = new FileSystem(UnityEngine.Application.dataPath);
+#endif
+#else
+					fileSystemImplementation = new FileSystem(Directory.GetCurrentDirectory());
+#endif
+			
 		}
 
 		private string Normalize(string path) => path.ToSPath().ToString(SlashMode.Forward);

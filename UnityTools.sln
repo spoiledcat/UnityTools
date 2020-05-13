@@ -35,6 +35,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helper.WebServer", "tests\H
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBase", "tests\Helpers\TestBase\TestBase.csproj", "{D85495CD-E955-4E08-8D57-7381C6CA88EF}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.SimpleIO", "src\com.spoiledcat.simpleio\Runtime\SpoiledCat.SimpleIO.csproj", "{BA3EC028-1970-4F51-95B5-2C18C7706925}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,14 @@ Global
 		{BA3EC028-1970-4F51-95B5-2C18C7706924}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BA3EC028-1970-4F51-95B5-2C18C7706924}.ReleaseUnity|Any CPU.ActiveCfg = ReleaseUnity|Any CPU
 		{BA3EC028-1970-4F51-95B5-2C18C7706924}.ReleaseUnity|Any CPU.Build.0 = ReleaseUnity|Any CPU
+		{BA3EC028-1970-4F51-95B5-2C18C7706925}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA3EC028-1970-4F51-95B5-2C18C7706925}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA3EC028-1970-4F51-95B5-2C18C7706925}.DebugUnity|Any CPU.ActiveCfg = DebugUnity|Any CPU
+		{BA3EC028-1970-4F51-95B5-2C18C7706925}.DebugUnity|Any CPU.Build.0 = DebugUnity|Any CPU
+		{BA3EC028-1970-4F51-95B5-2C18C7706925}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA3EC028-1970-4F51-95B5-2C18C7706925}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA3EC028-1970-4F51-95B5-2C18C7706925}.ReleaseUnity|Any CPU.ActiveCfg = ReleaseUnity|Any CPU
+		{BA3EC028-1970-4F51-95B5-2C18C7706925}.ReleaseUnity|Any CPU.Build.0 = ReleaseUnity|Any CPU
 		{2A572465-DE6D-42FA-BC88-C846D6931B5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2A572465-DE6D-42FA-BC88-C846D6931B5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A572465-DE6D-42FA-BC88-C846D6931B5F}.DebugUnity|Any CPU.ActiveCfg = DebugUnity|Any CPU
