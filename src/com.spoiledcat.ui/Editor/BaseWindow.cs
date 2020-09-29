@@ -4,217 +4,229 @@
 // For a copy, see <https://opensource.org/licenses/MIT>.
 
 using System;
-using System.Globalization;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 namespace SpoiledCat.UI
 {
-	using Extensions;
-	using Threading;
+    using System.Linq;
+    using Threading;
 
-	class ApplicationState : ScriptableSingleton<ApplicationState>
-	{
-		[NonSerialized] public DateTimeOffset? firstRunAtValue;
-		[NonSerialized] private bool? firstRunValue;
+    public abstract class BaseWindow : EditorWindow, IView
+    {
+        [NonSerialized] private bool firstRepaint = true;
+        [NonSerialized] private bool initializeCalled;
+        [NonSerialized] private bool awakeCalled;
 
-		[NonSerialized] private bool initialized = false;
-		[SerializeField] private bool firstRun = true;
-		[SerializeField] public string firstRunAtString;
+        private List<BaseView> views;
+        public IEnumerable<IView> Views => views == null ? views = new List<BaseView>() : views;
 
-		private void EnsureFirstRun()
-		{
-			if (!firstRunValue.HasValue)
-			{
-				firstRunValue = firstRun;
-			}
-		}
+        protected BaseWindow()
+        {
+        }
 
-		public static ApplicationState Instance => instance;
+        public static T GetWindowDontShow<T>() where T : EditorWindow
+        {
+            UnityEngine.Object[] windows = Resources.FindObjectsOfTypeAll(typeof(T));
+            return (windows.Length > 0) ? (T)windows[0] : CreateInstance<T>();
+        }
 
-		public bool FirstRun {
-			get {
-				EnsureFirstRun();
-				return firstRunValue.Value;
-			}
-		}
+        public virtual void Initialize(bool firstRun)
+        {
+            foreach (var view in Views)
+                view.Initialize(firstRun);
+        }
 
-		public DateTimeOffset FirstRunAt {
-			get {
-				EnsureFirstRun();
+        public virtual void Redraw()
+        {
+            Repaint();
+        }
 
-				if (!firstRunAtValue.HasValue)
-				{
-					DateTimeOffset dt;
-					if (!DateTimeOffset.TryParseExact(firstRunAtString.ToEmptyIfNull(), Constants.Iso8601Formats,
-							CultureInfo.InvariantCulture, DateTimeStyles.None, out dt))
-					{
-						dt = DateTimeOffset.Now;
-					}
-					FirstRunAt = dt;
-				}
+        public virtual void Refresh()
+        {
+            NeedsRefresh = true;
+        }
 
-				return firstRunAtValue.Value;
-			}
-			private set {
-				firstRunAtString = value.ToString(Constants.Iso8601Format);
-				firstRunAtValue = value;
-				Save(true);
-			}
-		}
+        public virtual void Finish(bool result)
+        {
+            foreach (var view in Views)
+                view.Finish(result);
+        }
 
-		public bool Initialized {
-			get { return initialized; }
-			set {
-				initialized = value;
-				if (initialized && firstRun)
-				{
-					firstRun = false;
-					FirstRunAt = DateTimeOffset.Now;
-				}
-				Save(true);
-			}
-		}
-	}
+        public virtual void Awake()
+        {
+            awakeCalled = true;
+            InitializeWindow(false);
+        }
 
-	public abstract class BaseWindow : EditorWindow
-	{
-		[NonSerialized] private bool firstRepaint = true;
+        public virtual void OnEnable()
+        {
+            InitializeWindow(false);
+        }
 
-		protected BaseWindow()
-		{
-		}
+        public virtual void OnDisable()
+        {
+            foreach (var view in Views.Where(x => x.IsActive))
+                view.OnDisable();
+        }
 
-		public static T GetWindowDontShow<T>() where T : EditorWindow
-		{
-			UnityEngine.Object[] windows = Resources.FindObjectsOfTypeAll(typeof(T));
-			return (windows.Length > 0) ? (T)windows[0] : ScriptableObject.CreateInstance<T>();
-		}
+        public virtual void Update()
+        {
+            foreach (var view in Views.Where(x => x.IsActive))
+                view.Update();
+        }
 
-		public virtual void Initialize(bool firstRun)
-		{
-		}
+        public virtual void OnFirstRepaint()
+        {
+        }
 
-		public virtual void Redraw()
-		{
-			Repaint();
-		}
+        private void InternalOnFirstRepaint()
+        {
+            OnFirstRepaint();
+            foreach (var view in Views.Where(x => x.IsActive))
+                view.OnFirstRepaint();
+        }
 
-		public virtual void Refresh()
-		{
-			NeedsRefresh = true;
-		}
+        public virtual void OnDataUpdate()
+        {
+        }
 
-		public virtual void Finish(bool result)
-		{
-		}
+        private void InternalOnDataUpdate()
+        {
+            OnDataUpdate();
+            foreach (var view in Views.Where(x => x.IsActive))
+                view.OnDataUpdate();
+        }
 
-		public virtual void Awake()
-		{
-			InitializeWindow(false);
-		}
+        // OnGUI calls this everytime, so override it to render as you would OnGUI
+        public virtual void OnUI()
+        {
+            foreach (var view in Views.Where(x => x.IsActive))
+                view.OnUI();
+        }
 
-		public virtual void OnEnable()
-		{
-			InitializeWindow(false);
-		}
+        public virtual void OnFocusChanged()
+        {
+            foreach (var view in Views.Where(x => x.IsActive))
+                view.OnFocusChanged();
+        }
 
-		public virtual void OnDisable()
-		{
-		}
+        public virtual void OnDestroy()
+        {
+            foreach (var view in Views)
+                view.OnDestroy();
+        }
 
-		public virtual void Update()
-		{
-		}
+        public virtual void OnSelectionChange()
+        {
+            foreach (var view in Views.Where(x => x.IsActive))
+                view.OnSelectionChange();
+        }
 
-		public virtual void OnFirstRepaint()
-		{
+        public void AddView(IView view)
+        {
+            ((List<BaseView>)Views).Add((BaseView)view);
+            if (initializeCalled)
+                view.Initialize(ApplicationState.Instance.FirstRun);
+            if (awakeCalled)
+                view.Awake();
+        }
 
-		}
+        public void RemoveView(IView view)
+        {
+            ((List<BaseView>)Views).Remove((BaseView)view);
+        }
 
-		public virtual void OnDataUpdate()
-		{
-		}
+        public void ActivateView(IView view)
+        {
+            view.IsActive = true;
+            view.OnEnable();
+        }
 
-		// OnGUI calls this everytime, so override it to render as you would OnGUI
-		public virtual void OnUI() { }
+        public void DeactivateView(IView view)
+        {
+            view.OnDisable();
+            view.IsActive = false;
+        }
 
-		public virtual void OnFocusChanged()
-		{
-		}
+        private void InitializeWindow(bool requiresRedraw = true)
+        {
+            initializeCalled = true;
+            if (!ApplicationState.Instance.Initialized)
+            {
+                ApplicationState.Instance.Initialized = true;
+                InternalInitialize();
+                if (requiresRedraw)
+                    Redraw();
+            }
+        }
 
-		public virtual void OnDestroy()
-		{
-		}
+        private void InternalInitialize()
+        {
+            Initialize(ApplicationState.Instance.FirstRun);
+            if (TaskManager == null)
+            {
+                TaskManager = new TaskManager();
+                TaskManager.Initialize();
+            }
+        }
 
-		public virtual void OnSelectionChange()
-		{
-		}
+        // This is Unity's magic method
+        private void OnGUI()
+        {
+            if (Event.current.type == EventType.Layout)
+            {
+                InLayout = true;
+                InternalOnDataUpdate();
+                NeedsRefresh = false;
+                if (firstRepaint)
+                {
+                    InternalOnFirstRepaint();
+                    firstRepaint = false;
+                }
+            }
 
-		void InitializeWindow(bool requiresRedraw = true)
-		{
-			if (!ApplicationState.Instance.Initialized)
-			{
-				ApplicationState.Instance.Initialized = true;
-				InternalInitialize();
-				if (requiresRedraw)
-					Redraw();
-			}
-		}
+            OnUI();
 
-		private void InternalInitialize()
-		{
-			Initialize(ApplicationState.Instance.FirstRun);
-			if (TaskManager == null)
-			{
-				TaskManager = new TaskManager();
-				TaskManager.Initialize();
-			}
-		}
+            if (Event.current.type == EventType.Layout)
+            {
+                InLayout = false;
+            }
+        }
 
-		// This is Unity's magic method
-		private void OnGUI()
-		{
-			if (Event.current.type == EventType.Layout)
-			{
-				InLayout = true;
-				OnDataUpdate();
-				NeedsRefresh = false;
-				if (firstRepaint)
-				{
-					OnFirstRepaint();
-					firstRepaint = false;
-				}
-			}
+        public virtual void OnFocus()
+        {
+            HasFocus = true;
+            OnFocusChanged();
+        }
 
-			OnUI();
+        public virtual void OnLostFocus()
+        {
+            HasFocus = false;
+            OnFocusChanged();
+        }
 
-			if (Event.current.type == EventType.Layout)
-			{
-				InLayout = false;
-			}
-		}
+        protected void SetPosition(Rect? pos) => _position = pos;
 
-		private void OnFocus()
-		{
-			HasFocus = true;
-			OnFocusChanged();
-		}
+        private Rect? _position;
+        public Rect Position => _position.HasValue ? _position.Value : position;
 
-		private void OnLostFocus()
-		{
-			HasFocus = false;
-			OnFocusChanged();
-		}
+        public bool IsBusy { get; set; }
+        public bool HasFocus { get; private set; }
+        protected bool InLayout { get; private set; }
+     
+        protected bool InRepaint => Event.current.type == EventType.Repaint;
 
-		public Rect Position => position;
-		public bool IsBusy { get; set; }
-		public bool HasFocus { get; private set; }
-		protected bool InLayout { get; private set; }
-		protected bool InRepaint => Event.current.type == EventType.Repaint;
+        public bool NeedsRefresh { get; set; }
 
-		public bool NeedsRefresh { get; set; }
+        public ITaskManager TaskManager { get; set; }
 
-		public ITaskManager TaskManager { get; set; }
-	}
+        public bool IsActive
+        {
+            get => true;
+            set
+            { }
+        }
+    }
 }

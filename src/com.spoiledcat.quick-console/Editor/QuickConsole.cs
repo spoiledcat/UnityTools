@@ -63,43 +63,43 @@ namespace SpoiledCat
 		[SerializeField] private Vector2 outputScrollPos;
 		[SerializeField] private Vector2 sourceScrollPos;
 
-		[MenuItem("Debug/Stuff")]
-		public static void Stuff()
-		{
-			//GameObject.Find("GameObject").transform.Cast<Transform>().ForEach(x => Debug.Log(x.gameObject));
-			//PrefabUtilityShim.CreateVariant(GameObject.Find("GameObject").transform.Cast<Transform>().First().gameObject, "stuff").GetComponent<MeshFilter>().sharedMesh
-			var list = new Dictionary<string, Vector2Int> {
-				{ "variant_Curve_002", new Vector2Int(0, 0) },
-				{ "variant_Curve_003", new Vector2Int(0, 0) },
-				{ "variant_Curve_004", new Vector2Int(0, 0) },
-				{ "variant_Curve_005", new Vector2Int(0, 0) },
-				{ "variant_Curve_006", new Vector2Int(0, 0) },
-				{ "variant_Curve_007", new Vector2Int(0, 0) },
-				{ "variant_Curve_008", new Vector2Int(0, 0) },
-				{ "variant_Curve_009", new Vector2Int(0, 0) },
-				{ "variant_Curve_010", new Vector2Int(0, 0) },
-				{ "variant_Curve_011", new Vector2Int(0, 0) },
-				{ "variant_Curve_012", new Vector2Int(0, 0) },
-				{ "variant_Curve_013", new Vector2Int(0, 0) },
-				{ "variant_Curve_014", new Vector2Int(0, 0) },
-				{ "variant_Curve_015", new Vector2Int(0, 0) },
-				{ "variant_Curve_016", new Vector2Int(0, 0) },
-				{ "variant_Curve_017", new Vector2Int(0, 0) },
-				{ "variant_Curve_018", new Vector2Int(0, 0) },
-				{ "variant_Curve_029", new Vector2Int(0, 0) },
-				{ "variant_Curve_020", new Vector2Int(0, 0) },
-				{ "variant_Curve_021", new Vector2Int(0, 0) },
-				{ "variant_Curve_022", new Vector2Int(0, 0) },
-				{ "variant_Curve_023", new Vector2Int(0, 0) },
-				{ "variant_Curve_024", new Vector2Int(0, 0) },
-				{ "variant_Curve_025", new Vector2Int(0, 0) },
-				{ "variant_Curve_026", new Vector2Int(0, 0) },
-			};
-			GameObject.Find("GameObject").transform.Cast<Transform>().ForEach(x => {
+		//[MenuItem("Debug/Stuff")]
+		//public static void Stuff()
+		//{
+		//	//GameObject.Find("GameObject").transform.Cast<Transform>().ForEach(x => Debug.Log(x.gameObject));
+		//	//PrefabUtilityShim.CreateVariant(GameObject.Find("GameObject").transform.Cast<Transform>().First().gameObject, "stuff").GetComponent<MeshFilter>().sharedMesh
+		//	var list = new Dictionary<string, Vector2Int> {
+		//		{ "variant_Curve_002", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_003", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_004", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_005", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_006", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_007", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_008", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_009", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_010", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_011", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_012", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_013", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_014", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_015", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_016", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_017", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_018", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_029", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_020", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_021", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_022", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_023", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_024", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_025", new Vector2Int(0, 0) },
+		//		{ "variant_Curve_026", new Vector2Int(0, 0) },
+		//	};
+		//	GameObject.Find("GameObject").transform.Cast<Transform>().ForEach(x => {
 
-			});
+		//	});
 
-		}
+		//}
 
 		[MenuItem("Window/Quick Console")]
 		public static void Menu_Show()
@@ -107,13 +107,15 @@ namespace SpoiledCat
 			GetWindow<QuickConsole>().Show();
 		}
 
-		public override void Initialize(bool firstRun)
-		{
+		public override void OnEnable()
+        {
+            title = "Quick Console";
 			EndEditingActiveTextField = () => EndEditingActiveTextField_method.Invoke(null, null);
 			compiler = new Compiler();
 			scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 			if (context == null) context = new List<UnityReference>();
-		}
+            if (selectedSource == null)  selectedSource = "";
+        }
 
 		public override void OnUI()
 		{
@@ -363,14 +365,22 @@ namespace SpoiledCat
 			"SpoiledCat.SimpleIO",
 		};
 
+        private readonly List<string> namespaceExcludes = new List<string>
+        {
+            "System", "Microsoft", "Internal", "Unity", "XamMac", "Mono", "Jetbrains", "SyntaxTree", "AOT", "MS", "TreeEditor", "ObjC", "VSCodeEditor", "Rider",
+			"Packages.Rider", "ICSharpCode", "NUnit", "TestRunner", "SpoiledCat.Utilities.ICSharpCode"
+		};
+
 		private Dictionary<string, (string className, string methodName, string source, Assembly assembly)>
 			compiledAssemblies =
 				new Dictionary<string, (string className, string methodName, string source, Assembly assembly)>();
 		private CompilerParameters compilerParameters;
 
 		public Compiler()
-		{
-			assemblies.AddRange(AppDomain.CurrentDomain.GetAssemblies()
+        {
+            var asms = AppDomain.CurrentDomain.GetAssemblies().ToArray();
+
+			assemblies.AddRange(asms
 				.Select(x => x.TryGetLocation())
 				.Where(x => x != null));
 
@@ -378,7 +388,14 @@ namespace SpoiledCat
 				GenerateExecutable = false,
 				GenerateInMemory = true
 			};
-		}
+
+			IEnumerable<string> a = asms.Where(x => x.TryGetLocation() != null)
+                    .SelectMany(x => x.GetTypes())
+                    .Select(x => x.Namespace)
+                    .Where(x => x != null && !namespaceExcludes.Any(z => x.StartsWith(z, StringComparison.OrdinalIgnoreCase)))
+					.Distinct();
+            usings.AddRange(a);
+        }
 
 		public (bool success, string result, Exception exception) CompileCSharp(List<UnityReference> context,
 			string csharp)
