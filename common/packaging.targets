@@ -44,7 +44,9 @@
     <Copy
       SourceFiles="@(SourcesToCopy)"
       DestinationFiles="@(SourcesToCopy->'$(PublishTo)$(PackageName)\%(RecursiveDir)%(Filename)%(Extension)')"
-      SkipUnchangedFiles="true" />
+      SkipUnchangedFiles="true"
+      RetryDelayMilliseconds="10"
+      Retries="1" />
 
   </Target>
 
@@ -133,14 +135,18 @@
     <Copy
       SourceFiles="@(TestsToCopy)"
       DestinationFiles="@(TestsToCopy->'$(PublishTo)$(PackageTestName)\%(RecursiveDir)%(Filename)%(Extension)')"
-      SkipUnchangedFiles="true">
+      SkipUnchangedFiles="true"
+      RetryDelayMilliseconds="10"
+      Retries="1">
       <Output TaskParameter="CopiedFiles" ItemName="FilesCopied" />
     </Copy>
 
     <Copy
       SourceFiles="@(VersionFiles)"
       DestinationFiles="@(VersionFiles->'$(PublishTo)$(PackageTestName)$(PackageSubFolder)Version%(Extension)')"
-      SkipUnchangedFiles="true" />
+      SkipUnchangedFiles="true"
+      RetryDelayMilliseconds="10"
+      Retries="1" />
 
   </Target>
 
