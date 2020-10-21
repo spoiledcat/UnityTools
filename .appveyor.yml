@@ -33,6 +33,7 @@ after_test:
 - ps: |
     dotnet pack --no-build --no-restore -c $env:CONFIGURATION
     scripts\Pack-Packages.ps1
+    scripts\Publish-Branches.ps1
 
 artifacts:
 - path: build\**\*.nupkg
