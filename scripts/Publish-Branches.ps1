@@ -40,7 +40,7 @@ try {
             Invoke-Command -Quiet { & git init . }
             Invoke-Command -Quiet { & git remote add origin git@github.com:spoiledcat/UnityTools }
             Invoke-Command -Quiet { & git fetch origin }
-            Invoke-Command -Quiet { & git co -fb $branch }
+            Invoke-Command -Quiet { & git checkout -fb $branch }
             Invoke-Command -Quiet { & git add . }
             Invoke-Command -Quiet { & git commit -m "$msg" }
             Invoke-Command -Quiet { & git rebase -srecursive -Xours origin/$branch }
