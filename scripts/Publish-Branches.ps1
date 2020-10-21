@@ -43,7 +43,7 @@ try {
             Invoke-Command -Quiet { & git checkout -fb $branch }
             Invoke-Command -Quiet { & git add . }
             Invoke-Command -Quiet { & git commit -m "$msg" }
-            Invoke-Command -Quiet { & git rebase -srecursive -Xours --empty=drop origin/$branch}
+            Invoke-Command -Quiet { & git rebase -srecursive -Xours --no-keep-empty origin/$branch}
             Invoke-Command -Quiet { & git push origin ${branch}:${branch} }
         } finally {
             Pop-Location

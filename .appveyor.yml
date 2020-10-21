@@ -23,8 +23,6 @@ install:
 - ps: scripts\Get-Deps.ps1
 
 before_build:
-- git version
-- ps: exit 1
 # - dotnet --info
 - appveyor-retry dotnet restore -v Minimal
 
