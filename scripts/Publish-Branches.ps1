@@ -57,7 +57,7 @@ try {
             Copy-Item "$srcDir\*" $gitDir -Force
             Invoke-Command -Quiet { & git add . }
             Invoke-Command -Quiet { & git commit -m "$msg" }
-            Invoke-Command -Quiet { & git push origin ${branch}:${branch} }
+            Invoke-Command -Quiet { & git push origin HEAD:${branch} }
             Pop-Location
         } finally {
             Pop-Location
