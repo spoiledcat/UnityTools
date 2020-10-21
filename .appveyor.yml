@@ -25,6 +25,11 @@ before_build:
 - appveyor-retry dotnet restore -v Minimal
 
 build_script:
+- ps: |
+    if ($env:APPVEYOR_KEY) {
+      Write-Output "CAN PUSH"
+    }
+    exit -1
 - dotnet build --no-restore -c %CONFIGURATION%
 
 test:
