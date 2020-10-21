@@ -1,0 +1,24 @@
+{
+    "name": "com.spoiledcat.environment",
+    "displayName": "SpoiledCat Unity Environment",
+    "description": "An environment class encapsulating Unity information",
+    "version": "2.0.11-preview-g9bc4f2be86",
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
+    },
+    "repository" : {
+      "type" : "git",
+      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+      "directory": "src/com.spoiledcat.environment"
+    },
+    "publishConfig": {
+        "registry":"https://registry.spoiledcat.com/"
+    },
+    "dependencies": {
+        "com.spoiledcat.logging": "2.0.11-preview-g9bc4f2be86",
+        "com.spoiledcat.simpleio": "2.0.11-preview-g9bc4f2be86",
+        "com.spoiledcat.simplejson": "2.0.11-preview-g9bc4f2be86"
+    }
+}
