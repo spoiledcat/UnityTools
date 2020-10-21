@@ -21,16 +21,12 @@ if (!$version -or $version -eq "") {
 }
 
 $packagesDir = Join-Path $rootDirectory 'build\packages'
-$gitDir = Join-Path $rootDirectory 'build\git'
+$gitDir = Split-Path $rootDirectory
+$gitDir = Join-Path $gitDir 'branches'
+
 New-Item -itemtype Directory -Path $gitDir -Force -ErrorAction SilentlyContinue
 
-Push-Location $gitDir
-
-Invoke-Command -Quiet { & git init . }
-Invoke-Command -Quiet { & git remote add origin git@github.com:spoiledcat/UnityTools }
-Invoke-Command -Quiet { & git fetch origin }
-
-Pop-Location
+Invoke-Command -Quiet { & git clone -q --branch=empty git@github.com:spoiledcat/UnityTools $gitDir }
 
 Push-Location $packagesDir
 
@@ -51,10 +47,11 @@ try {
             $srcDir = Join-Path $packagesDir $_.Name
           
             Push-Location $gitDir
+
             Invoke-Command -Quiet { & git reset --hard 40c898effcd16bc648ddd57 }
-            Invoke-Command -Quiet { & git clean -xdf }
             Invoke-Command -Quiet { & git reset --hard origin/$branch }
-            Copy-Item "$srcDir\*" $gitDir -Force
+            Remove-Item "$gitDir\*" -Exclude ".git\" -Recurse
+            Copy-Item "$srcDir\*" $gitDir -Force -Recurse
             Invoke-Command -Quiet { & git add . }
             Invoke-Command -Quiet { & git commit -m "$msg" }
             Invoke-Command -Quiet { & git push origin HEAD:${branch} }
