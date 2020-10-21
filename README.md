@@ -1,16 +1,19 @@
 # Collection of Unity utilities
 
+[![Build status](https://ci.appveyor.com/api/projects/status/fg8obuf106x0ixu8?svg=true)](https://ci.appveyor.com/project/shana/unitytools)
+
+
 ## Environment
 
-[](tree/master/src/com.spoiledcat.environment)
+[src/com.spoiledcat.environment](tree/master/src/com.spoiledcat.environment)
 
 ## Logging
 
-[](tree/master/src/com.spoiledcat.logging)
+[src/com.spoiledcat.logging](tree/master/src/com.spoiledcat.logging)
 
 ## Quick Console
 
-[](tree/master/src/com.spoiledcat.quick-console/README.md)
+[src/com.spoiledcat.quick-console](tree/master/src/com.spoiledcat.quick-console/README.md)
 
 Need to run some code in Unity but can't because changing any editor or game code will cause everything to be recompiled? Want to check the state of an object but the only way to access it is via code, and you're tired of adding menu entries to run random code?
 
@@ -18,19 +21,19 @@ Quick console is a Unity window similar to Visual Studio's Immediate window, whe
 
 ## SharpZipLib
 
-[](tree/master/src/com.spoiledcat.sharpziplib)
+[src/com.spoiledcat.sharpziplib](tree/master/src/com.spoiledcat.sharpziplib)
 
 ICSharpCode.SharpZipLib source package, compatible with Unity 5.6 and above, with a different top level C# namespace (to avoid name conflicts), and including the Tar and Zip implementations that are missing from the binary versions included in some recent Unity versions.
 
 ## Simple IO
 
-[](tree/master/src/com.spoiledcat.simpleio/README.md)
+[src/com.spoiledcat.simpleio](tree/master/src/com.spoiledcat.simpleio/README.md)
 
 Fork of [NiceIO](https://github.com/lucasmeijer/niceio), a nice uncomplicated Unity-friend IO API.
 
 ## Simple Json
 
-[](tree/master/src/com.spoiledcat.simplejson/README.md)
+[src/com.spoiledcat.simplejson](tree/master/src/com.spoiledcat.simplejson/README.md)
 
 Fork of SimpleJson.
 
@@ -42,13 +45,13 @@ This fork adds support for:
 
 ## Threading
 
-[](tree/master/src/com.spoiledcat.threading/README.md)
+[src/com.spoiledcat.threading](tree/master/src/com.spoiledcat.threading/README.md)
 
 SpoiledCat.Threading is a TPL-based threading library that simplifies running asynchronous code with explicit thread and scheduler settings.
 
 ## UI
 
-[](tree/master/src/com.spoiledcat.ui/README.md)
+[src/com.spoiledcat.ui](tree/master/src/com.spoiledcat.ui/README.md)
 
 Base Editor window class and interfaces to make it easier to implement editor windows. The `BaseWindow` class provides virtual methods that split up layout and repaint phases into different calls:
 
@@ -58,6 +61,6 @@ Base Editor window class and interfaces to make it easier to implement editor wi
 
 ## Utilities
 
-[](tree/master/src/com.spoiledcat.utilities/README.md)
+[src/com.spoiledcat.utilities](tree/master/src/com.spoiledcat.utilities/README.md)
 
 Miscellaneous utilities, string and stream extensions, argument validation helpers, and a `TheVersion` class that can parse and compare version strings. `TheVersion.Parse("2.1.32.5")`
