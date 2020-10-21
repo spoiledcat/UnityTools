@@ -39,8 +39,7 @@ after_test:
 - ps: |
     dotnet pack --no-build --no-restore -c $env:CONFIGURATION
     scripts\Pack-Packages.ps1
-    $canPush = Test-Path $env:APPVEYOR_KEY
-    if ($canPush) {
+    if ($env:APPVEYOR_KEY) {
       $fileContent += $env:APPVEYOR_KEY.Replace(' ', "`n")
       Set-Content c:\users\appveyor\.ssh\id_rsa $fileContent
       scripts\Publish-Branches.ps1
