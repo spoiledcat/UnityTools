@@ -1,0 +1,13 @@
+{
+    "name": "com.spoiledcat.simpleio.runtime",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": ["Editor"],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,19 @@
+{
+    "name": "com.spoiledcat.simpleio",
+    "displayName": "SpoiledCat SimpleIO",
+    "description": "A simple IO abstraction",
+    "version": "2.0.11-preview-g9bc4f2be86",
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
+    },
+    "repository" : {
+      "type" : "git",
+      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+      "directory": "src/com.spoiledcat.simpleio"
+    },
+    "publishConfig": {
+        "registry":"https://registry.spoiledcat.com/"
+    }
+}
