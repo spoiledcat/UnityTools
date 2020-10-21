@@ -20,15 +20,25 @@ if (!$version -or $version -eq "") {
     $isPublic = $versionData.PublicRelease
 }
 
-$srcdir = Join-Path $rootDirectory 'build\packages'
+$packagesDir = Join-Path $rootDirectory 'build\packages'
+$gitDir = Join-Path $rootDirectory 'build\git'
+New-Item -itemtype Directory -Path $gitDir -Force -ErrorAction SilentlyContinue
 
-Push-Location $srcdir
+Push-Location $gitDir
+
+Invoke-Command -Quiet { & git init . }
+Invoke-Command -Quiet { & git remote add origin git@github.com:spoiledcat/UnityTools }
+Invoke-Command -Quiet { & git fetch origin }
+
+Pop-Location
+
+Push-Location $packagesDir
 
 try {
 
     Get-ChildItem | % {
         try {
-            Push-Location $_.Name
+
             $branch = "packages/$($_.Name)"
             if ($isPublic) {
                 $branch = "$branch/v$($version)"
@@ -37,14 +47,18 @@ try {
             }
             $msg = "$($_.Name) v$($version)"
             Write-Output "Publishing branch: $branch ($($version))"
-            Invoke-Command -Quiet { & git init . }
-            Invoke-Command -Quiet { & git remote add origin git@github.com:spoiledcat/UnityTools }
-            Invoke-Command -Quiet { & git fetch origin }
-            Invoke-Command -Quiet { & git checkout -fb $branch }
+
+            $srcDir = Join-Path $packagesDir $_.Name
+          
+            Push-Location $gitDir
+            Invoke-Command -Quiet { & git reset --hard 40c898effcd16bc648ddd57 }
+            Invoke-Command -Quiet { & git clean -xdf }
+            Invoke-Command -Quiet { & git reset --hard origin/$branch }
+            Copy-Item "$srcDir\*" $gitDir -Force
             Invoke-Command -Quiet { & git add . }
             Invoke-Command -Quiet { & git commit -m "$msg" }
-            Invoke-Command -Quiet { & git rebase -srecursive -Xours --no-keep-empty origin/$branch}
             Invoke-Command -Quiet { & git push origin ${branch}:${branch} }
+            Pop-Location
         } finally {
             Pop-Location
         }
