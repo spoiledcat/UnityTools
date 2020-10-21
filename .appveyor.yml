@@ -28,10 +28,6 @@ before_build:
 
 build_script:
 - dotnet build --no-restore -c %CONFIGURATION%
-- ps: |
-    Write-Output $env:GitAssemblyInformationalVersion
-    Write-Output $env:NBGV_PublicRelease
-    exit 1
 
 test:
   assemblies:
