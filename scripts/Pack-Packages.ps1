@@ -24,7 +24,7 @@ try {
         try {
             Push-Location $_.Name
             Write-Output "Packing $($_.Name)"
-            Invoke-Command -Fatal { & npm pack }
+            Invoke-Command -Fatal -Quiet { & npm pack }
             Move-Item *.tgz $destdir
         } finally {
             Pop-Location
