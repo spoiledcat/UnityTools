@@ -1,6 +1,6 @@
 ![](https://github.com/unity-technologies/com.spoiledcat.threading/workflows/Build,%20Test,%20Pack/badge.svg)
 
-# About the Tasks package
+# About the Threading package
 
 SpoiledCat.Threading is a TPL-based threading library that simplifies running asynchronous code with explicit thread and scheduler settings.
 

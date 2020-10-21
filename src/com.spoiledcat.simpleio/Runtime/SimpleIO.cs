@@ -582,7 +582,6 @@ namespace SpoiledCat.SimpleIO
 		public SPath CreateFile()
 		{
 			ThrowIfNotInitialized();
-			ThrowIfRelative();
 			ThrowIfRoot();
 			EnsureParentDirectoryExists();
 			FileSystem.WriteAllBytes(MakeAbsolute(), new byte[0]);
@@ -597,16 +596,12 @@ namespace SpoiledCat.SimpleIO
 		public SPath CreateFile(SPath file)
 		{
 			ThrowIfNotInitialized();
-			if (!file.IsRelative)
-				throw new ArgumentException(
-					"You cannot call CreateFile() on an existing path with a non relative argument");
 			return Combine(file).CreateFile();
 		}
 
 		public SPath CreateDirectory()
 		{
 			ThrowIfNotInitialized();
-			ThrowIfRelative();
 
 			if (IsRoot)
 				throw new NotSupportedException(
@@ -701,7 +696,6 @@ namespace SpoiledCat.SimpleIO
 		public void Delete(DeleteMode deleteMode = DeleteMode.Normal)
 		{
 			ThrowIfNotInitialized();
-			ThrowIfRelative();
 
 			if (IsRoot)
 				throw new NotSupportedException(
@@ -733,7 +727,6 @@ namespace SpoiledCat.SimpleIO
 		public void DeleteIfExists(DeleteMode deleteMode = DeleteMode.Normal)
 		{
 			ThrowIfNotInitialized();
-			ThrowIfRelative();
 
 			if (FileExists() || DirectoryExists())
 				Delete(deleteMode);
@@ -742,7 +735,6 @@ namespace SpoiledCat.SimpleIO
 		public SPath DeleteContents()
 		{
 			ThrowIfNotInitialized();
-			ThrowIfRelative();
 
 			if (IsRoot)
 				throw new NotSupportedException(

@@ -81,7 +81,8 @@ namespace SpoiledCat.Utilities
 				return this;
 			}
 
-			major = int.Parse(match.Groups["major"].Value);
+			var majorMatch = match.Groups["major"];
+			major = int.Parse(majorMatch.Value);
 			intParts[parts] = major;
 			stringParts[parts] = major.ToString();
 			parts = 1;
@@ -94,7 +95,8 @@ namespace SpoiledCat.Utilities
 			{
 				if (!int.TryParse(minorMatch.Value, out minor))
 				{
-					special = minorMatch.Value.TrimEnd();
+					if (minorMatch.Index >= 0)
+						special = Version.Substring(minorMatch.Index).TrimEnd();
 					stringParts[parts] = special ?? "0";
 				}
 				else
@@ -107,7 +109,8 @@ namespace SpoiledCat.Utilities
 					{
 						if (!int.TryParse(patchMatch.Value, out patch))
 						{
-							special = patchMatch.Value.TrimEnd();
+							if (patchMatch.Index >= 0)
+								special = Version.Substring(patchMatch.Index).TrimEnd();
 							stringParts[parts] = special ?? "0";
 						}
 						else
@@ -120,7 +123,8 @@ namespace SpoiledCat.Utilities
 							{
 								if (!int.TryParse(buildMatch.Value, out build))
 								{
-									special = buildMatch.Value.TrimEnd();
+									if (buildMatch.Index >= 0)
+										special = Version.Substring(buildMatch.Index).TrimEnd();
 									stringParts[parts] = special ?? "0";
 								}
 								else

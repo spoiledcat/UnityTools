@@ -1,0 +1,18 @@
+{
+    "name": "com.spoiledcat.utilities.tests",
+    "references": [
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:38eef5a24ad9eec4d9c20289ab611a58"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

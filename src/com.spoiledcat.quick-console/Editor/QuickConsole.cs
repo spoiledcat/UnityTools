@@ -109,7 +109,7 @@ namespace SpoiledCat
 
 		public override void OnEnable()
         {
-            title = "Quick Console";
+            titleContent = new GUIContent("Quick Console");
 			EndEditingActiveTextField = () => EndEditingActiveTextField_method.Invoke(null, null);
 			compiler = new Compiler();
 			scheduler = TaskScheduler.FromCurrentSynchronizationContext();
@@ -395,6 +395,7 @@ namespace SpoiledCat
                     .Where(x => x != null && !namespaceExcludes.Any(z => x.StartsWith(z, StringComparison.OrdinalIgnoreCase)))
 					.Distinct();
             usings.AddRange(a);
+            usings = usings.Distinct().ToList();
         }
 
 		public (bool success, string result, Exception exception) CompileCSharp(List<UnityReference> context,

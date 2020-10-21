@@ -1,0 +1,171 @@
+{
+  "dependencies": {
+    "com.spoiledcat.environment": {
+      "version": "file:../../../src/com.spoiledcat.environment",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.spoiledcat.logging": "0.0.0-placeholder",
+        "com.spoiledcat.simpleio": "0.0.0-placeholder",
+        "com.spoiledcat.simplejson": "0.0.0-placeholder"
+      }
+    },
+    "com.spoiledcat.logging": {
+      "version": "file:../../../src/com.spoiledcat.logging",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
+    "com.spoiledcat.quick-console": {
+      "version": "file:../../../src/com.spoiledcat.quick-console",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.spoiledcat.simpleio": "0.0.0-placeholder",
+        "com.spoiledcat.simplejson": "0.0.0-placeholder",
+        "com.spoiledcat.ui": "0.0.0-placeholder"
+      }
+    },
+    "com.spoiledcat.sharpziplib": {
+      "version": "file:../../../src/com.spoiledcat.sharpziplib",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
+    "com.spoiledcat.simpleio": {
+      "version": "file:../../../src/com.spoiledcat.simpleio",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
+    "com.spoiledcat.simplejson": {
+      "version": "file:../../../src/com.spoiledcat.simplejson",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
+    "com.spoiledcat.threading": {
+      "version": "file:../../../src/com.spoiledcat.threading",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.spoiledcat.logging": "0.0.0-placeholder",
+        "com.spoiledcat.simpleio": "0.0.0-placeholder",
+        "com.spoiledcat.environment": "0.0.0-placeholder"
+      }
+    },
+    "com.spoiledcat.threading.tasks": {
+      "version": "file:../../../src/com.spoiledcat.threading.tasks",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.spoiledcat.threading": "0.0.0-placeholder",
+        "com.spoiledcat.utilities": "0.0.0-placeholder"
+      }
+    },
+    "com.spoiledcat.ui": {
+      "version": "file:../../../src/com.spoiledcat.ui",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.spoiledcat.threading": "0.0.0-placeholder"
+      }
+    },
+    "com.spoiledcat.utilities": {
+      "version": "file:../../../src/com.spoiledcat.utilities",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.spoiledcat.environment": "0.0.0-placeholder",
+        "com.spoiledcat.logging": "0.0.0-placeholder",
+        "com.spoiledcat.simpleio": "0.0.0-placeholder",
+        "com.spoiledcat.sharpziplib": "0.0.0-placeholder",
+        "com.spoiledcat.simplejson": "0.0.0-placeholder"
+      }
+    },
+    "com.unity.2d.sprite": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
+    "com.unity.2d.tilemap": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
+    "com.unity.ext.nunit": {
+      "version": "1.0.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.ide.rider": {
+      "version": "1.1.4",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.test-framework": "1.1.1"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.ide.vscode": {
+      "version": "1.2.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.test-framework": {
+      "version": "1.1.18",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.ext.nunit": "1.0.0",
+        "com.unity.modules.imgui": "1.0.0",
+        "com.unity.modules.jsonserialize": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.ugui": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.modules.ui": "1.0.0"
+      }
+    },
+    "com.unity.modules.androidjni": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
+    "com.unity.modules.imageconversion": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
+    "com.unity.modules.imgui": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
+    "com.unity.modules.jsonserialize": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
+    "com.unity.modules.ui": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    }
+  }
+}

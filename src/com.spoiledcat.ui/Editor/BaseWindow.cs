@@ -180,6 +180,9 @@ namespace SpoiledCat.UI
                 InLayout = true;
                 InternalOnDataUpdate();
                 NeedsRefresh = false;
+            }
+            else if (Event.current.type == EventType.Repaint)
+            {
                 if (firstRepaint)
                 {
                     InternalOnFirstRepaint();
