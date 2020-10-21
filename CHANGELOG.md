@@ -2,7 +2,7 @@
 
 <!-- Do not change the line immediately below this comment, the build system will replace it with the actual version and date. -->
 
-## [2.0.11-preview-g9bc4f2be86] - 2020-10-21
+## [2.0.12-preview-g72fbe8ba15] - 2020-10-21
 
 - Merge back code from editor tasks
 
