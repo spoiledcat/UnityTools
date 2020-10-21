@@ -11,8 +11,8 @@ if ($Trace) {
 
 . $PSScriptRoot\helpers.ps1 | out-null
 
-$version = $env:CloudBuildNumber
-$isPublic = $env:PublicRelease
+$version = $env:GitAssemblyInformationalVersion
+$isPublic = $env:NBGV_PublicRelease
 
 if (!$version -or $version -eq "") {
     $versionData = & "$($env:USERPROFILE)\.nuget\packages\nerdbank.gitversioning\3.1.91\tools\Get-Version.ps1"
