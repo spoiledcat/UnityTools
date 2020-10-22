@@ -46,10 +46,10 @@ after_test:
       $fileContent += $env:GHPKEY.Replace(' ', "`n")
       $fileContent += "`n-----END OPENSSH PRIVATE KEY-----`n"
       Set-Content c:\users\appveyor\.ssh\id_rsa $fileContent
-      $version = $env:GitAssemblyInformationalVersion
-      $isPublic = $False
-      if ($env:NBGV_PublicRelease -eq "True") {
-        $isPublic = $True
+      $version = $env:APPVEYOR_BUILD_NUMBER
+      $isPublic = 0
+      if ($env:APPVEYOR_REPO_TAG -eq "true") {
+        $isPublic = 1
       }
       Write-Output "Publishing branches version:$version isPublic:$isPublic"
       scripts\Publish-Branches.ps1 $version $isPublic -IsCI
