@@ -50,8 +50,7 @@ after_test:
         $isPublic = 1
       }
       Write-Host "Publishing branches version:$version isPublic:$isPublic"
-      #scripts\Publish-Branches.ps1 $version $isPublic -IsCI
-      exit 1
+      scripts\Publish-Branches.ps1 $version $isPublic -IsCI
     }
 
     dotnet pack --no-build --no-restore -c $env:CONFIGURATION
