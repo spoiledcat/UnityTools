@@ -9,8 +9,8 @@
 //------------------------------------------------------------------------------
 
 [assembly: System.Reflection.AssemblyVersionAttribute("2.0.0.0")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("2.0.13.23386")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.0.13+5a5bc9dd03")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("2.0.13.25191")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.0.13+676283ce66")]
 #if NETSTANDARD || NETFRAMEWORK || NETCOREAPP
 [System.CodeDom.Compiler.GeneratedCode("Nerdbank.GitVersioning.Tasks","3.1.91.19327")]
 #endif
@@ -19,15 +19,15 @@
 #endif
 internal static partial class ThisAssembly {
     internal const string AssemblyVersion = "2.0.0.0";
-    internal const string AssemblyFileVersion = "2.0.13.23386";
-    internal const string AssemblyInformationalVersion = "2.0.13+5a5bc9dd03";
+    internal const string AssemblyFileVersion = "2.0.13.25191";
+    internal const string AssemblyInformationalVersion = "2.0.13+676283ce66";
     internal const string AssemblyName = "SpoiledCat.Unity.Utilities";
     internal const string AssemblyConfiguration = "Release";
-    internal const string GitCommitId = "5a5bc9dd03f80916c6081b278377d697122adcb5";
+    internal const string GitCommitId = "676283ce6692275a83369d3ff3df2351135585ea";
     internal const string PublicKey = "0024000004800000940000000602000000240000525341310004000001000100117d0dec0a3fe810510e005bd6a1cb5aca2af1a411346777d30fe1aa0e9fa786495ab06591d36124aacc8e0ff799a47233ca73de6d91935796e339b1564cfbfcdfc7aed3032449af2641359289721cd4354823e0b94779b7d81c2b531c775e7cb03472fe00acc0e325e48620683d4b6ee8df9b4ff39d45cd7de0747e6a0226bd";
     internal const string PublicKeyToken = "506395a6745f91e6";
     internal const bool IsPublicRelease = false;
     internal const bool IsPrerelease = false;
-    internal static readonly System.DateTime GitCommitDate = new System.DateTime(637389666700000000L, System.DateTimeKind.Utc);
+    internal static readonly System.DateTime GitCommitDate = new System.DateTime(637389811500000000L, System.DateTimeKind.Utc);
     internal const string RootNamespace = "SpoiledCat.Unity.Utilities";
 }
