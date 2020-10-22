@@ -3,11 +3,11 @@ Param(
     [string]
     $Version = ""
     ,
-    [switch]
-    $IsCI = $false
+    [bool]
+    $IsPublic = $false
     ,
     [switch]
-    $IsPublic = $false
+    $IsCI = $false
     ,
     [switch]
     $Trace = $false
@@ -38,9 +38,6 @@ if ($Version -eq "") {
         }
     }
 }
-
-Write-Output "Version: $Version IsPublic: $IsPublic"
-exit 0
 
 $srcDir = Join-Path $rootDirectory 'build\packages'
 $destdir = Join-Path (Split-Path $rootDirectory) 'branches'

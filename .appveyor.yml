@@ -47,9 +47,12 @@ after_test:
       $fileContent += "`n-----END OPENSSH PRIVATE KEY-----`n"
       Set-Content c:\users\appveyor\.ssh\id_rsa $fileContent
       $version = $env:GitAssemblyInformationalVersion
-      $isPublic = $env:NBGV_PublicRelease
+      $isPublic = $False
+      if ($env:NBGV_PublicRelease -eq "True") {
+        $isPublic = $True
+      }
       Write-Output "Publishing branches version:$version isPublic:$isPublic"
-      scripts\Publish-Branches.ps1 -Version $version -isPublic $isPublic -IsCI
+      scripts\Publish-Branches.ps1 $version $isPublic -IsCI
     }
 
     scripts\Pack-Packages.ps1
