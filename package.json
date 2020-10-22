@@ -1,0 +1,19 @@
+{
+    "name": "com.spoiledcat.simplejson",
+    "displayName": "SpoiledCat Simple Json",
+    "description": "A powerful yet simple json (de)serializer with support for Unity and custom types",
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
+    },
+    "version": "2.0.13",
+    "repository" : {
+      "type" : "git",
+      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+      "directory": "src/com.spoiledcat.simplejson"
+    },
+    "publishConfig": {
+        "registry":"https://registry.spoiledcat.com/"
+    }
+}
