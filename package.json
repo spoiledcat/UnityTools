@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.environment",
     "displayName": "SpoiledCat Unity Environment",
     "description": "An environment class encapsulating Unity information",
-    "version": "2.0.13-preview-g676283ce66",
+    "version": "2.0.13-preview-g7bc24db671",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
@@ -17,8 +17,8 @@
         "registry":"https://registry.spoiledcat.com/"
     },
     "dependencies": {
-        "com.spoiledcat.logging": "2.0.13-preview-g676283ce66",
-        "com.spoiledcat.simpleio": "2.0.13-preview-g676283ce66",
-        "com.spoiledcat.simplejson": "2.0.13-preview-g676283ce66"
+        "com.spoiledcat.logging": "2.0.13-preview-g7bc24db671",
+        "com.spoiledcat.simpleio": "2.0.13-preview-g7bc24db671",
+        "com.spoiledcat.simplejson": "2.0.13-preview-g7bc24db671"
     }
 }
