@@ -1,0 +1,20 @@
+{
+    "name": "com.spoiledcat.threading.tasks",
+    "references": [
+        "com.spoiledcat.logging",
+        "com.spoiledcat.simpleio",
+        "com.spoiledcat.utilities",
+        "com.spoiledcat.threading"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
