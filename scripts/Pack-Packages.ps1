@@ -16,21 +16,17 @@ $srcdir = Join-Path $rootDirectory 'build\packages'
 
 New-Item -itemtype Directory -Path $destdir -Force -ErrorAction SilentlyContinue
 
-Push-Location $srcdir
-
-try {
-
-    Get-ChildItem | % {
+Get-ChildItem -Directory $srcDir | % {
+    if (Test-Path "$srcDir\$($_)\package.json") {
         try {
-            Push-Location $_.Name
-            Write-Output "Packing $($_.Name)"
-            Invoke-Command -Fatal -Quiet { & npm pack }
-            Move-Item *.tgz $destdir
+            Push-Location (Join-Path $srcDir $_.Name)
+            $package = Invoke-Command -Fatal { & npm pack -q }
+            $package = "$package".Trim()
+            $tgt = Join-Path $destdir $package
+            Move-Item $package $tgt -Force
+            Write-Output "Created package $tgt\$package"
         } finally {
             Pop-Location
         }
     }
-
-} finally {
-    Pop-Location
 }

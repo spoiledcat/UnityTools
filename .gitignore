@@ -140,3 +140,5 @@ TestResults
 MonoBleedingEdge
 /.bin/
 /.download/
+.store
+nbgv.exe

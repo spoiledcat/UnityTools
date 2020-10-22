@@ -40,14 +40,19 @@ test:
 after_test:
 - ps: |
     dotnet pack --no-build --no-restore -c $env:CONFIGURATION
-    scripts\Pack-Packages.ps1
+
     if ($env:GHPKEY) {
       $fileContent = "-----BEGIN OPENSSH PRIVATE KEY-----`n"
       $fileContent += $env:GHPKEY.Replace(' ', "`n")
       $fileContent += "`n-----END OPENSSH PRIVATE KEY-----`n"
       Set-Content c:\users\appveyor\.ssh\id_rsa $fileContent
-      scripts\Publish-Branches.ps1
+      $version = $env:GitAssemblyInformationalVersion
+      $isPublic = $env:NBGV_PublicRelease
+      Write-Output "Publishing branches version:$version isPublic:$isPublic"
+      scripts\Publish-Branches.ps1 -Version $version -isPublic $isPublic -IsCI
     }
+
+    scripts\Pack-Packages.ps1
 
 artifacts:
 - path: build\**\*.nupkg

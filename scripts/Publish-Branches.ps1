@@ -1,5 +1,14 @@
 [CmdletBinding()]
 Param(
+    [string]
+    $Version = ""
+    ,
+    [switch]
+    $IsCI = $false
+    ,
+    [switch]
+    $IsPublic = $false
+    ,
     [switch]
     $Trace = $false
 )
@@ -11,56 +20,63 @@ if ($Trace) {
 
 . $PSScriptRoot\helpers.ps1 | out-null
 
-$version = $env:GitAssemblyInformationalVersion
-$isPublic = $env:NBGV_PublicRelease
+if ($Version -eq "") {
+    Invoke-Command -Quiet { & dotnet tool install -v q --tool-path . nbgv }
+    $arr = Invoke-Command { & nbgv cloud -s VisualStudioTeamServices --all-vars -p src }
+    $arr = $arr.split("`r`n")
 
-if (!$version -or $version -eq "") {
-    $versionData = & "$($env:USERPROFILE)\.nuget\packages\nerdbank.gitversioning\3.1.91\tools\Get-Version.ps1"
-    $version = $versionData.CloudBuildNumber
-    $isPublic = $versionData.PublicRelease
+    foreach ($i in 0..($arr.length-1)) {
+        $str = $arr[$i].split(";]")
+        if ($str.length -eq 3) {
+            $strname = $str[0].Replace("##vso[task.setvariable variable=", "")
+            $strval = $str[2]
+            if ($strname -eq "NBGV_CloudBuildNumber") {
+                $Version = $strval
+            } elseif ($strname -eq "NBGV_PublicRelease") {
+                $IsPublic = $strval -eq "True"
+            }
+        }
+    }
 }
 
-$packagesDir = Join-Path $rootDirectory 'build\packages'
-$gitDir = Split-Path $rootDirectory
-$gitDir = Join-Path $gitDir 'branches'
+Write-Output "Version: $Version IsPublic: $IsPublic"
+exit 0
 
-New-Item -itemtype Directory -Path $gitDir -Force -ErrorAction SilentlyContinue
+$srcDir = Join-Path $rootDirectory 'build\packages'
+$destdir = Join-Path (Split-Path $rootDirectory) 'branches'
 
-Invoke-Command -Quiet { & git clone -q --branch=empty git@github.com:spoiledcat/UnityTools $gitDir }
+New-Item -itemtype Directory -Path $destdir -Force -ErrorAction SilentlyContinue
 
-Push-Location $packagesDir
+Invoke-Command -Quiet { & git clone -q --branch=empty git@github.com:spoiledcat/UnityTools $destdir }
 
-try {
+Get-ChildItem -Directory $srcDir | % {
+    if (Test-Path "$srcDir\$($_)\package.json") {
+        $branch = "packages/$($_.Name)"
+        if ($isPublic) {
+            $branch = "$branch/v$($version)"
+        } else {
+            $branch = "$branch/latest"
+        }
+        $msg = "$($_.Name) v$($version)"
+        $packageDir = Join-Path $srcDir $_.Name
 
-    Get-ChildItem | % {
+        Write-Output "Publishing branch: $branch ($($version))"
+      
         try {
 
-            $branch = "packages/$($_.Name)"
-            if ($isPublic) {
-                $branch = "$branch/v$($version)"
-            } else {
-                $branch = "$branch/latest"
-            }
-            $msg = "$($_.Name) v$($version)"
-            Write-Output "Publishing branch: $branch ($($version))"
-
-            $srcDir = Join-Path $packagesDir $_.Name
-          
-            Push-Location $gitDir
+            Push-Location $destdir
 
             Invoke-Command -Quiet { & git reset --hard 40c898effcd16bc648ddd57 }
             Invoke-Command -Quiet { & git reset --hard origin/$branch }
-            Remove-Item "$gitDir\*" -Exclude ".git\" -Recurse
-            Copy-Item "$srcDir\*" $gitDir -Force -Recurse
+            Remove-Item "$destdir\*" -Exclude ".git\" -Recurse
+            Copy-Item "$packageDir\*" $destdir -Force -Recurse
             Invoke-Command -Quiet { & git add . }
             Invoke-Command -Quiet { & git commit -m "$msg" }
             Invoke-Command -Quiet { & git push origin HEAD:${branch} }
+
             Pop-Location
         } finally {
             Pop-Location
         }
     }
-
-} finally {
-    Pop-Location
 }
