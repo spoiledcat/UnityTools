@@ -7,7 +7,7 @@
       "name": "Andreia Gaita",
       "email": "shana@spoiledcat.net"
     },
-    "version": "2.0.13-preview-g5a5bc9dd03",
+    "version": "2.0.13-preview-g676283ce66",
     "repository" : {
       "type" : "git",
       "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
@@ -17,6 +17,6 @@
         "registry":"https://registry.spoiledcat.com/"
     },
     "dependencies": {
-        "com.spoiledcat.threading": "2.0.13-preview-g5a5bc9dd03"
+        "com.spoiledcat.threading": "2.0.13-preview-g676283ce66"
     }
 }
