@@ -64,8 +64,7 @@ function UpdateBranchAndPush([string]$branch, [string]$destdir, [string]$package
 
 Get-ChildItem -Directory $srcDir | % {
     if (Test-Path "$srcDir\$($_)\package.json") {
-        $branch = "packages/$($_.Name)"
-        $branch = "$branch/latest"
+        $branch = "packages/$($_.Name)/latest"
         $msg = "$($_.Name) v$($version)"
         $packageDir = Join-Path $srcDir $_.Name
 
@@ -74,7 +73,7 @@ Get-ChildItem -Directory $srcDir | % {
         UpdateBranchAndPush $branch $destdir $packageDir $msg
       
         if ($isPublic) {
-            $branch = "$branch/v$($version)"
+            $branch = "packages/$($_.Name)/v$($version)"
             Write-Output "Publishing branch: $branch"
             UpdateBranchAndPush $branch $destdir $packageDir $msg
         }
