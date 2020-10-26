@@ -34,6 +34,12 @@ namespace SpoiledCat.UI
 
         public virtual void Initialize(bool firstRun)
         {
+            if (TaskManager == null)
+            {
+                TaskManager = new TaskManager();
+                TaskManager.Initialize();
+            }
+
             foreach (var view in Views)
                 view.Initialize(firstRun);
         }
