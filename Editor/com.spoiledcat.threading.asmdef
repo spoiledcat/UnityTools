@@ -1,0 +1,19 @@
+{
+    "name": "com.spoiledcat.threading",
+    "references": [
+        "com.spoiledcat.environment",
+        "com.spoiledcat.simpleio",
+        "com.spoiledcat.logging"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
