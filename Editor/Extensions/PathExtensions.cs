@@ -1,4 +1,4 @@
-﻿// Copyright 2016-2019 Andreia Gaita
+﻿// Copyright 2016-2020 Andreia Gaita
 // Copyright 2015-2018 GitHub
 //
 // This work is licensed under the terms of the MIT license.
