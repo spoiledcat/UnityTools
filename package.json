@@ -1,0 +1,24 @@
+{
+    "name": "com.spoiledcat.quick-console",
+    "displayName": "SpoiledCat Quick Console",
+    "description": "An evaluation console for editor scripts without recompiling the whole project",
+    "version": "2.0.16",
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
+    },
+    "repository" : {
+      "type" : "git",
+      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+      "directory": "src/com.spoiledcat.quick-console"
+    },
+    "publishConfig": {
+        "registry":"https://registry.spoiledcat.com/"
+    },
+    "dependencies": {
+        "com.spoiledcat.simpleio": "2.0.16",
+        "com.spoiledcat.simplejson": "2.0.16",
+        "com.spoiledcat.ui": "2.0.16"
+    }
+}
