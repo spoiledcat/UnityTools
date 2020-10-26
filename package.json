@@ -1,0 +1,19 @@
+{
+    "name": "com.spoiledcat.sharpziplib",
+    "displayName": "SpoiledCat SharpZipLib",
+    "description": "Fork of sharpziplib",
+    "version": "2.0.16",
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
+    },
+    "repository" : {
+      "type" : "git",
+      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+      "directory": "src/com.spoiledcat.sharpziplib"
+    },
+    "publishConfig": {
+        "registry":"https://registry.spoiledcat.com/"
+    }
+}
