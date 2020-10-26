@@ -46,34 +46,37 @@ New-Item -itemtype Directory -Path $destdir -Force -ErrorAction SilentlyContinue
 
 Invoke-Command -Quiet { & git clone -q --branch=empty git@github.com:spoiledcat/UnityTools $destdir }
 
+function UpdateBranchAndPush([string]$branch, [string]$destdir, [string]$packageDir, [string]$msg) {
+    Push-Location $destdir
+    try {
+        Invoke-Command -Quiet { & git reset --hard 40c898effcd16bc648ddd57 }
+        Invoke-Command -Quiet { & git reset --hard origin/$branch }
+        Remove-Item "$destdir\*" -Exclude ".git\" -Recurse
+        Copy-Item "$packageDir\*" $destdir -Force -Recurse
+        Invoke-Command -Quiet { & git add . }
+        Invoke-Command -Quiet { & git commit -m "$msg" }
+        Invoke-Command -Quiet { & git push origin HEAD:${branch} }
+
+    } finally {
+        Pop-Location
+    }
+}
+
 Get-ChildItem -Directory $srcDir | % {
     if (Test-Path "$srcDir\$($_)\package.json") {
         $branch = "packages/$($_.Name)"
-        if ($isPublic) {
-            $branch = "$branch/v$($version)"
-        } else {
-            $branch = "$branch/latest"
-        }
+        $branch = "$branch/latest"
         $msg = "$($_.Name) v$($version)"
         $packageDir = Join-Path $srcDir $_.Name
 
         Write-Output "Publishing branch: $branch ($($version))"
+
+        UpdateBranchAndPush $branch $destdir $packageDir $msg
       
-        try {
-
-            Push-Location $destdir
-
-            Invoke-Command -Quiet { & git reset --hard 40c898effcd16bc648ddd57 }
-            Invoke-Command -Quiet { & git reset --hard origin/$branch }
-            Remove-Item "$destdir\*" -Exclude ".git\" -Recurse
-            Copy-Item "$packageDir\*" $destdir -Force -Recurse
-            Invoke-Command -Quiet { & git add . }
-            Invoke-Command -Quiet { & git commit -m "$msg" }
-            Invoke-Command -Quiet { & git push origin HEAD:${branch} }
-
-            Pop-Location
-        } finally {
-            Pop-Location
+        if ($isPublic) {
+            $branch = "$branch/v$($version)"
+            Write-Output "Publishing branch: $branch"
+            UpdateBranchAndPush $branch $destdir $packageDir $msg
         }
     }
 }
