@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.threading.tasks",
     "displayName": "SpoiledCat threading Tasks",
     "description": "Premade tasks for use with the SpoiledCat Threading package",
-    "version": "2.0.16",
+    "version": "2.0.16-preview-g5e6d26c294",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
@@ -17,7 +17,7 @@
         "registry":"https://registry.spoiledcat.com/"
     },
     "dependencies": {
-        "com.spoiledcat.threading": "2.0.16",
-        "com.spoiledcat.utilities": "2.0.16"
+        "com.spoiledcat.threading": "2.0.16-preview-g5e6d26c294",
+        "com.spoiledcat.utilities": "2.0.16-preview-g5e6d26c294"
     }
 }
