@@ -18,12 +18,16 @@ environment:
     secure: CNIdeIKP5CY48G4+NqkRfNREo4HgGlkSSfzSCv6x0To=
   GIT_COMMITTER_EMAIL:
     secure: CNIdeIKP5CY48G4+NqkRfNREo4HgGlkSSfzSCv6x0To=
+  nodejs_version: "12"
 
 install:
+- ps: Install-Product node $env:nodejs_version
 - ps: scripts\Get-Deps.ps1
 
 before_build:
 # - dotnet --info
+- node --version
+- npm --version
 - appveyor-retry dotnet restore -v Minimal
 
 build_script:
