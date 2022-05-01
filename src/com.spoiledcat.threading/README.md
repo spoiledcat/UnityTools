@@ -106,6 +106,6 @@ These days, Unity supports modern .NET and can compile all this code just fine, 
 
 Copyright (c) 2019 Unity Technologies
 
-Copyright (c) 2016-2020 Andreia Gaita
+Copyright (c) 2016-2022 Andreia Gaita
 
 Copyright (c) 2016-2018 GitHub

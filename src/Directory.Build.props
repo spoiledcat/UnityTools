@@ -15,7 +15,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Authors>Andreia Gaita</Authors>
     <Owners>Andreia Gaita</Owners>
-    <Copyright>2016-2020 Andreia Gaita. All rights reserved.</Copyright>
+    <Copyright>2016-2022 Andreia Gaita. All rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/spoiledcat/UnityTools</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>icon.png</PackageIcon>

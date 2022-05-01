@@ -3,7 +3,7 @@ com.spoiledcat.threading copyright © 2019 Unity Technologies ApS
 MIT License
 
 Copyright (c) 2019 Unity Technologies
-Copyright (c) 2016-2020 Andreia Gaita
+Copyright (c) 2016-2022 Andreia Gaita
 Copyright (c) 2016-2018 GitHub
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
