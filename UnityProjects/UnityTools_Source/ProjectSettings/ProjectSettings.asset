@@ -41,6 +41,7 @@ PlayerSettings:
     height: 1
   m_SplashScreenLogos: []
   m_VirtualRealitySplashScreen: {fileID: 0}
+  m_AllowDeviceDisableSplashScreen: 1
   m_HolographicTrackingLossScreen: {fileID: 0}
   defaultScreenWidth: 1024
   defaultScreenHeight: 768
@@ -562,6 +563,49 @@ PlayerSettings:
   - libSceNpToolkit2.prx
   - libSceS3DConversion.prx
   ps4attribVROutputEnabled: 0
+  ps5AppType: 0
+  ps5ParamFilePath: 
+  ps5VideoOutPixelFormat: 0
+  ps5VideoOutInitialWidth: 1920
+  ps5VideoOutReprojectionRate: 60
+  ps5PronunciationXMLPath: 
+  ps5PronunciationSIGPath: 
+  ps5BackgroundImagePath: 
+  ps5StartupImagePath: 
+  ps5Pic2Path: 
+  ps5StartupImagesFolder: 
+  ps5IconImagesFolder: 
+  ps5SaveDataImagePath: 
+  ps5SdkOverride: 
+  ps5BGMPath: 
+  ps5ShareFilePath: 
+  ps5ShareOverlayImagePath: 
+  ps5PrivacyGuardImagePath: 
+  ps5NPConfigZipPath: 
+  ps5RemotePlayKeyAssignment: -1
+  ps5RemotePlayKeyMappingDir: 
+  ps5GarlicHeapSize: 2048
+  ps5Passcode: frAQBc8Wsa1xVPfvJcrgRYwTiizs2trQ
+  ps5UseResolutionFallback: 0
+  ps5ReprojectionSupport: 0
+  ps5UseAudio3dBackend: 0
+  ps5SocialScreenEnabled: 0
+  ps5ScriptOptimizationLevel: 2
+  ps5Audio3dVirtualSpeakerCount: 14
+  ps5attribCpuUsage: 0
+  ps5PatchPkgPath: 
+  ps5PatchLatestPkgPath: 
+  ps5PatchChangeinfoPath: 
+  ps5PatchDayOne: 0
+  ps5disableAutoHideSplash: 0
+  ps5IncludedModules:
+  - libc.prx
+  - libSceFace.prx
+  - libSceFaceTracker.prx
+  - libSceJobManager.prx
+  - libSceJobManager_nosubmission.prx
+  - libSceNpCppWebApi.prx
+  - libScePfs.prx
   monoEnv: 
   splashScreenBackgroundSourceLandscape: {fileID: 0}
   splashScreenBackgroundSourcePortrait: {fileID: 0}

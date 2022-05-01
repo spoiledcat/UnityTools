@@ -59,8 +59,14 @@ namespace SpoiledCat.SimpleIO
 	{
 		public static SPath Default;
 
-		[NonSerialized] private readonly string[] elements;
-		[NonSerialized] private readonly string driveLetter;
+#if UNITY_5_3_OR_NEWER
+		[UnityEngine.SerializeField]
+#endif
+		private readonly string[] elements;
+#if UNITY_5_3_OR_NEWER
+		[UnityEngine.SerializeField]
+#endif
+		private readonly string driveLetter;
 
 		#region construction
 

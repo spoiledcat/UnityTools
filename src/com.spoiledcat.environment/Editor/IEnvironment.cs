@@ -6,13 +6,14 @@ namespace SpoiledCat.Unity
 	{
 		LocalApplicationData,
 		CommonApplicationData,
-		Logs
+		Logs,
+		RoamingApplicationData,
 	}
 
 	public interface IEnvironment
 	{
 		IEnvironment Initialize(string projectPath,
-            string extensionInstallPath,
+			string extensionInstallPath,
 			string unityVersion = null,
 			string EditorApplication_applicationPath = default,
 			string EditorApplication_applicationContentsPath = default);

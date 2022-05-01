@@ -1,0 +1,19 @@
+{
+    "name": "SerializedStuff",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0419205829404da2bdd224c9364dcbb9",
+        "GUID:0eb9ccb2c7c9e1b48970ab881f3bd787"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

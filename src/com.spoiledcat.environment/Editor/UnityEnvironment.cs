@@ -49,6 +49,9 @@ namespace SpoiledCat.Unity
 			UserCachePath = LocalAppData.Combine(ApplicationName);
 			SystemCachePath = CommonAppData.Combine(ApplicationName);
 			LogPath = GetFolder(Folders.Logs).Combine(ApplicationName, logFile);
+#if !UNITY_EDITOR
+			EditorStubs.InternalEditorUtility.unityPreferencesFolder = GetFolder(Folders.RoamingApplicationData).Combine("Unity", "Editor-5.x");
+#endif
 		}
 
 		public virtual IEnvironment Initialize(
@@ -126,6 +129,13 @@ namespace SpoiledCat.Unity
 				{
 					if (IsMac)
 						return SPath.HomeDirectory.Combine("Library", "Logs");
+				}
+				break;
+				case Folders.RoamingApplicationData:
+				{
+					if (IsWindows)
+						return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToSPath()
+						    .Parent.Combine("Roaming");
 				}
 				break;
 			}

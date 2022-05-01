@@ -59,8 +59,32 @@ namespace SpoiledCat.SimpleIO
 	{
 		public static SPath Default;
 
-		[NonSerialized] private readonly string[] elements;
-		[NonSerialized] private readonly string driveLetter;
+#if UNITY_5_3_OR_NEWER
+		[UnityEngine.SerializeField]
+#else
+		[NonSerialized]
+#endif
+		private string[] elements;
+#if UNITY_5_3_OR_NEWER
+		[UnityEngine.SerializeField]
+#else
+		[NonSerialized]
+#endif
+		private string driveLetter;
+
+#if UNITY_5_3_OR_NEWER
+		[UnityEngine.SerializeField]
+#else
+		[NonSerialized]
+#endif
+		private bool isInitialized;
+
+#if UNITY_5_3_OR_NEWER
+		[UnityEngine.SerializeField]
+#else
+		[NonSerialized]
+#endif
+		private bool isRelative;
 
 		#region construction
 
@@ -68,22 +92,22 @@ namespace SpoiledCat.SimpleIO
 		{
 			EnsureNotNull(path, "path");
 
-			IsInitialized = true;
+			isInitialized = true;
 
 			path = ParseDriveLetter(path, out driveLetter);
 
 			if (path == "/")
 			{
-				IsRelative = false;
+				isRelative = false;
 				elements = new string[] {};
 			}
 			else
 			{
 				var split = path.Split('/', '\\');
 
-				IsRelative = driveLetter == null && IsRelativeFromSplitString(split);
+				isRelative = driveLetter == null && IsRelativeFromSplitString(split);
 
-				elements = ParseSplitStringIntoElements(split.Where(s => s.Length > 0).ToArray(), IsRelative);
+				elements = ParseSplitStringIntoElements(split.Where(s => s.Length > 0).ToArray(), isRelative);
 			}
 		}
 
@@ -97,9 +121,9 @@ namespace SpoiledCat.SimpleIO
 		private SPath(string[] elements, bool isRelative, string driveLetter)
 		{
 			this.elements = elements;
-			IsRelative = isRelative;
+			this.isRelative = isRelative;
 			this.driveLetter = driveLetter;
-			IsInitialized = true;
+			this.isInitialized = true;
 		}
 
 		private static string[] ParseSplitStringIntoElements(IEnumerable<string> inputs, bool isRelative)
@@ -262,7 +286,9 @@ namespace SpoiledCat.SimpleIO
 
 		#region inspection
 
-		public bool IsRelative { get; }
+		public bool IsRelative => isRelative;
+		public bool IsInitialized => isInitialized;
+
 
 		public string FileName {
 			get {
@@ -294,8 +320,6 @@ namespace SpoiledCat.SimpleIO
 				return elements.Length;
 			}
 		}
-
-		public bool IsInitialized { get; }
 
 		public bool Exists()
 		{
@@ -666,6 +690,26 @@ namespace SpoiledCat.SimpleIO
 				return this;
 
 			return SPath.CurrentDirectory.Combine(this);
+		}
+
+		public SPath MakeRelative()
+		{
+			ThrowIfNotInitialized();
+
+			if (IsRelative)
+				return this;
+
+			var sb = new StringBuilder();
+			var first = true;
+			foreach (var element in elements)
+			{
+				if (!first)
+					sb.Append('/');
+				first = false;
+				sb.Append(element);
+			}
+
+			return new SPath(sb.ToString());
 		}
 
 		SPath CopyWithDeterminedDestination(SPath absoluteDestination, Func<SPath, bool> fileFilter)
