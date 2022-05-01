@@ -1,0 +1,27 @@
+{
+    "name": "com.spoiledcat.threading.tests",
+    "displayName": "Tests - SpoiledCat Threading",
+    "description": "Tests - SpoiledCat Threading",
+    "type": "tests",
+    "version": "2.1.0",
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
+    },
+    "repository" : {
+      "type" : "git",
+      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+      "directory": "src/com.spoiledcat.threading/Tests"
+    },
+    "publishConfig": {
+        "registry":"https://registry.spoiledcat.com/"
+    },
+    "dependencies": {
+        "com.spoiledcat.threading": "2.1.0",
+        "com.spoiledcat.logging": "2.1.0",
+        "com.spoiledcat.utilities": "2.1.0",
+        "com.spoiledcat.simpleio": "2.1.0",
+        "com.spoiledcat.threading.tasks": "2.1.0"
+    }
+}
