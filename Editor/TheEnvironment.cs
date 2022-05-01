@@ -15,7 +15,7 @@ namespace SpoiledCat.Unity
 	using EditorStubs;
 #endif
 
-    using SimpleIO;
+	using SimpleIO;
 
 	public sealed class TheEnvironment : ScriptableSingleton<TheEnvironment>
 	{
