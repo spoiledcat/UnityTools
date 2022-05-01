@@ -1,0 +1,19 @@
+{
+    "name": "com.spoiledcat.environment",
+    "references": [
+        "com.spoiledcat.simpleio",
+        "com.spoiledcat.logging",
+        "com.spoiledcat.simplejson"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
