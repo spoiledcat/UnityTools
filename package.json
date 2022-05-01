@@ -1,0 +1,26 @@
+{
+    "name": "com.spoiledcat.utilities.tests",
+    "displayName": "Tests - SpoiledCat Utilities",
+    "description": "Tests - SpoiledCat Utilities",
+    "version": "2.1.0",
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
+    },
+    "repository" : {
+        "type" : "git",
+        "url": "ssh://git@github.com/spoiledcat/UnityTools.git"
+    },
+    "publishConfig": {
+        "registry":"https://registry.spoiledcat.com/"
+    },
+    "dependencies": {
+        "com.spoiledcat.environment": "2.1.0",
+        "com.spoiledcat.logging": "2.1.0",
+        "com.spoiledcat.simpleio": "2.1.0",
+        "com.spoiledcat.sharpziplib": "2.1.0",
+        "com.spoiledcat.simplejson": "2.1.0",
+        "com.spoiledcat.utilities": "2.1.0"
+    }
+}
