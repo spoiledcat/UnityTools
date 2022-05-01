@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.logging",
     "displayName": "SpoiledCat Logging",
     "description": "A friendly and simple logging framework with multiple outputs",
-    "version": "2.0.17-preview-gbe3e48068b",
+    "version": "2.0.18-preview-g92ddaba9fc",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
