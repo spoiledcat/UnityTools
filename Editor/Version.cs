@@ -8,26 +8,28 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#pragma warning disable CA2243
+
 [assembly: System.Reflection.AssemblyVersionAttribute("2.0.0.0")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("2.0.17.16062")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.0.17+be3e48068b")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("2.0.18.56722")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.0.18+92ddaba9fc")]
 #if NETSTANDARD || NETFRAMEWORK || NETCOREAPP
-[System.CodeDom.Compiler.GeneratedCode("Nerdbank.GitVersioning.Tasks","3.1.91.19327")]
+[System.CodeDom.Compiler.GeneratedCode("Nerdbank.GitVersioning.Tasks","3.4.255.64262")]
 #endif
 #if NETFRAMEWORK || NETCOREAPP || NETSTANDARD2_0 || NETSTANDARD2_1
 [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 #endif
 internal static partial class ThisAssembly {
-    internal const string AssemblyVersion = "2.0.0.0";
-    internal const string AssemblyFileVersion = "2.0.17.16062";
-    internal const string AssemblyInformationalVersion = "2.0.17+be3e48068b";
-    internal const string AssemblyName = "SpoiledCat.Unity.QuickConsole";
     internal const string AssemblyConfiguration = "Release";
-    internal const string GitCommitId = "be3e48068b00bcad369f8ebc333719b4a58fb861";
+    internal const string AssemblyFileVersion = "2.0.18.56722";
+    internal const string AssemblyInformationalVersion = "2.0.18+92ddaba9fc";
+    internal const string AssemblyName = "SpoiledCat.Unity.QuickConsole";
+    internal const string AssemblyVersion = "2.0.0.0";
+    internal static readonly System.DateTime GitCommitDate = new System.DateTime(637869992930000000L, System.DateTimeKind.Utc);
+    internal const string GitCommitId = "92ddaba9fc765a18a5cb160a99d12a58383d708b";
+    internal const bool IsPrerelease = false;
+    internal const bool IsPublicRelease = false;
     internal const string PublicKey = "0024000004800000940000000602000000240000525341310004000001000100117d0dec0a3fe810510e005bd6a1cb5aca2af1a411346777d30fe1aa0e9fa786495ab06591d36124aacc8e0ff799a47233ca73de6d91935796e339b1564cfbfcdfc7aed3032449af2641359289721cd4354823e0b94779b7d81c2b531c775e7cb03472fe00acc0e325e48620683d4b6ee8df9b4ff39d45cd7de0747e6a0226bd";
     internal const string PublicKeyToken = "506395a6745f91e6";
-    internal const bool IsPublicRelease = false;
-    internal const bool IsPrerelease = false;
-    internal static readonly System.DateTime GitCommitDate = new System.DateTime(637870037870000000L, System.DateTimeKind.Utc);
     internal const string RootNamespace = "SpoiledCat.Unity.QuickConsole";
 }
