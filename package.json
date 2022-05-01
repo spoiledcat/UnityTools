@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.utilities.tests",
     "displayName": "Tests - SpoiledCat Utilities",
     "description": "Tests - SpoiledCat Utilities",
-    "version": "2.0.17-preview-gbe3e48068b",
+    "version": "2.0.18-preview-g92ddaba9fc",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
@@ -16,11 +16,11 @@
         "registry":"https://registry.spoiledcat.com/"
     },
     "dependencies": {
-        "com.spoiledcat.environment": "2.0.17-preview-gbe3e48068b",
-        "com.spoiledcat.logging": "2.0.17-preview-gbe3e48068b",
-        "com.spoiledcat.simpleio": "2.0.17-preview-gbe3e48068b",
-        "com.spoiledcat.sharpziplib": "2.0.17-preview-gbe3e48068b",
-        "com.spoiledcat.simplejson": "2.0.17-preview-gbe3e48068b",
-        "com.spoiledcat.utilities": "2.0.17-preview-gbe3e48068b"
+        "com.spoiledcat.environment": "2.0.18-preview-g92ddaba9fc",
+        "com.spoiledcat.logging": "2.0.18-preview-g92ddaba9fc",
+        "com.spoiledcat.simpleio": "2.0.18-preview-g92ddaba9fc",
+        "com.spoiledcat.sharpziplib": "2.0.18-preview-g92ddaba9fc",
+        "com.spoiledcat.simplejson": "2.0.18-preview-g92ddaba9fc",
+        "com.spoiledcat.utilities": "2.0.18-preview-g92ddaba9fc"
     }
 }
