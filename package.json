@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.utilities",
     "displayName": "SpoiledCat Utilities",
     "description": "Handy utilities primitives like string extension methods and unzip tools!",
-    "version": "2.0.18-preview-g92ddaba9fc",
+    "version": "2.1.0",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
@@ -16,10 +16,10 @@
         "registry":"https://registry.spoiledcat.com/"
     },
     "dependencies": {
-        "com.spoiledcat.environment": "2.0.18-preview-g92ddaba9fc",
-        "com.spoiledcat.logging": "2.0.18-preview-g92ddaba9fc",
-        "com.spoiledcat.simpleio": "2.0.18-preview-g92ddaba9fc",
-        "com.spoiledcat.sharpziplib": "2.0.18-preview-g92ddaba9fc",
-        "com.spoiledcat.simplejson": "2.0.18-preview-g92ddaba9fc"
+        "com.spoiledcat.environment": "2.1.0",
+        "com.spoiledcat.logging": "2.1.0",
+        "com.spoiledcat.simpleio": "2.1.0",
+        "com.spoiledcat.sharpziplib": "2.1.0",
+        "com.spoiledcat.simplejson": "2.1.0"
     }
 }
