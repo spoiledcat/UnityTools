@@ -1,0 +1,24 @@
+﻿// Copyright 2016-2022 Andreia Gaita
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
+
+using System.Runtime.CompilerServices;
+
+namespace SpoiledCat.Threading
+{
+	public interface IAwaitable
+	{
+		IAwaiter GetAwaiter();
+	}
+
+	public interface IAwaiter : INotifyCompletion
+	{
+		void GetResult();
+		bool IsCompleted { get; }
+	}
+	public interface IAwaiter<T> : IAwaiter
+	{
+		new T GetResult();
+	}
+}

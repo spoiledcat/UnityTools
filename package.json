@@ -1,0 +1,24 @@
+{
+    "name": "com.spoiledcat.threading",
+    "displayName": "SpoiledCat Threading",
+    "description": "A friendly threaded task system for Unity",
+    "version": "2.1.0",
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
+    },
+    "repository" : {
+      "type" : "git",
+      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+      "directory": "src/com.spoiledcat.threading"
+    },
+    "publishConfig": {
+        "registry":"https://registry.spoiledcat.com/"
+    },
+    "dependencies": {
+        "com.spoiledcat.logging": "2.1.0",
+        "com.spoiledcat.simpleio": "2.1.0",
+        "com.spoiledcat.environment": "2.1.0"
+    }
+}
