@@ -1,4 +1,5 @@
 version: '{build}'
+image: Visual Studio 2019
 
 nuget:
   disable_publish_on_pr: true
@@ -25,7 +26,8 @@ install:
 - ps: scripts\Get-Deps.ps1
 
 before_build:
-# - dotnet --info
+- dotnet --list-sdks
+- dotnet --info
 - node --version
 - npm --version
 - appveyor-retry dotnet restore -v Minimal
