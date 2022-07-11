@@ -1,4 +1,6 @@
 version: '{build}'
+build_cloud: zcd
+image: Linux
 
 nuget:
   disable_publish_on_pr: true
