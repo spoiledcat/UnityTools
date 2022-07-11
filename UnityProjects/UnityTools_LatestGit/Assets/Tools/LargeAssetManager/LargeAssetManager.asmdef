@@ -1,0 +1,26 @@
+{
+    "name": "LargeAssetManager",
+    "references": [
+        "com.spoiledcat.simpleio",
+        "com.spoiledcat.simplejson",
+        "com.spoiledcat.logging",
+        "com.spoiledcat.threading",
+        "com.spoiledcat.threading.tasks",
+        "com.spoiledcat.ui",
+        "com.spoiledcat.utilities",
+        "com.spoiledcat.sharpziplib",
+        "com.spoiledcat.processmanager",
+        "com.spoiledcat.environment"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

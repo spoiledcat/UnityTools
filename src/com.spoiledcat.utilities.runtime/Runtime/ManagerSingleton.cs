@@ -98,7 +98,13 @@ namespace SpoiledCat
 		{ }
 
 		private static void MaybeInitialize(T obj) => ((ManagerSingleton<T>)(object)obj).InternalInitialize();
-		private static T FindSingletonInScene() => FindObjectOfType<T>(true);
+
+		private static T FindSingletonInScene() =>
+#if UNITY_2020_1_OR_NEWER
+			Component.FindObjectOfType<T>(true);
+#else // 2019 and earlier can only find active objects
+			Component.FindObjectOfType<T>();
+#endif
 
 		private static bool IsAutoCreatedSingleton(string name) => name.StartsWith(SingletonPrefix);
 
