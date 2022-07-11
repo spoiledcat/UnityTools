@@ -108,14 +108,14 @@ namespace SpoiledCat
 		}
 
 		public override void OnEnable()
-        {
-            titleContent = new GUIContent("Quick Console");
+		{
+			titleContent = new GUIContent("Quick Console");
 			EndEditingActiveTextField = () => EndEditingActiveTextField_method.Invoke(null, null);
 			compiler = new Compiler();
 			scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 			if (context == null) context = new List<UnityReference>();
-            if (selectedSource == null)  selectedSource = "";
-        }
+			if (selectedSource == null)  selectedSource = "";
+		}
 
 		public override void OnUI()
 		{
@@ -365,9 +365,9 @@ namespace SpoiledCat
 			"SpoiledCat.SimpleIO",
 		};
 
-        private readonly List<string> namespaceExcludes = new List<string>
-        {
-            "System", "Microsoft", "Internal", "Unity", "XamMac", "Mono", "Jetbrains", "SyntaxTree", "AOT", "MS", "TreeEditor", "ObjC", "VSCodeEditor", "Rider",
+		private readonly List<string> namespaceExcludes = new List<string>
+		{
+			"System", "Microsoft", "Internal", "Unity", "XamMac", "Mono", "Jetbrains", "SyntaxTree", "AOT", "MS", "TreeEditor", "ObjC", "VSCodeEditor", "Rider",
 			"Packages.Rider", "ICSharpCode", "NUnit", "TestRunner", "SpoiledCat.Utilities.ICSharpCode"
 		};
 
@@ -377,8 +377,8 @@ namespace SpoiledCat
 		private CompilerParameters compilerParameters;
 
 		public Compiler()
-        {
-            var asms = AppDomain.CurrentDomain.GetAssemblies().ToArray();
+		{
+			var asms = AppDomain.CurrentDomain.GetAssemblies().ToArray();
 
 			assemblies.AddRange(asms
 				.Select(x => x.TryGetLocation())
@@ -390,13 +390,13 @@ namespace SpoiledCat
 			};
 
 			IEnumerable<string> a = asms.Where(x => x.TryGetLocation() != null)
-                    .SelectMany(x => x.GetTypes())
-                    .Select(x => x.Namespace)
-                    .Where(x => x != null && !namespaceExcludes.Any(z => x.StartsWith(z, StringComparison.OrdinalIgnoreCase)))
+					.SelectMany(x => x.GetTypes())
+					.Select(x => x.Namespace)
+					.Where(x => x != null && !namespaceExcludes.Any(z => x.StartsWith(z, StringComparison.OrdinalIgnoreCase)))
 					.Distinct();
-            usings.AddRange(a);
-            usings = usings.Distinct().ToList();
-        }
+			usings.AddRange(a);
+			usings = usings.Distinct().ToList();
+		}
 
 		public (bool success, string result, Exception exception) CompileCSharp(List<UnityReference> context,
 			string csharp)
