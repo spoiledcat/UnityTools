@@ -83,6 +83,12 @@
         "com.spoiledcat.simplejson": "0.0.0-placeholder"
       }
     },
+    "com.spoiledcat.utilities.runtime": {
+      "version": "file:../../../src/com.spoiledcat.utilities.runtime",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <TargetFrameworks>net471;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp2.2</TargetFrameworks>
     <RootDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\'))</RootDir>
     <PackageSourceRoot>$(MSBuildProjectDirectory)\..\</PackageSourceRoot>
     <FullBuild Condition="'$(SolutionName)' == 'UnityTools'">true</FullBuild>
@@ -39,12 +39,8 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <Description>Premade tasks for use with the SpoiledCat Threading package</Description>
+    <Description>Handy runtime utilities and classes</Description>
   </PropertyGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\..\com.spoiledcat.threading\Editor\SpoiledCat.Unity.Threading.csproj" />
-    <ProjectReference Include="..\..\com.spoiledcat.utilities\Editor\SpoiledCat.Unity.Utilities.Editor.csproj" />
   </ItemGroup>
-
 </Project>

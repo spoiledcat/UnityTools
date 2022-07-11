@@ -10,6 +10,7 @@
     "com.spoiledcat.threading.tasks": "file:../../../build/packages/com.spoiledcat.threading.tasks",
     "com.spoiledcat.ui": "file:../../../build/packages/com.spoiledcat.ui",
     "com.spoiledcat.utilities": "file:../../../build/packages/com.spoiledcat.utilities",
+    "com.spoiledcat.utilities.runtime": "file:../../../build/packages/com.spoiledcat.utilities.runtime",
     "com.unity.test-framework": "1.1.13",
     "com.unity.modules.imageconversion": "1.0.0",
     "com.unity.modules.imgui": "1.0.0",

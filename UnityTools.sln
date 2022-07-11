@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Threading.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.UI", "src\com.spoiledcat.ui\Editor\SpoiledCat.Unity.UI.csproj", "{7F58AD75-25A1-4D10-BCD4-52F965AA25D5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Utilities", "src\com.spoiledcat.utilities\Editor\SpoiledCat.Unity.Utilities.csproj", "{D82E300E-7BD9-4B87-9522-847D4EDAABE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Utilities.Editor", "src\com.spoiledcat.utilities\Editor\SpoiledCat.Unity.Utilities.Editor.csproj", "{D82E300E-7BD9-4B87-9522-847D4EDAABE7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Utilities.Runtime", "src\com.spoiledcat.utilities.runtime\Runtime\SpoiledCat.Unity.Utilities.Runtime.csproj", "{D82E300E-7BD9-4B87-9522-847D4EDAABEF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1B6C7155-DF65-440B-B560-7414E4325AE3}"
 EndProject
