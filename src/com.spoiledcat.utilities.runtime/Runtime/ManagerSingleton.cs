@@ -40,12 +40,11 @@ namespace SpoiledCat
 					// prevent reentrancy if someone does something funny
 					if (instance != value)
 					{
-						bool preferOld = true;
 						T instanceToKeep = instance;
 						T instanceToDestroy = value;
 
 #if UNITY_EDITOR
-						preferOld = Application.isPlaying || !IsAutoCreatedSingleton(instance.name);
+						var preferOld = Application.isPlaying || !IsAutoCreatedSingleton(instance.name);
 						if (!preferOld)
 						{
 							(instanceToKeep, instanceToDestroy) = (instanceToDestroy, instanceToKeep);

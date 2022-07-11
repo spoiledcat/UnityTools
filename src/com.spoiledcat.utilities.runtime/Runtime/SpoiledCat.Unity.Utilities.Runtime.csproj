@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <TargetFrameworks>net471;netcoreapp2.2</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp3.1</TargetFrameworks>
     <RootDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\'))</RootDir>
     <PackageSourceRoot>$(MSBuildProjectDirectory)\..\</PackageSourceRoot>
     <FullBuild Condition="'$(SolutionName)' == 'UnityTools'">true</FullBuild>
@@ -29,7 +29,7 @@
     <PackageId>$(AssemblyName)</PackageId>
   </PropertyGroup>
 
-  <Import Project="$(RootDir)common\unityreferences.targets" Condition="'$(Configuration)'=='DebugUnity' or '$(Configuration)'=='ReleaseUnity'" />
+  <Import Project="$(RootDir)common\unityreferences.targets" />
   <Import Project="$(RootDir)common\packaging.targets" Condition="'$(FullBuild)' == 'true'" />
 
   <ItemGroup>

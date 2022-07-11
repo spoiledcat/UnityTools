@@ -21,7 +21,9 @@
     ":!com.spoiledcat.ui/Tests",
     ":!com.spoiledcat.ui/CHANGELOG.md",
     ":!com.spoiledcat.utilities/Tests",
-    ":!com.spoiledcat.utilities/CHANGELOG.md"
+    ":!com.spoiledcat.utilities/CHANGELOG.md",
+    ":!com.spoiledcat.utilities.runtime/Tests",
+    ":!com.spoiledcat.utilities.runtime/CHANGELOG.md"
   ],
   "inherit": true
 }

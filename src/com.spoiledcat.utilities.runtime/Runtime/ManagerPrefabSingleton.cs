@@ -40,14 +40,14 @@ namespace SpoiledCat
 				}
 			}
 #else
-		//if (IsAutoCreated)
-		//{
-		//	if (TryInstantiateFromDefaultPrefab(out var inst))
-		//	{
-		//		Instance = inst;
-		//		return;
-		//	}
-		//}
+			if (IsAutoCreated)
+			{
+				//	if (TryInstantiateFromDefaultPrefab(out var inst))
+				//	{
+				//		Instance = inst;
+				//		return;
+				//	}
+			}
 #endif
 			else
 				base.Awake();
