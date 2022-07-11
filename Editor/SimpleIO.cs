@@ -4,7 +4,7 @@
 // The MIT License(MIT)
 // =====================
 //
-// Copyright © `2017-2019` `Andreia Gaita`
+// Copyright © `2017-2022` `Andreia Gaita`
 // Copyright © `2015-2017` `Lucas Meijer`
 //
 // Permission is hereby granted, free of charge, to any person
@@ -1065,6 +1065,8 @@ namespace SpoiledCat.SimpleIO
 
 			if (String.IsNullOrEmpty(append))
 			{
+				if (IsRoot)
+					return this;
 				if (DirectoryExists())
 					return this;
 				EnsureParentDirectoryExists();
@@ -1093,7 +1095,7 @@ namespace SpoiledCat.SimpleIO
 
 			var parent = Parent;
 			parent.EnsureDirectoryExists();
-			return parent;
+			return this;
 		}
 
 		public SPath FileMustExist()
@@ -1771,7 +1773,7 @@ namespace SpoiledCat.SimpleIO
 
 		public string CommonAppData
 		{
-			get => commonAppData ?? (localAppData = GetFolderPath(Environment.SpecialFolder.CommonApplicationData));
+			get => commonAppData ?? (commonAppData = GetFolderPath(Environment.SpecialFolder.CommonApplicationData));
 			set => commonAppData = value;
 		}
 
