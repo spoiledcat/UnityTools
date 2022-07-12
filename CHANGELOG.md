@@ -2,7 +2,7 @@
 
 <!-- Do not change the line immediately below this comment, the build system will replace it with the actual version and date. -->
 
-## [2.1.5] - 2022-07-12
+## [2.1.6] - 2022-07-12
 
 - Merge back code from editor tasks
 
