@@ -13,6 +13,6 @@ if ($Trace) {
 
 $destdir = Join-Path $rootDirectory 'build\npm'
 
-Get-ChildItem $destdir | % {
+Get-ChildItem $destdir -Filter *.tgz | % {
     Invoke-Command { & npm publish -quiet "$destdir\$($_.Name)" }
 }

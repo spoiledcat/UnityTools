@@ -82,9 +82,7 @@ deploy:
     APPVEYOR_REPO_TAG: true
 
 after_deploy:
-  - ps: |
-      if ($env:APPVEYOR_REPO_TAG -eq "true") {
-        npm config set //registry.spoiledcat.com/:_authToken $env:NPM_TOKEN
-        npm config set always-auth true
-        .\scripts\Publish-ToNpm.ps1
-      }
+  - |
+    if [[ $isPublic -eq 1 ]];then
+      ./publish.sh --npm
+    fi

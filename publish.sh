@@ -8,10 +8,9 @@ if [[ -e "/c/" ]]; then
   OS="Windows"
 fi
 
-CONFIGURATION=Release
 PUBLIC=""
 BUILD=0
-UPM=0
+NPM=0
 UNITYVERSION=2019.2
 YAMATO=0
 BRANCHES=0
@@ -21,30 +20,20 @@ PUBLIC=0
 
 while (( "$#" )); do
   case "$1" in
-    -d|--debug)
-      CONFIGURATION="Debug"
-    ;;
-    -r|--release)
-      CONFIGURATION="Release"
-    ;;
     -p|--public)
       PUBLIC=1
     ;;
     -b|--build)
       BUILD=1
     ;;
-    -u|--upm)
-      UPM=1
+    -u|--npm)
+      NPM=1
     ;;
     -c|--branches)
       BRANCHES=1
     ;;
     -g|--nuget)
       NUGET=1
-    ;;
-    -c)
-      shift
-      CONFIGURATION=$1
     ;;
     -g|--github)
       GITHUB=1
@@ -157,3 +146,19 @@ if [[ x"$NUGET" == x"1" ]]; then
 
 fi
 
+if [[ x"$NPM" == x"1" ]]; then
+
+  if [[ x"${NPM_TOKEN:-}" == x"" ]]; then
+    echo "Can't publish without a NPM_TOKEN environment variable" >&2
+    popd >/dev/null 2>&1
+    exit 1
+  fi
+
+  npm config set //registry.spoiledcat.com/:_authToken $NPM_TOKEN
+  npm config set always-auth true
+  pushd build/npm
+  for pkg in *.tgz;do
+    npm publish -quiet $pkg
+  done
+  popd
+fi
