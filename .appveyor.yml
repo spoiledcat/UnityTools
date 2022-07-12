@@ -31,7 +31,8 @@ before_build:
 - dotnet --info
 - node --version
 - npm --version
-- appveyor-retry dotnet restore -v Minimal
+#- appveyor-retry dotnet restore -v Minimal
+- for i in 1 2 3 4 5; do dotnet restore -v Minimal && break || sleep 2; done
 
 build_script:
 - dotnet build --no-restore -c %CONFIGURATION%
