@@ -30,6 +30,12 @@ while (( "$#" )); do
       shift
       CONFIGURATION=$1
     ;;
+    --ispublic)
+      shift
+      if [[ x"$1" == x"1" ]]; then
+        PUBLIC="-p:PublicRelease=true"
+      fi
+    ;;
     -*|--*=) # unsupported flags
       echo "Error: Unsupported flag $1" >&2
       exit 1

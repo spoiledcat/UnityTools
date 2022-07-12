@@ -23,20 +23,24 @@ environment:
   nodejs_version: "12"
 
 install:
-#- ps: Install-Product node $env:nodejs_version
-- ps: .\scripts\Get-Deps.ps1
+- |
+  mkdir -p lib
+  curl -fSL --output lib/deps.zip https://files.spoiledcat.com/deps.zip
+  7z -y -bb3 x deps.zip
 
 before_build:
 - dotnet --list-sdks
-- dotnet --info
 - node --version
 - npm --version
-#- appveyor-retry dotnet restore -v Minimal
-- for i in 1 2 3 4 5; do dotnet restore -v Minimal && break || sleep 2; done
+- ps: |
+  $env:isPublic=0
+  if ($env:APPVEYOR_REPO_TAG -eq "true") {
+    $env:isPublic=1
+  }
 
 build_script:
-- cmd: dotnet build --no-restore -c %CONFIGURATION%
-- sh: dotnet build --no-restore -c $CONFIGURATION
+- for i in 1 2 3 4 5; do dotnet restore -v Minimal && break || sleep 1; done
+- ./build.sh -c $CONFIGURATION --ispublic $isPublic
 
 test:
   assemblies:
@@ -53,17 +57,10 @@ after_test:
       $fileContent += $env:GHPKEY.Replace(' ', "`n")
       $fileContent += "`n-----END OPENSSH PRIVATE KEY-----`n"
       Set-Content \home\appveyor\.ssh\id_rsa $fileContent
-      $version = $env:APPVEYOR_BUILD_VERSION
-      $isPublic = 0
-      if ($env:APPVEYOR_REPO_TAG -eq "true") {
-        $isPublic = 1
-      }
-      Write-Host "Publishing branches version:$version isPublic:$isPublic"
-      .\scripts\Publish-Branches.ps1 $version $isPublic -IsCI
     }
 
-    dotnet pack --no-build --no-restore -c $env:CONFIGURATION
-    .\scripts\Pack-Packages.ps1
+- ./publish.sh --branches --version $APPVEYOR_BUILD_VERSION --ispublic $isPublic
+- ./pack.sh -c $CONFIGURATION --ispublic $isPublic
 
 artifacts:
 - path: build\**\*.nupkg

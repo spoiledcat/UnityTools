@@ -14,6 +14,10 @@ BUILD=0
 UPM=0
 UNITYVERSION=2019.2
 YAMATO=0
+BRANCHES=0
+NUGET=0
+VERSION=
+PUBLIC=0
 
 while (( "$#" )); do
   case "$1" in
@@ -24,7 +28,7 @@ while (( "$#" )); do
       CONFIGURATION="Release"
     ;;
     -p|--public)
-      PUBLIC="-p:PublicRelease=true"
+      PUBLIC=1
     ;;
     -b|--build)
       BUILD=1
@@ -32,12 +36,29 @@ while (( "$#" )); do
     -u|--upm)
       UPM=1
     ;;
+    -c|--branches)
+      BRANCHES=1
+    ;;
+    -g|--nuget)
+      NUGET=1
+    ;;
     -c)
       shift
       CONFIGURATION=$1
     ;;
     -g|--github)
       GITHUB=1
+    ;;
+    -v|--version)
+      shift
+      VERSION=$1
+    ;;
+    --ispublic)
+      shift
+      PUBLIC=$1
+    ;;
+    --trace)
+      { set -x; } 2>/dev/null
     ;;
     -*|--*=) # unsupported flags
       echo "Error: Unsupported flag $1" >&2
@@ -54,18 +75,85 @@ if [[ x"${YAMATO_JOB_ID:-}" != x"" ]]; then
   export CI_COMMIT_REF_NAME="${GIT_BRANCH:-}"
 fi
 
-if [[ x"${PUBLISH_KEY:-}" == x"" ]]; then
-  echo "Can't publish without a PUBLISH_KEY environment variable in the user:token format" >&2
-  popd >/dev/null 2>&1
-  exit 1
+function updateBranchAndPush() {
+  local branch=$1
+  local destdir=$2
+  local pkgdir=$3
+  local msg=$4
+  local ver=$5
+  local publ=$6
+
+  echo "Publishing branch: $branch/latest ($VERSION)"
+
+  pushd $destdir
+
+  git reset --hard 40c898effcd16bc648ddd57
+  git clean -xdf
+  git reset --hard origin/$branch/latest
+  rm -rf *
+  cp -R $pkgdir/ .
+  git add .
+  git commit -m "$msg"
+  git push origin HEAD:$branch/latest
+
+  if [[ $publ -eq 1 ]]; then
+      echo "Publishing branch: $branch/$VERSION"
+      git push origin HEAD:$branch/$VERSION
+  fi
+
+  popd
+}
+
+if [[ x"$BRANCHES" == x"1" ]]; then
+
+  if [[ x"$VERSION" == x"" ]]; then
+    dotnet tool install -v q --tool-path . nbgv || true
+    VERSION=$(./nbgv cloud -s VisualStudioTeamServices --all-vars -p src|grep NBGV_CloudBuildNumber|cut -d']' -f2)
+    _public=$(./nbgv cloud -s VisualStudioTeamServices --all-vars -p src|grep NBGV_PublicRelease|cut -d']' -f2)
+    if [[ x"${_public}" == x"True" ]]; then
+      PUBLIC=1
+    fi
+  fi
+
+  srcdir=$DIR/build/packages
+  destdir=$( cd .. >/dev/null 2>&1 && pwd )/branches
+  test -d $destdir && rm -rf $destdir
+  mkdir -p $destdir
+  git clone -q --branch=empty git@github.com:spoiledcat/UnityTools $destdir
+
+  pushd $srcdir
+
+  for name in *;do
+    test -f $name/package.json || continue
+    branch=packages/$name
+    msg="$name v$VERSION"
+    pkgdir=$srcdir/$name
+
+    updateBranchAndPush "$branch" "$destdir" "$pkgdir" "$msg" "$VERSION" $PUBLIC
+
+  done
+
+  popd
+
 fi
 
-if [[ x"${PUBLISH_URL:-}" == x"" ]]; then
-  echo "Can't publish without a PUBLISH_URL environment variable" >&2
-  popd >/dev/null 2>&1
-  exit 1
+if [[ x"$NUGET" == x"1" ]]; then
+
+  if [[ x"${PUBLISH_KEY:-}" == x"" ]]; then
+    echo "Can't publish without a PUBLISH_KEY environment variable in the user:token format" >&2
+    popd >/dev/null 2>&1
+    exit 1
+  fi
+
+  if [[ x"${PUBLISH_URL:-}" == x"" ]]; then
+    echo "Can't publish without a PUBLISH_URL environment variable" >&2
+    popd >/dev/null 2>&1
+    exit 1
+  fi
+
+  for p in "$DIR/build/nuget/**/*nupkg"; do
+    dotnet nuget push $p -ApiKey "${PUBLISH_KEY}" -Source "${PUBLISH_URL}"
+  done
+
 fi
 
-for p in "$DIR/build/nuget/**/*nupkg"; do
-  dotnet nuget push $p -ApiKey "${PUBLISH_KEY}" -Source "${PUBLISH_URL}"
-done
