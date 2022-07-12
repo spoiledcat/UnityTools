@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.quick-console",
     "displayName": "SpoiledCat Quick Console",
     "description": "An evaluation console for editor scripts without recompiling the whole project",
-    "version": "2.1.5",
+    "version": "2.1.6",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
@@ -17,8 +17,8 @@
         "registry":"https://registry.spoiledcat.com/"
     },
     "dependencies": {
-        "com.spoiledcat.simpleio": "2.1.5",
-        "com.spoiledcat.simplejson": "2.1.5",
-        "com.spoiledcat.ui": "2.1.5"
+        "com.spoiledcat.simpleio": "2.1.6",
+        "com.spoiledcat.simplejson": "2.1.6",
+        "com.spoiledcat.ui": "2.1.6"
     }
 }
