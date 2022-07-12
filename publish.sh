@@ -91,7 +91,7 @@ function updateBranchAndPush() {
   git clean -xdf
   git reset --hard origin/$branch/latest
   rm -rf *
-  cp -R $pkgdir/ .
+  cp -R $pkgdir/* .
   git add .
   git commit -m "$msg"
   git push origin HEAD:$branch/latest
