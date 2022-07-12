@@ -35,7 +35,8 @@ before_build:
 - for i in 1 2 3 4 5; do dotnet restore -v Minimal && break || sleep 2; done
 
 build_script:
-- dotnet build --no-restore -c %CONFIGURATION%
+- cmd: dotnet build --no-restore -c %CONFIGURATION%
+- sh: dotnet build --no-restore -c $CONFIGURATION
 
 test:
   assemblies:
