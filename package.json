@@ -1,8 +1,8 @@
 {
     "name": "com.spoiledcat.utilities.runtime",
-    "displayName": "SpoiledCat Utilities - Runtime",
+    "displayName": "SpoiledCat Utilities, Runtime only",
     "description": "Handy runtime utilities and classes",
-    "version": "2.1.5",
+    "version": "2.1.6",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
