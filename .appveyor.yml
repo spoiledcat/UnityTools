@@ -52,7 +52,7 @@ after_test:
       $fileContent = "-----BEGIN OPENSSH PRIVATE KEY-----`n"
       $fileContent += $env:GHPKEY.Replace(' ', "`n")
       $fileContent += "`n-----END OPENSSH PRIVATE KEY-----`n"
-      Set-Content c:\users\appveyor\.ssh\id_rsa $fileContent
+      Set-Content \home\appveyor\.ssh\id_rsa $fileContent
       $version = $env:APPVEYOR_BUILD_VERSION
       $isPublic = 0
       if ($env:APPVEYOR_REPO_TAG -eq "true") {
