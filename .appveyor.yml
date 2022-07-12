@@ -24,7 +24,7 @@ environment:
 
 install:
 #- ps: Install-Product node $env:nodejs_version
-- ps: scripts\Get-Deps.ps1
+- ps: .\scripts\Get-Deps.ps1
 
 before_build:
 - dotnet --list-sdks
@@ -57,11 +57,11 @@ after_test:
         $isPublic = 1
       }
       Write-Host "Publishing branches version:$version isPublic:$isPublic"
-      scripts\Publish-Branches.ps1 $version $isPublic -IsCI
+      .\scripts\Publish-Branches.ps1 $version $isPublic -IsCI
     }
 
     dotnet pack --no-build --no-restore -c $env:CONFIGURATION
-    scripts\Pack-Packages.ps1
+    .\scripts\Pack-Packages.ps1
 
 artifacts:
 - path: build\**\*.nupkg
@@ -85,5 +85,5 @@ after_deploy:
       if ($env:APPVEYOR_REPO_TAG -eq "true") {
         npm config set //registry.spoiledcat.com/:_authToken $env:NPM_TOKEN
         npm config set always-auth true
-        scripts\Publish-ToNpm.ps1
+        .\scripts\Publish-ToNpm.ps1
       }
