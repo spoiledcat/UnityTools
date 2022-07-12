@@ -33,10 +33,10 @@ before_build:
 - node --version
 - npm --version
 - ps: |
-  $env:isPublic=0
-  if ($env:APPVEYOR_REPO_TAG -eq "true") {
-    $env:isPublic=1
-  }
+    $env:isPublic=0
+    if ($env:APPVEYOR_REPO_TAG -eq "true") {
+      $env:isPublic=1
+    }
 
 build_script:
 - for i in 1 2 3 4 5; do dotnet restore -v Minimal && break || sleep 1; done
