@@ -1,15 +1,33 @@
 // Copyright 2016-2022 Andreia Gaita
 //
-// This work is licensed under the terms of the MIT license.
-// For a copy, see <https://opensource.org/licenses/MIT>.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Text.RegularExpressions;
+#if SPOILEDCAT_HAS_JSON
+using NotSerialized=SpoiledCat.Json.NotSerializedAttribute;
+using NotSerializedProperty=SpoiledCat.Json.NotSerializedAttribute;
+#else
+using NotSerialized=System.NonSerializedAttribute;
+[System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field)]
+public sealed class NotSerializedPropertyAttribute : Attribute{}
+#endif
 
 namespace SpoiledCat.Utilities
 {
-	using Json;
+#if SPOILEDCAT_HAS_LOGGING
 	using Logging;
+#endif
 
 	[Serializable]
 	public struct TheVersion : IComparable<TheVersion>
@@ -19,29 +37,28 @@ namespace SpoiledCat.Utilities
 		public static TheVersion Default { get; } = default(TheVersion).Initialize(null);
 
 		[NotSerialized] private int major;
-		[NotSerialized] public int Major { get { Initialize(Version); return major; } }
+		[NotSerializedProperty] public int Major { get { Initialize(Version); return major; } }
 		[NotSerialized] private int minor;
-		[NotSerialized] public int Minor { get { Initialize(Version); return minor; } }
+		[NotSerializedProperty] public int Minor { get { Initialize(Version); return minor; } }
 		[NotSerialized] private int patch;
-		[NotSerialized] public int Patch { get { Initialize(Version); return patch; } }
+		[NotSerializedProperty] public int Patch { get { Initialize(Version); return patch; } }
 		[NotSerialized] private int build;
-		[NotSerialized] public int Build { get { Initialize(Version); return build; } }
+		[NotSerializedProperty] public int Build { get { Initialize(Version); return build; } }
 		[NotSerialized] private string special;
-		[NotSerialized] public string Special { get { Initialize(Version); return special; } }
+		[NotSerializedProperty] public string Special { get { Initialize(Version); return special; } }
 		[NotSerialized] private bool isAlpha;
-		[NotSerialized] public bool IsAlpha { get { Initialize(Version); return isAlpha; } }
+		[NotSerializedProperty] public bool IsAlpha { get { Initialize(Version); return isAlpha; } }
 		[NotSerialized] private bool isBeta;
-		[NotSerialized] public bool IsBeta { get { Initialize(Version); return isBeta; } }
+		[NotSerializedProperty] public bool IsBeta { get { Initialize(Version); return isBeta; } }
 		[NotSerialized] private bool isUnstable;
-		[NotSerialized] public bool IsUnstable { get { Initialize(Version); return isUnstable; } }
+		[NotSerializedProperty] public bool IsUnstable { get { Initialize(Version); return isUnstable; } }
 
 		[NotSerialized] private int[] intParts;
 		[NotSerialized] private string[] stringParts;
 		[NotSerialized] private int parts;
 		[NotSerialized] private bool initialized;
 		[NotSerialized] private string version;
-		public string Version { get => version ?? (version = String.Empty); set => version = value;
-		}
+		public string Version { get => version ?? (version = String.Empty); set => version = value; }
 
 		private static readonly Regex regex = new Regex(versionRegex);
 
@@ -77,7 +94,11 @@ namespace SpoiledCat.Utilities
 			var match = regex.Match(theVersion);
 			if (!match.Success)
 			{
-				LogHelper.GetLogger<TheVersion>().Error(new ArgumentException("Invalid version: " + theVersion, "theVersion"));
+#if SPOILEDCAT_HAS_LOGGING
+				LogHelper.GetLogger<TheVersion>().Error(new ArgumentException("Invalid version: " + theVersion, nameof(theVersion)));
+#elif UNITY_2017_1_OR_NEWER
+				UnityEngine.Debug.LogException(new ArgumentException("Invalid version: " + theVersion, nameof(theVersion)));
+#endif
 				return this;
 			}
 

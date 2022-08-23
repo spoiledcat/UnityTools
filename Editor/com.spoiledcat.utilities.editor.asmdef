@@ -1,5 +1,6 @@
 {
     "name": "com.spoiledcat.utilities",
+    "rootNamespace": "",
     "references": [
         "com.spoiledcat.simpleio",
         "com.spoiledcat.logging",
@@ -7,7 +8,6 @@
         "com.spoiledcat.environment",
         "com.spoiledcat.sharpziplib"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -17,5 +17,32 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [
+        {
+            "name": "com.spoiledcat.logging",
+            "expression": "0.0.0-placeholder",
+            "define": "SPOILEDCAT_HAS_LOGGING"
+        },
+        {
+            "name": "com.spoiledcat.simplejson",
+            "expression": "0.0.0-placeholder",
+            "define": "SPOILEDCAT_HAS_JSON"
+        },
+        {
+            "name": "com.spoiledcat.simpleio",
+            "expression": "0.0.0-placeholder",
+            "define": "SPOILEDCAT_HAS_IO"
+        },
+        {
+            "name": "com.spoiledcat.sharpziplib",
+            "expression": "0.0.0-placeholder",
+            "define": "SPOILEDCAT_HAS_ZIP"
+        },
+        {
+            "name": "com.spoiledcat.environment",
+            "expression": "0.0.0-placeholder",
+            "define": "SPOILEDCAT_HAS_ENV"
+        }
+    ],
+    "noEngineReferences": false
 }

@@ -1,25 +1,18 @@
 {
-    "name": "com.spoiledcat.utilities",
-    "displayName": "SpoiledCat Utilities",
-    "description": "Handy utilities primitives like string extension methods and unzip tools!",
-    "version": "2.1.6",
-    "license" : "MIT",
-    "author": {
-      "name": "Andreia Gaita",
-      "email": "shana@spoiledcat.net"
-    },
-    "repository" : {
-        "type" : "git",
-        "url": "ssh://git@github.com/spoiledcat/UnityTools.git"
-    },
-    "publishConfig": {
-        "registry":"https://registry.spoiledcat.com/"
-    },
-    "dependencies": {
-        "com.spoiledcat.environment": "2.1.6",
-        "com.spoiledcat.logging": "2.1.6",
-        "com.spoiledcat.simpleio": "2.1.6",
-        "com.spoiledcat.sharpziplib": "2.1.6",
-        "com.spoiledcat.simplejson": "2.1.6"
-    }
+  "name": "com.spoiledcat.utilities",
+  "displayName": "SpoiledCat Utilities",
+  "description": "Handy utilities primitives like string extension methods and unzip tools!",
+  "version": "2.1.7-preview-gea0447e624",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Andreia Gaita",
+    "email": "shana@spoiledcat.net"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/spoiledcat/UnityTools.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.spoiledcat.com/"
+  }
 }
