@@ -78,7 +78,7 @@ function updateBranchAndPush() {
 
   git reset --hard 40c898effcd16bc648ddd57
   git clean -xdf
-  git reset --hard origin/$branch/latest
+  git reset --hard origin/$branch/latest >/dev/null 2>&1||true
   rm -rf *
   cp -R $pkgdir/* .
   git add .
