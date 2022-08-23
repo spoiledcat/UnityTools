@@ -37,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helper.WebServer", "tests\H
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBase", "tests\Helpers\TestBase\TestBase.csproj", "{D85495CD-E955-4E08-8D57-7381C6CA88EF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.SimpleIO", "src\com.spoiledcat.simpleio\Runtime\SpoiledCat.SimpleIO.csproj", "{BA3EC028-1970-4F51-95B5-2C18C7706925}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.SimpleIO.Runtime", "src\com.spoiledcat.simpleio.runtime\Runtime\SpoiledCat.SimpleIO.Runtime.csproj", "{BA3EC028-1970-4F51-95B5-2C18C7706925}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

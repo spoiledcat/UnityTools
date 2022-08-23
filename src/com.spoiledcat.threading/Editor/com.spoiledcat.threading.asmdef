@@ -1,9 +1,10 @@
 {
     "name": "com.spoiledcat.threading",
+    "rootNamespace": "",
     "references": [
-        "com.spoiledcat.environment",
-        "com.spoiledcat.simpleio",
-        "com.spoiledcat.logging"
+        "GUID:0eb9ccb2c7c9e1b48970ab881f3bd787",
+        "GUID:0419205829404da2bdd224c9364dcbb9",
+        "GUID:5bf40a4773817614db3c8c08715df070"
     ],
     "includePlatforms": [
         "Editor"

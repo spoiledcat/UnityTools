@@ -10,7 +10,6 @@
         "com.spoiledcat.ui",
         "com.spoiledcat.utilities",
         "com.spoiledcat.sharpziplib",
-        "com.spoiledcat.processmanager",
         "com.spoiledcat.environment"
     ],
     "includePlatforms": [

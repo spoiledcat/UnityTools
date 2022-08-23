@@ -1,11 +1,11 @@
 {
     "name": "com.spoiledcat.environment",
+    "rootNamespace": "",
     "references": [
-        "com.spoiledcat.simpleio",
-        "com.spoiledcat.logging",
-        "com.spoiledcat.simplejson"
+        "GUID:0419205829404da2bdd224c9364dcbb9",
+        "GUID:5bf40a4773817614db3c8c08715df070",
+        "GUID:ebfacd876c3bc004db083475f365824d"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -15,5 +15,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

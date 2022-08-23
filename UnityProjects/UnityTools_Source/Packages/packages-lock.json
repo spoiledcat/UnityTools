@@ -38,6 +38,12 @@
       "source": "local",
       "dependencies": {}
     },
+    "com.spoiledcat.simpleio.runtime": {
+      "version": "file:../../../src/com.spoiledcat.simpleio.runtime",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.spoiledcat.simplejson": {
       "version": "file:../../../src/com.spoiledcat.simplejson",
       "depth": 0,

@@ -1,11 +1,11 @@
 {
     "name": "com.spoiledcat.quick-console",
+    "rootNamespace": "",
     "references": [
-        "com.spoiledcat.simplejson",
-        "com.spoiledcat.ui",
-        "com.spoiledcat.simpleio"
+        "GUID:ebfacd876c3bc004db083475f365824d",
+        "GUID:efaa3bc815a71744fab34654993efcd3",
+        "GUID:0419205829404da2bdd224c9364dcbb9"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -15,5 +15,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

@@ -5,6 +5,7 @@
     "com.spoiledcat.quick-console": "file:../../../src/com.spoiledcat.quick-console",
     "com.spoiledcat.sharpziplib": "file:../../../src/com.spoiledcat.sharpziplib",
     "com.spoiledcat.simpleio": "file:../../../src/com.spoiledcat.simpleio",
+    "com.spoiledcat.simpleio.runtime": "file:../../../src/com.spoiledcat.simpleio.runtime",
     "com.spoiledcat.simplejson": "file:../../../src/com.spoiledcat.simplejson",
     "com.spoiledcat.threading": "file:../../../src/com.spoiledcat.threading",
     "com.spoiledcat.threading.tasks": "file:../../../src/com.spoiledcat.threading.tasks",
