@@ -60,7 +60,10 @@
       "source": "local",
       "dependencies": {
         "com.spoiledcat.threading": "0.0.0-placeholder",
-        "com.spoiledcat.utilities": "0.0.0-placeholder"
+        "com.spoiledcat.utilities": "0.0.0-placeholder",
+        "com.spoiledcat.simpleio": "0.0.0-placeholder",
+        "com.spoiledcat.logging": "0.0.0-placeholder",
+        "com.spoiledcat.sharpziplib": "0.0.0-placeholder"
       }
     },
     "com.spoiledcat.ui": {
@@ -75,13 +78,7 @@
       "version": "file:../../../src/com.spoiledcat.utilities",
       "depth": 0,
       "source": "local",
-      "dependencies": {
-        "com.spoiledcat.environment": "0.0.0-placeholder",
-        "com.spoiledcat.logging": "0.0.0-placeholder",
-        "com.spoiledcat.simpleio": "0.0.0-placeholder",
-        "com.spoiledcat.sharpziplib": "0.0.0-placeholder",
-        "com.spoiledcat.simplejson": "0.0.0-placeholder"
-      }
+      "dependencies": {}
     },
     "com.spoiledcat.utilities.runtime": {
       "version": "file:../../../src/com.spoiledcat.utilities.runtime",

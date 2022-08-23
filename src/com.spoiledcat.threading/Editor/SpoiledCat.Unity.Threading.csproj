@@ -29,6 +29,7 @@
     <PackageId>$(AssemblyName)</PackageId>
   </PropertyGroup>
 
+  <Import Project="$(RootDir)common\configuration.props" />
   <Import Project="$(RootDir)common\unityreferences.targets" Condition="'$(Configuration)'=='DebugUnity' or '$(Configuration)'=='ReleaseUnity'" />
   <Import Project="$(RootDir)common\packaging.targets" Condition="'$(FullBuild)' == 'true'" />
 

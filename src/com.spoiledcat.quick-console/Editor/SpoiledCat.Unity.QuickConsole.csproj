@@ -30,6 +30,7 @@
     <PackageId>$(AssemblyName)</PackageId>
   </PropertyGroup>
 
+  <Import Project="$(RootDir)common\configuration.props" />
   <Import Project="$(RootDir)common\unityreferences.targets" />
   <Import Project="$(RootDir)common\packaging.targets" Condition="'$(FullBuild)' == 'true'" />
 

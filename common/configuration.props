@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <AllDefines>SPOILEDCAT_HAS_ZIP;SPOILEDCAT_HAS_JSON;SPOILEDCAT_HAS_IO;SPOILEDCAT_HAS_LOGGING;SPOILEDCAT_HAS_ENV</AllDefines>
+    <DefineConstants>$(DefineConstants);$(AllDefines)</DefineConstants>
+  </PropertyGroup>
+</Project>

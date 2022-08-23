@@ -1,23 +1,26 @@
 {
-    "name": "com.spoiledcat.threading.tasks",
-    "displayName": "SpoiledCat threading Tasks",
-    "description": "Premade tasks for use with the SpoiledCat Threading package",
-    "version": "0.0.0-placeholder",
-    "license" : "MIT",
-    "author": {
-      "name": "Andreia Gaita",
-      "email": "shana@spoiledcat.net"
-    },
-    "repository" : {
-      "type" : "git",
-      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
-      "directory": ""
-    },
-    "publishConfig": {
-        "registry":"https://registry.spoiledcat.com/"
-    },
-    "dependencies": {
-        "com.spoiledcat.threading": "0.0.0-placeholder",
-        "com.spoiledcat.utilities": "0.0.0-placeholder"
-    }
+  "name": "com.spoiledcat.threading.tasks",
+  "displayName": "SpoiledCat threading Tasks",
+  "description": "Premade tasks for use with the SpoiledCat Threading package",
+  "version": "0.0.0-placeholder",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Andreia Gaita",
+    "email": "shana@spoiledcat.net"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+    "directory": ""
+  },
+  "publishConfig": {
+    "registry": "https://registry.spoiledcat.com/"
+  },
+  "dependencies": {
+    "com.spoiledcat.threading": "0.0.0-placeholder",
+    "com.spoiledcat.utilities": "0.0.0-placeholder",
+    "com.spoiledcat.simpleio": "0.0.0-placeholder",
+    "com.spoiledcat.logging": "0.0.0-placeholder",
+    "com.spoiledcat.sharpziplib": "0.0.0-placeholder"
+  }
 }

@@ -267,6 +267,7 @@ public class LargeAssetManager
 		var unzipper = new TaskQueue<SPath>(TaskManager);
 		foreach (var asset in assetList.Where(x => x.NeedsUnzip))
 		{
+#if SPOILEDCAT_HAS_ZIP
 			var unzipStamp = asset.LocalPath.Parent.Combine($".{asset.Filename}");
 			if (unzipStamp.FileExists() && unzipStamp.ReadAllText() == asset.Hash)
 				continue;
@@ -278,6 +279,7 @@ public class LargeAssetManager
 				}
 			};
 			unzipper.Queue(task);
+#endif
 		}
 
 		unzipper.Progress(progress => {
