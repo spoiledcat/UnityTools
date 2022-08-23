@@ -2,11 +2,11 @@
     "name": "com.spoiledcat.utilities",
     "rootNamespace": "",
     "references": [
-        "com.spoiledcat.simpleio",
-        "com.spoiledcat.logging",
-        "com.spoiledcat.simplejson",
-        "com.spoiledcat.environment",
-        "com.spoiledcat.sharpziplib"
+        "GUID:0419205829404da2bdd224c9364dcbb9",
+        "GUID:5bf40a4773817614db3c8c08715df070",
+        "GUID:ebfacd876c3bc004db083475f365824d",
+        "GUID:0eb9ccb2c7c9e1b48970ab881f3bd787",
+        "GUID:5ab4ec1d3f2df1145b431a813564dab5"
     ],
     "includePlatforms": [
         "Editor"

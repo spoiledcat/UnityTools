@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if SPOILEDCAT_HAS_IO
+#if SPOILEDCAT_HAS_IO && SPOILEDCAT_HAS_ENV
 using System.IO;
 using System.Linq;
 using System.Reflection;
