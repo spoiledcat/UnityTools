@@ -1,9 +1,9 @@
 {
     "name": "com.spoiledcat.ui",
+    "rootNamespace": "",
     "references": [
-        "com.spoiledcat.threading"
+        "GUID:354f3f42ad547974db67e633b313dbf4"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -13,5 +13,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }
