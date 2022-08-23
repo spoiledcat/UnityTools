@@ -3,7 +3,7 @@
     "displayName": "Tests - SpoiledCat Threading",
     "description": "Tests - SpoiledCat Threading",
     "type": "tests",
-    "version": "2.1.7-preview-gea0447e624",
+    "version": "2.1.9-preview-g4c13f2d097",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
@@ -18,10 +18,10 @@
         "registry":"https://registry.spoiledcat.com/"
     },
     "dependencies": {
-        "com.spoiledcat.threading": "2.1.7-preview-gea0447e624",
-        "com.spoiledcat.logging": "2.1.7-preview-gea0447e624",
-        "com.spoiledcat.utilities": "2.1.7-preview-gea0447e624",
-        "com.spoiledcat.simpleio": "2.1.7-preview-gea0447e624",
-        "com.spoiledcat.threading.tasks": "2.1.7-preview-gea0447e624"
+        "com.spoiledcat.threading": "2.1.9-preview-g4c13f2d097",
+        "com.spoiledcat.logging": "2.1.9-preview-g4c13f2d097",
+        "com.spoiledcat.utilities": "2.1.9-preview-g4c13f2d097",
+        "com.spoiledcat.simpleio": "2.1.9-preview-g4c13f2d097",
+        "com.spoiledcat.threading.tasks": "2.1.9-preview-g4c13f2d097"
     }
 }
