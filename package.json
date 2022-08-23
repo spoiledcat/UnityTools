@@ -1,0 +1,19 @@
+{
+    "name": "com.spoiledcat.simpleio.runtime",
+    "displayName": "SpoiledCat SimpleIO Runtime",
+    "description": "A simple IO abstraction, runtime only",
+    "version": "2.1.9-preview-g4c13f2d097",
+    "license" : "MIT",
+    "author": {
+      "name": "Andreia Gaita",
+      "email": "shana@spoiledcat.net"
+    },
+    "repository" : {
+      "type" : "git",
+      "url": "ssh://git@github.com/spoiledcat/UnityTools.git",
+      "directory": "src/com.spoiledcat.simpleio.runtime"
+    },
+    "publishConfig": {
+        "registry":"https://registry.spoiledcat.com/"
+    }
+}
