@@ -48,5 +48,6 @@
     <ProjectReference Include="..\..\com.spoiledcat.simpleio\Editor\SpoiledCat.Unity.SimpleIO.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.sharpziplib\Editor\SpoiledCat.Unity.SharpZipLib.csproj" />
     <ProjectReference Include="..\..\com.spoiledcat.simplejson\Editor\SpoiledCat.Unity.SimpleJson.csproj" />
+    <ProjectReference Include="..\..\com.spoiledcat.utilities.runtime\Runtime\SpoiledCat.Unity.Utilities.Runtime.csproj" />
   </ItemGroup>
 </Project>

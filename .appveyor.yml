@@ -83,6 +83,6 @@ deploy:
 
 after_deploy:
   - |
-    if [[ $isPublic -eq 1 ]];then
+    if [[ x"${APPVEYOR:-}" != x"" && ( x"${APPVEYOR_REPO_TAG:-}" == x"true" || ( x"${APPVEYOR_PULL_REQUEST_NUMBER:-}" == x"" && x"${APPVEYOR_REPO_BRANCH:-}" == x"master" )) ]]; then
       ./publish.sh --npm
     fi
