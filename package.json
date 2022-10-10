@@ -2,7 +2,7 @@
   "name": "com.spoiledcat.utilities",
   "displayName": "SpoiledCat Utilities",
   "description": "Handy utilities primitives like string extension methods and unzip tools!",
-  "version": "2.2.1",
+  "version": "2.2.2-preview-gef3d480695",
   "license": "Apache-2.0",
   "author": {
     "name": "Andreia Gaita",
