@@ -95,8 +95,8 @@ namespace SpoiledCat.Threading
 			this.Total = total;
 			this.Message = message;
 			this.InnerProgress = innerProgress;
-			this.OnProgress = null;
 			this.Changed = true;
+			OnProgress = null;
 		}
 
 		public IProgress UpdateProgress(long value, long total, string message = null,

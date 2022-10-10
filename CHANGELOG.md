@@ -2,7 +2,7 @@
 
 <!-- Do not change the line immediately below this comment, the build system will replace it with the actual version and date. -->
 
-## [2.2.1] - 2022-09-27
+## [2.2.2-preview-gef3d480695] - 2022-10-10
 
 - Merge back code from editor tasks
 
