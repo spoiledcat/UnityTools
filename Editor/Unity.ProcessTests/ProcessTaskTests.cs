@@ -226,7 +226,7 @@ namespace ProcessManagerTests
 				{
 					monoPath = test.Environment.UnityApplicationContents.Combine(monoPath);
 					var task = new MonoProcessTask(test.TaskManager, test.ProcessManager, TestApp, "-d 1");
-					Assert.AreEqual(monoPath, task.ProcessName.ToSPath());
+					Assert.AreEqual(monoPath.ToSPath(), task.ProcessName.ToSPath());
 					Assert.AreEqual($"{TestApp} -d 1", task.ProcessArguments);
 					foreach (var frame in StartAndWaitForCompletion(task)) yield return frame;
 					Assert.AreEqual($"1{test.Environment.NewLine}", task.Result);

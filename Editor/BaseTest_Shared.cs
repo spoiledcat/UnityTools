@@ -84,12 +84,11 @@ namespace BaseTests
 			var projectPath = TestPath.Combine("project").EnsureDirectoryExists();
 
 #if UNITY_EDITOR
-			Environment.Initialize(projectPath, TheEnvironment.instance.Environment.UnityVersion, TheEnvironment.instance.Environment.UnityApplication, TheEnvironment.instance.Environment.UnityApplicationContents);
+			Environment.Initialize(projectPath, projectPath, TheEnvironment.instance.Environment.UnityVersion, TheEnvironment.instance.Environment.UnityApplication, TheEnvironment.instance.Environment.UnityApplicationContents);
 			return;
 #endif
 
-			SPath unityPath, unityContentsPath;
-			unityPath = CurrentExecutionDirectory;
+			(SPath unityPath, SPath unityContentsPath) = (CurrentExecutionDirectory, SPath.Default);
 
 			while (!unityPath.IsEmpty && !unityPath.DirectoryExists(".Editor"))
 				unityPath = unityPath.Parent;
@@ -97,14 +96,17 @@ namespace BaseTests
 			if (!unityPath.IsEmpty)
 			{
 				unityPath = unityPath.Combine(".Editor");
-				unityContentsPath = unityPath.Combine("Data");
+				if (unityPath.DirectoryExists("Data"))
+					unityContentsPath = unityPath.Combine("Data");
+				else if (unityPath.DirectoryExists("Contents"))
+					unityContentsPath = unityPath.Combine("Contents");
 			}
 			else
 			{
 				unityPath = unityContentsPath = SPath.Default;
 			}
 
-			Environment.Initialize(projectPath, "2019.2", unityPath, unityContentsPath);
+			Environment.Initialize(projectPath, projectPath, "2019.2", unityPath, unityContentsPath);
 		}
 
 		public void Dispose()
