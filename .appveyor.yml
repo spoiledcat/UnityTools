@@ -63,6 +63,7 @@ after_test:
 
 - ./publish.sh --branches --version $APPVEYOR_BUILD_VERSION --ispublic $isPublic
 - ./pack.sh -c $CONFIGURATION --ispublic $isPublic
+- ./publish.sh --npm --ispublic $isPublic
 
 artifacts:
 - path: build\**\*.nupkg
@@ -80,9 +81,3 @@ deploy:
   artifact: /.*\.nupkg/
   on:
     APPVEYOR_REPO_TAG: true
-
-after_deploy:
-  - |
-    if [[ x"${APPVEYOR:-}" != x"" && ( x"${APPVEYOR_REPO_TAG:-}" == x"true" || ( x"${APPVEYOR_PULL_REQUEST_NUMBER:-}" == x"" && x"${APPVEYOR_REPO_BRANCH:-}" == x"master" )) ]]; then
-      ./publish.sh --npm
-    fi
