@@ -42,6 +42,16 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
+#if UNITY_5_3_OR_NEWER
+using SerializeField=UnityEngine.SerializeField;
+using SerializeFieldProperty=UnityEngine.SerializeField;
+#else
+using SerializeField=SerializePropertyAttribute;
+using SerializeFieldProperty=SerializePropertyAttribute;
+[System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field)]
+public sealed class SerializePropertyAttribute : Attribute{}
+#endif
+
 namespace SpoiledCat.SimpleIO
 {
 	using System.Globalization;
@@ -59,33 +69,12 @@ namespace SpoiledCat.SimpleIO
 	{
 		public static SPath Default;
 
-#if UNITY_5_3_OR_NEWER
-		[UnityEngine.SerializeField]
-#else
-		[NonSerialized]
-#endif
-		private string[] elements;
-#if UNITY_5_3_OR_NEWER
-		[UnityEngine.SerializeField]
-#else
-		[NonSerialized]
-#endif
-		private string driveLetter;
+		[SerializeField] private string[] elements;
+		[SerializeField] private string driveLetter;
+		[SerializeField] private bool isInitialized;
+		[SerializeField] private bool isRelative;
 
-#if UNITY_5_3_OR_NEWER
-		[UnityEngine.SerializeField]
-#else
-		[NonSerialized]
-#endif
-		private bool isInitialized;
-
-#if UNITY_5_3_OR_NEWER
-		[UnityEngine.SerializeField]
-#else
-		[NonSerialized]
-#endif
-		private bool isRelative;
-
+		[NonSerialized] private bool driveLetterInitialized;
 		#region construction
 
 		public SPath(string path)
@@ -93,6 +82,7 @@ namespace SpoiledCat.SimpleIO
 			EnsureNotNull(path, "path");
 
 			isInitialized = true;
+			driveLetterInitialized = true;
 
 			path = ParseDriveLetter(path, out driveLetter);
 
@@ -122,8 +112,9 @@ namespace SpoiledCat.SimpleIO
 		{
 			this.elements = elements;
 			this.isRelative = isRelative;
-			this.driveLetter = driveLetter;
-			this.isInitialized = true;
+			this.driveLetter = driveLetter?.Length == 0 ? null : driveLetter;
+			driveLetterInitialized = true;
+			isInitialized = true;
 		}
 
 		private static string[] ParseSplitStringIntoElements(IEnumerable<string> inputs, bool isRelative)
@@ -213,7 +204,7 @@ namespace SpoiledCat.SimpleIO
 
 			if (!IsChildOf(path))
 			{
-				if (!IsRelative && !path.IsRelative && driveLetter != path.driveLetter)
+				if (!IsRelative && !path.IsRelative && DriveLetter != path.DriveLetter)
 					throw new ArgumentException(
 						"Path.RelativeTo() was invoked with two paths that are on different volumes. invoked on: " +
 						ToString() + " asked to be made relative to: " + path);
@@ -251,7 +242,7 @@ namespace SpoiledCat.SimpleIO
 
 			if (!IsChildOf(path))
 			{
-				if (!IsRelative && !path.IsRelative && driveLetter != path.driveLetter)
+				if (!IsRelative && !path.IsRelative && DriveLetter != path.DriveLetter)
 					return Default;
 
 				SPath commonParent = Default;
@@ -289,6 +280,16 @@ namespace SpoiledCat.SimpleIO
 		public bool IsRelative => isRelative;
 		public bool IsInitialized => isInitialized;
 
+		private string DriveLetter {
+			get {
+				if (!driveLetterInitialized)
+				{
+					driveLetter = driveLetter?.Length == 0 ? null : driveLetter;
+					driveLetterInitialized = true;
+				}
+				return driveLetter;
+			}
+		}
 
 		public string FileName {
 			get {
@@ -330,10 +331,8 @@ namespace SpoiledCat.SimpleIO
 		public bool Exists(string append)
 		{
 			ThrowIfNotInitialized();
-			if (String.IsNullOrEmpty(append))
-			{
+			if (string.IsNullOrEmpty(append))
 				return Exists();
-			}
 			return Exists(new SPath(append));
 		}
 
@@ -354,7 +353,7 @@ namespace SpoiledCat.SimpleIO
 		public bool DirectoryExists(string append)
 		{
 			ThrowIfNotInitialized();
-			if (String.IsNullOrEmpty(append))
+			if (string.IsNullOrEmpty(append))
 				return DirectoryExists();
 			return DirectoryExists(new SPath(append));
 		}
@@ -376,7 +375,7 @@ namespace SpoiledCat.SimpleIO
 		public bool FileExists(string append)
 		{
 			ThrowIfNotInitialized();
-			if (String.IsNullOrEmpty(append))
+			if (string.IsNullOrEmpty(append))
 				return FileExists();
 			return FileExists(new SPath(append));
 		}
@@ -396,8 +395,8 @@ namespace SpoiledCat.SimpleIO
 					throw new ArgumentException("A root directory does not have an extension");
 
 				var last = elements.Last();
-				var index = last.LastIndexOf(".");
-				if (index < 0) return String.Empty;
+				var index = last.LastIndexOf(".", StringComparison.InvariantCulture);
+				if (index < 0) return string.Empty;
 				return last.Substring(index);
 			}
 		}
@@ -420,17 +419,17 @@ namespace SpoiledCat.SimpleIO
 		public string ToString(SlashMode slashMode)
 		{
 			if (!IsInitialized)
-				return String.Empty;
+				return string.Empty;
 
 			// Check if it's linux root /
-			if (IsRoot && string.IsNullOrEmpty(driveLetter))
+			if (IsRoot && DriveLetter == null)
 				return Slash(slashMode).ToString();
 
 			if (IsRelative && elements.Length == 0)
 				return ".";
 
 			var sb = new StringBuilder();
-			if (driveLetter != null)
+			if (DriveLetter != null)
 			{
 				sb.Append(driveLetter);
 				sb.Append(":");
@@ -488,7 +487,7 @@ namespace SpoiledCat.SimpleIO
 			if (p.IsRelative != IsRelative)
 				return false;
 
-			if (!string.Equals(p.driveLetter, driveLetter, PathStringComparison))
+			if (!string.Equals(p.DriveLetter, DriveLetter, PathStringComparison))
 				return false;
 
 			if (p.elements.Length != elements.Length)
@@ -510,16 +509,14 @@ namespace SpoiledCat.SimpleIO
 		{
 			unchecked
 			{
-				int hash = 17;
+				int hash = (int) 2166136261;
 				// Suitable nullity checks etc, of course :)
-				hash = hash * 23 + IsInitialized.GetHashCode();
-				if (!IsInitialized)
+				if (!isInitialized)
 					return hash;
-				hash = hash * 23 + IsRelative.GetHashCode();
+				hash = hash * 16777619 + isRelative.GetHashCode();
+				hash = hash * 16777619 + DriveLetter?.ToUpperInvariant().GetHashCode() ?? 0;
 				foreach (var element in elements)
-					hash = hash * 23 + (IsUnix ? element : element.ToUpperInvariant()).GetHashCode();
-				if (driveLetter != null)
-					hash = hash * 23 + (IsUnix ? driveLetter : driveLetter.ToUpperInvariant()).GetHashCode();
+					hash = hash * 16777619 + (IsUnix ? element : element.ToUpperInvariant()).GetHashCode();
 				return hash;
 			}
 		}
@@ -699,17 +696,7 @@ namespace SpoiledCat.SimpleIO
 			if (IsRelative)
 				return this;
 
-			var sb = new StringBuilder();
-			var first = true;
-			foreach (var element in elements)
-			{
-				if (!first)
-					sb.Append('/');
-				first = false;
-				sb.Append(element);
-			}
-
-			return new SPath(sb.ToString());
+			return new SPath(elements, true, null);
 		}
 
 		SPath CopyWithDeterminedDestination(SPath absoluteDestination, Func<SPath, bool> fileFilter)
@@ -824,7 +811,7 @@ namespace SpoiledCat.SimpleIO
 		public static SPath GetTempFilename(string myprefix = "")
 		{
 			var random = new Random();
-			var prefix = FileSystem.TempPath+ "/" + (String.IsNullOrEmpty(myprefix) ? "" : myprefix + "_");
+			var prefix = FileSystem.TempPath+ "/" + (string.IsNullOrEmpty(myprefix) ? "" : myprefix + "_");
 			while (true)
 			{
 				var candidate = new SPath(prefix + random.Next());
@@ -1063,7 +1050,7 @@ namespace SpoiledCat.SimpleIO
 		{
 			ThrowIfNotInitialized();
 
-			if (String.IsNullOrEmpty(append))
+			if (string.IsNullOrEmpty(append))
 			{
 				if (IsRoot)
 					return this;
@@ -1134,7 +1121,7 @@ namespace SpoiledCat.SimpleIO
 			// If the other path is the root directory, then anything is a child of it as long as it's not a Windows path
 			if (potentialBasePath.IsRoot)
 			{
-				if (driveLetter != potentialBasePath.driveLetter)
+				if (DriveLetter != potentialBasePath.DriveLetter)
 					return false;
 				return true;
 			}
@@ -1223,7 +1210,7 @@ namespace SpoiledCat.SimpleIO
 			string caller = "")
 		{
 			if (value != null) return value;
-			string message = String.Format(CultureInfo.InvariantCulture, "In {0}, '{1}' must not be null", caller, name);
+			var message = string.Format(CultureInfo.InvariantCulture, "In {0}, '{1}' must not be null", caller, name);
 			throw new ArgumentNullException(name, message);
 		}
 
@@ -1448,36 +1435,29 @@ namespace SpoiledCat.SimpleIO
 		public bool FileExists(string filename)
 		{
 			if (!Path.IsPathRooted(filename))
-				throw new ArgumentException("FileExists requires a rooted path", "filename");
+				throw new ArgumentException("FileExists requires a rooted path", nameof(filename));
 			return File.Exists(filename);
 		}
 
 		public IEnumerable<string> GetDirectories(string path)
 		{
 			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("GetDirectories requires a rooted path", "path");
+				throw new ArgumentException("GetDirectories requires a rooted path", nameof(path));
 			return Directory.GetDirectories(path);
 		}
 
-		public string Combine(string path1, string path2)
-		{
-			return Path.Combine(path1, path2);
-		}
+		public string Combine(string path1, string path2) => Path.Combine(path1, path2);
 
-		public string Combine(string path1, string path2, string path3)
-		{
-			return Path.Combine(Path.Combine(path1, path2), path3);
-		}
+		public string Combine(string path1, string path2, string path3) => Path.Combine(Path.Combine(path1, path2), path3);
 
-		public string GetFullPath(string path)
-		{
-			return Path.GetFullPath(path);
-		}
+		public string GetFullPath(string path) => Path.GetFullPath(path);
+		public string ChangeExtension(string path, string extension) => Path.ChangeExtension(path, extension);
+		public string GetFileNameWithoutExtension(string fileName) => Path.GetFileNameWithoutExtension(fileName);
 
 		public bool DirectoryExists(string path)
 		{
 			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("DirectoryExists requires a rooted path", "path");
+				throw new ArgumentException("DirectoryExists requires a rooted path", nameof(path));
 			return Directory.Exists(path);
 		}
 
@@ -1490,25 +1470,17 @@ namespace SpoiledCat.SimpleIO
 		public IEnumerable<string> GetDirectories(string path, string pattern)
 		{
 			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("GetDirectories requires a rooted path", "path");
+				throw new ArgumentException("GetDirectories requires a rooted path", nameof(path));
 			return Directory.GetDirectories(path, pattern);
 		}
 
 		public IEnumerable<string> GetDirectories(string path, string pattern, SearchOption searchOption)
 		{
 			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("GetDirectories requires a rooted path", "path");
+				throw new ArgumentException("GetDirectories requires a rooted path", nameof(path));
 			return Directory.GetDirectories(path, pattern, searchOption);
-		}
 
-		public string ChangeExtension(string path, string extension)
-		{
-			return Path.ChangeExtension(path, extension);
-		}
 
-		public string GetFileNameWithoutExtension(string fileName)
-		{
-			return Path.GetFileNameWithoutExtension(fileName);
 		}
 
 		public IEnumerable<string> GetFiles(string path)
@@ -1519,7 +1491,7 @@ namespace SpoiledCat.SimpleIO
 		public IEnumerable<string> GetFiles(string path, string pattern)
 		{
 			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("GetFiles requires a rooted path", "path");
+				throw new ArgumentException("GetFiles requires a rooted path", nameof(path));
 			return Directory.GetFiles(path, pattern);
 		}
 
@@ -1569,114 +1541,101 @@ namespace SpoiledCat.SimpleIO
 			}
 		}
 
+		internal static void ValidatePath(string value, string argName, [CallerMemberName] string caller = null)
+		{
+			if (!Path.IsPathRooted(value))
+				throw new ArgumentException($"{caller} requires a rooted path", argName);
+		}
 		public byte[] ReadAllBytes(string path)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("ReadAllBytes requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			return File.ReadAllBytes(path);
 		}
 
 		public void WriteAllBytes(string path, byte[] bytes)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("WriteAllBytes requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			File.WriteAllBytes(path, bytes);
 		}
 
 		public void DirectoryCreate(string path)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("DirectoryCreate requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			Directory.CreateDirectory(path);
 		}
 
 		public void FileCopy(string sourceFileName, string destFileName, bool overwrite)
 		{
-			if (!Path.IsPathRooted(sourceFileName))
-				throw new ArgumentException("FileCopy requires a rooted path", "sourceFileName");
-			if (!Path.IsPathRooted(destFileName))
-				throw new ArgumentException("FileCopy requires a rooted path", "destFileName");
+			ValidatePath(sourceFileName, nameof(sourceFileName));
+			ValidatePath(destFileName, nameof(destFileName));
 			File.Copy(sourceFileName, destFileName, overwrite);
 		}
 
 		public void FileDelete(string path)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("FileDelete requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			File.Delete(path);
 		}
 
 		public void DirectoryDelete(string path, bool recursive)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("DirectoryDelete requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			Directory.Delete(path, recursive);
 		}
 
 		public void FileMove(string sourceFileName, string destFileName)
 		{
-			if (!Path.IsPathRooted(sourceFileName))
-				throw new ArgumentException("FileMove requires a rooted path", "sourceFileName");
-			if (!Path.IsPathRooted(destFileName))
-				throw new ArgumentException("FileMove requires a rooted path", "destFileName");
+			ValidatePath(sourceFileName, nameof(sourceFileName));
+			ValidatePath(destFileName, nameof(destFileName));
 			File.Move(sourceFileName, destFileName);
 		}
 
 		public void DirectoryMove(string source, string dest)
 		{
-			if (!Path.IsPathRooted(source))
-				throw new ArgumentException("DirectoryMove requires a rooted path", "source");
-			if (!Path.IsPathRooted(dest))
-				throw new ArgumentException("DirectoryMove requires a rooted path", "dest");
+			ValidatePath(source, nameof(source));
+			ValidatePath(dest, nameof(dest));
 			Directory.Move(source, dest);
 		}
 
 		public void WriteAllText(string path, string contents)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("WriteAllText requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			File.WriteAllText(path, contents);
 		}
 
 		public void WriteAllText(string path, string contents, Encoding encoding)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("WriteAllText requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			File.WriteAllText(path, contents, encoding);
 		}
 
 		public string ReadAllText(string path)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("ReadAllText requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			return File.ReadAllText(path);
 		}
 
 		public string ReadAllText(string path, Encoding encoding)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("ReadAllText requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			return File.ReadAllText(path, encoding);
 		}
 
 		public void WriteAllLines(string path, string[] contents)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("WriteAllLines requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			File.WriteAllLines(path, contents);
 		}
 
 		public string[] ReadAllLines(string path)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("ReadAllLines requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			return File.ReadAllLines(path);
 		}
 
 		public void WriteLines(string path, string[] contents)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("WriteLines requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			using (var fs = File.AppendText(path))
 			{
 				foreach (var line in contents)
@@ -1684,22 +1643,17 @@ namespace SpoiledCat.SimpleIO
 			}
 		}
 
-		public string GetRandomFileName()
-		{
-			return Path.GetRandomFileName();
-		}
+		public string GetRandomFileName() => Path.GetRandomFileName();
 
 		public Stream OpenRead(string path)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("OpenRead requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			return File.OpenRead(path);
 		}
 
 		public Stream OpenWrite(string path, FileMode mode)
 		{
-			if (!Path.IsPathRooted(path))
-				throw new ArgumentException("OpenWrite requires a rooted path", "path");
+			ValidatePath(path, nameof(path));
 			return new FileStream(path, mode);
 		}
 
@@ -1708,8 +1662,7 @@ namespace SpoiledCat.SimpleIO
 			get => currentDirectory ?? Directory.GetCurrentDirectory();
 			set
 			{
-				if (!Path.IsPathRooted(value))
-					throw new ArgumentException("SetCurrentDirectory requires a rooted path", "directory");
+				ValidatePath(value, nameof(value));
 				currentDirectory = value;
 			}
 		}
@@ -1813,8 +1766,6 @@ namespace SpoiledCat.SimpleIO
 			}
 		}
 
-		public char DirectorySeparatorChar {
-			get { return Path.DirectorySeparatorChar; }
-		}
+		public char DirectorySeparatorChar => Path.DirectorySeparatorChar;
 	}
 }

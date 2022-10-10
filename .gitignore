@@ -135,7 +135,8 @@ UpgradeLog*.htm
 .idea/
 upm-ci~/
 setenv.sh
-.Editor/
+/.Editor/
+/.Editor
 TestResults
 MonoBleedingEdge
 /.bin/
