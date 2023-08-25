@@ -14,7 +14,7 @@
 
 using System;
 using System.Text.RegularExpressions;
-#if SPOILEDCAT_HAS_JSON
+#if SPOILEDCAT_HAS_JSON_RUNTIME
 using NotSerialized=SpoiledCat.Json.NotSerializedAttribute;
 using NotSerializedProperty=SpoiledCat.Json.NotSerializedAttribute;
 #else

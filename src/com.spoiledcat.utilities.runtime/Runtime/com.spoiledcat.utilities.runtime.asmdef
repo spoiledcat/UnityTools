@@ -11,9 +11,9 @@
     "defineConstraints": [],
     "versionDefines": [
         {
-            "name": "com.spoiledcat.simplejson",
+            "name": "com.spoiledcat.simplejson.runtime",
             "expression": "0.0.0-placeholder",
-            "define": "SPOILEDCAT_HAS_JSON"
+            "define": "SPOILEDCAT_HAS_JSON_RUNTIME"
         },
         {
             "name": "com.unity.addressables",
