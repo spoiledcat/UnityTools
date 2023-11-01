@@ -164,6 +164,7 @@ if [[ x"$NPM" == x"1" ]]; then
     exit 1
   fi
 
+  npm config set registry https://registry.spoiledcat.com
   npm config set //registry.spoiledcat.com/:_authToken $NPM_TOKEN
   npm config set always-auth true
   pushd build/npm
