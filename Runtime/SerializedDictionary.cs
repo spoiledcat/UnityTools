@@ -22,7 +22,7 @@ namespace SpoiledCat
 	public class SerializedDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
 	{
 		[Serializable]
-		struct SerializedDictItem
+		protected struct SerializedDictItem
 		{
 			public TKey key;
 			public TValue value;
@@ -33,7 +33,7 @@ namespace SpoiledCat
 				this.value = value;
 			}
 		}
-		[SerializeField] private List<SerializedDictItem> items = new List<SerializedDictItem>();
+		[SerializeField] protected List<SerializedDictItem> items = new List<SerializedDictItem>();
 
 		// save the dictionary to lists
 		public virtual void OnBeforeSerialize()
