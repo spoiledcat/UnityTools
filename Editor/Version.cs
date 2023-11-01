@@ -11,8 +11,8 @@
 #pragma warning disable CA2243
 
 [assembly: System.Reflection.AssemblyVersionAttribute("2.2.0.0")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("2.2.4.317")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.2.4+3d012cd507")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("2.2.5.7802")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.2.5+7a1eea2172")]
 #if NETSTANDARD || NETFRAMEWORK || NETCOREAPP
 [System.CodeDom.Compiler.GeneratedCode("Nerdbank.GitVersioning.Tasks","3.4.255.64262")]
 #endif
@@ -21,12 +21,12 @@
 #endif
 internal static partial class ThisAssembly {
     internal const string AssemblyConfiguration = "Release";
-    internal const string AssemblyFileVersion = "2.2.4.317";
-    internal const string AssemblyInformationalVersion = "2.2.4+3d012cd507";
+    internal const string AssemblyFileVersion = "2.2.5.7802";
+    internal const string AssemblyInformationalVersion = "2.2.5+7a1eea2172";
     internal const string AssemblyName = "SpoiledCat.Unity.Logging";
     internal const string AssemblyVersion = "2.2.0.0";
-    internal static readonly System.DateTime GitCommitDate = new System.DateTime(638285905870000000L, System.DateTimeKind.Utc);
-    internal const string GitCommitId = "3d012cd5077ea99078b409b41236936b51abb3c2";
+    internal static readonly System.DateTime GitCommitDate = new System.DateTime(638344732060000000L, System.DateTimeKind.Utc);
+    internal const string GitCommitId = "7a1eea21727356f32d3f4f66ae2d86df976efb89";
     internal const bool IsPrerelease = false;
     internal const bool IsPublicRelease = true;
     internal const string PublicKey = "0024000004800000940000000602000000240000525341310004000001000100117d0dec0a3fe810510e005bd6a1cb5aca2af1a411346777d30fe1aa0e9fa786495ab06591d36124aacc8e0ff799a47233ca73de6d91935796e339b1564cfbfcdfc7aed3032449af2641359289721cd4354823e0b94779b7d81c2b531c775e7cb03472fe00acc0e325e48620683d4b6ee8df9b4ff39d45cd7de0747e6a0226bd";
