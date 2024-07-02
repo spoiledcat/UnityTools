@@ -197,6 +197,33 @@ namespace SpoiledCat.Utilities
 			return fullZipToPath;
 		}
 
+		public bool List(string archive, CancellationToken cancellationToken, Func<string, long, bool> onEntry)
+		{
+			ZipFile zf = null;
+
+			try
+			{
+				FileStream fs = File.OpenRead(archive);
+				zf = new ZipFile(fs);
+
+				foreach (ZipEntry zipEntry in zf)
+				{
+					if (!onEntry(zipEntry.Name, zipEntry.Size))
+						break;
+				}
+			}
+			catch (Exception ex)
+			{
+				LogHelper.GetLogger<ZipHelper>().Error(ex);
+				throw;
+			}
+			finally
+			{
+				zf?.Close(); // Ensure we release resources
+			}
+			return true;
+		}
+
 		public static IZipHelper Instance
 		{
 			get
