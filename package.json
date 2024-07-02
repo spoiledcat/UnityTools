@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.utilities.runtime",
     "displayName": "SpoiledCat Utilities, Runtime only",
     "description": "Handy runtime utilities and classes",
-    "version": "2.2.8-preview-gec7f0921f6",
+    "version": "2.2.8",
     "license" : "Apache-2.0",
     "author": {
       "name": "Andreia Gaita",
