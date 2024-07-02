@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.sharpziplib",
     "displayName": "SpoiledCat SharpZipLib",
     "description": "Fork of sharpziplib",
-    "version": "2.2.6",
+    "version": "2.2.7-preview-gf32e1f86a3",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
