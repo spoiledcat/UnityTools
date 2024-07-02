@@ -118,12 +118,11 @@ namespace SpoiledCat.Utilities
 		{
 
 			const int chunkSize = 4096; // 4K is optimum
-			foreach (var e in entries)
+			foreach (var entry in entries)
 			{
 				cancellationToken.ThrowIfCancellationRequested();
 
-				var filename = e.Name;
-				var entry = zf.FindEntry(filename);
+				var filename = entry.Name;
 				var fullZipToPath = MaybeSetPermissions(outFolder, filename, entry.FileAttributes);
 				var targetFile = new FileInfo(fullZipToPath);
 
