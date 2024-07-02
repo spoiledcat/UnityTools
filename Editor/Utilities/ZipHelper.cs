@@ -33,6 +33,7 @@ namespace SpoiledCat.Utilities
 		bool Extract(string archive, string outFolder, CancellationToken cancellationToken,
 			Action<string, long> onStart, Func<long, long, string, bool> onProgress,
 			Func<string, bool> onFilter = null);
+		bool List(string archive, CancellationToken cancellationToken, Func<string, long, bool> onEntry);
 	}
 
 	public class ZipHelper : IZipHelper
