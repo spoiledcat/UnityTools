@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.threading",
     "displayName": "SpoiledCat Threading",
     "description": "A friendly threaded task system for Unity",
-    "version": "2.2.8-preview-gec7f0921f6",
+    "version": "2.2.8",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
@@ -17,8 +17,8 @@
         "registry":"https://registry.spoiledcat.com/"
     },
     "dependencies": {
-        "com.spoiledcat.logging": "2.2.8-preview-gec7f0921f6",
-        "com.spoiledcat.simpleio": "2.2.8-preview-gec7f0921f6",
-        "com.spoiledcat.environment": "2.2.8-preview-gec7f0921f6"
+        "com.spoiledcat.logging": "2.2.8",
+        "com.spoiledcat.simpleio": "2.2.8",
+        "com.spoiledcat.environment": "2.2.8"
     }
 }
