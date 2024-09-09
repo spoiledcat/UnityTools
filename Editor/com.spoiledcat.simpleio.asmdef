@@ -9,7 +9,7 @@
     "precompiledReferences": [
         "Mono.Posix.dll"
     ],
-    "autoReferenced": true,
+    "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": []
 }
