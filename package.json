@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.simpleio",
     "displayName": "SpoiledCat SimpleIO",
     "description": "A simple IO abstraction",
-    "version": "2.2.12-preview-g68f4e39a62",
+    "version": "2.2.13",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
