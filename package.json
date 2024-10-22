@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.simpleio.runtime",
     "displayName": "SpoiledCat SimpleIO Runtime",
     "description": "A simple IO abstraction, runtime only",
-    "version": "2.2.9-preview-g675524b6c2",
+    "version": "2.2.12-preview-g68f4e39a62",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
