@@ -46,6 +46,15 @@ namespace SpoiledCat.Utilities.ICSharpCode.SharpZipLib.Zip
 		ZipEntry MakeDirectoryEntry(string directoryName, bool useFileSystem);
 
 		/// <summary>
+		/// Create a <see cref="ZipEntry"/> for a directory given its name
+		/// </summary>
+		/// <param name="directoryName">The name of the directory to create an entry for.</param>
+		/// <param name="entryName">An alternative name to be used for the new entry. Null if not applicable.</param>
+		/// <param name="useFileSystem">If true get details from the file system for this directory if it exists.</param>
+		/// <returns>Returns a <see cref="ZipEntry">directory entry</see> based on the <paramref name="directoryName"/> passed.</returns>
+		ZipEntry MakeDirectoryEntry(string directoryName, string entryName, bool useFileSystem);
+
+		/// <summary>
 		/// Get/set the <see cref="INameTransform"></see> applicable.
 		/// </summary>
 		INameTransform NameTransform { get; set; }

@@ -1885,6 +1885,23 @@ namespace SpoiledCat.Utilities.ICSharpCode.SharpZipLib.Zip
 			AddUpdate(new ZipUpdate(UpdateCommand.Add, dirEntry));
 		}
 
+		/// <summary>
+		/// Add a directory entry to the archive.
+		/// </summary>
+		/// <param name="directoryName">The directory to add.</param>
+		public void AddDirectory(string directory, string entryName, bool useFileSystem)
+		{
+			if (directory == null)
+			{
+				throw new ArgumentNullException(nameof(directory));
+			}
+
+			CheckUpdating();
+
+			ZipEntry dirEntry = EntryFactory.MakeDirectoryEntry(directory, entryName, useFileSystem);
+			AddUpdate(new ZipUpdate(UpdateCommand.Add, dirEntry));
+		}
+
 		#endregion Adding Entries
 
 		#region Modifying Entries
