@@ -1054,7 +1054,7 @@ namespace SpoiledCat.Json
 
 		static bool SerializeObject(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable keys, IEnumerable values, StringBuilder builder)
 		{
-			builder.Append("{");
+			jsonSerializerStrategy.BeginObject(builder);
 			IEnumerator ke = keys.GetEnumerator();
 			IEnumerator ve = values.GetEnumerator();
 			bool first = true;
@@ -1063,7 +1063,11 @@ namespace SpoiledCat.Json
 				object key = ke.Current;
 				object value = ve.Current;
 				if (!first)
+				{
 					builder.Append(",");
+					jsonSerializerStrategy.EndEntry(builder);
+				}
+				jsonSerializerStrategy.BeginEntry(builder);
 				string stringKey = key as string;
 				if (stringKey != null)
 					SerializeString(stringKey, builder);
@@ -1074,23 +1078,26 @@ namespace SpoiledCat.Json
 					return false;
 				first = false;
 			}
-			builder.Append("}");
+			jsonSerializerStrategy.EndObject(builder);
 			return true;
 		}
 
 		static bool SerializeArray(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable anArray, StringBuilder builder)
 		{
-			builder.Append("[");
+			jsonSerializerStrategy.BeginArray(builder);
 			bool first = true;
 			foreach (object value in anArray)
 			{
 				if (!first)
+				{
 					builder.Append(",");
+					jsonSerializerStrategy.EndEntry(builder);
+				}
 				if (!SerializeValue(jsonSerializerStrategy, value, builder))
 					return false;
 				first = false;
 			}
-			builder.Append("]");
+			jsonSerializerStrategy.EndArray(builder);
 			return true;
 		}
 
@@ -1239,6 +1246,12 @@ namespace SpoiledCat.Json
 		bool TrySerializeNonPrimitiveObject(object input, out object output);
 		object DeserializeObject(object value, Type type);
 		object DeserializeObject(string strInput, object objInput, Type type);
+		void BeginObject(StringBuilder builder);
+		void EndObject(StringBuilder builder);
+		void BeginArray(StringBuilder builder);
+		void EndArray(StringBuilder builder);
+		void BeginEntry(StringBuilder builder);
+		void EndEntry(StringBuilder builder);
 	}
 
 	public static class DateTimeFormatConstants
@@ -1604,6 +1617,13 @@ namespace SpoiledCat.Json
 			output = obj;
 			return true;
 		}
+
+		public virtual void BeginObject(StringBuilder builder) {}
+		public virtual void EndObject(StringBuilder builder) {}
+		public virtual void BeginArray(StringBuilder builder) {}
+		public virtual void EndArray(StringBuilder builder) {}
+		public virtual void BeginEntry(StringBuilder builder) {}
+		public virtual void EndEntry(StringBuilder builder) {}
 	}
 
 #if SIMPLE_JSON_DATACONTRACT
@@ -2262,10 +2282,14 @@ namespace SpoiledCat.Json
 		static JsonSerializationStrategy publicUpperCaseStrategy = new JsonSerializationStrategy(false, true);
 		static JsonSerializationStrategy privateLowerCaseStrategy = new JsonSerializationStrategy(true, false);
 		static JsonSerializationStrategy privateUpperCaseStrategy = new JsonSerializationStrategy(false, false);
+		static JsonSerializationStrategy publicLowerCasePrettyStrategy = new JsonSerializationStrategy(true, true, true);
+		static JsonSerializationStrategy publicUpperCasePrettyStrategy = new JsonSerializationStrategy(false, true, true);
+		static JsonSerializationStrategy privateLowerCasePrettyStrategy = new JsonSerializationStrategy(true, false, true);
+		static JsonSerializationStrategy privateUpperCasePrettyStrategy = new JsonSerializationStrategy(false, false, true);
 
-		public static string ToJson<T>(this T model, bool lowerCase = false, bool onlyPublic = true)
+		public static string ToJson<T>(this T model, bool lowerCase = false, bool onlyPublic = true, bool pretty = false)
 		{
-			return SimpleJson.SerializeObject(model, GetStrategy(lowerCase, onlyPublic));
+			return SimpleJson.SerializeObject(model, GetStrategy(lowerCase, onlyPublic, pretty));
 		}
 
 		public static T FromJson<T>(this string json, bool lowerCase = false, bool onlyPublic = true)
@@ -2283,15 +2307,19 @@ namespace SpoiledCat.Json
 			return default(T);
 		}
 
-		private static JsonSerializationStrategy GetStrategy(bool lowerCase, bool onlyPublic)
+		private static JsonSerializationStrategy GetStrategy(bool lowerCase, bool onlyPublic, bool pretty = false)
 		{
-			if (lowerCase && onlyPublic)
-				return publicLowerCaseStrategy;
-			if (lowerCase && !onlyPublic)
-				return privateLowerCaseStrategy;
-			if (!lowerCase && onlyPublic)
-				return publicUpperCaseStrategy;
-			return privateUpperCaseStrategy;
+			return lowerCase switch
+			{
+				true when onlyPublic && pretty => publicLowerCasePrettyStrategy,
+				true when onlyPublic => publicLowerCaseStrategy,
+				true when pretty => privateLowerCasePrettyStrategy,
+				true => privateLowerCaseStrategy,
+				false when onlyPublic && pretty => publicUpperCasePrettyStrategy,
+				false when onlyPublic => publicUpperCaseStrategy,
+				false when pretty => privateUpperCasePrettyStrategy,
+				false => privateUpperCaseStrategy,
+			};
 		}
 
 		/// <summary>
@@ -2312,11 +2340,87 @@ namespace SpoiledCat.Json
 		{
 			private readonly bool onlyPublic;
 			private readonly bool toLowerCase;
+			private readonly bool pretty;
+			private int indent;
 
-			public JsonSerializationStrategy(bool toLowerCase, bool onlyPublic)
+			public JsonSerializationStrategy(bool toLowerCase, bool onlyPublic, bool pretty = false)
 			{
 				this.toLowerCase = toLowerCase;
 				this.onlyPublic = onlyPublic;
+				this.pretty = pretty;
+			}
+
+			public override void BeginObject(StringBuilder builder)
+			{
+				if (pretty)
+				{
+					builder.AppendLine();
+					Indent(builder);
+					builder.Append("{");
+					indent++;
+				}
+				else
+					builder.Append("{");
+			}
+
+			public override void EndObject(StringBuilder builder)
+			{
+				if (pretty)
+				{
+					builder.AppendLine();
+					indent--;
+					Indent(builder);
+					builder.Append("}");
+				}
+				else
+					builder.Append("}");
+			}
+
+			public override void BeginArray(StringBuilder builder)
+			{
+				if (pretty)
+				{
+					builder.AppendLine();
+					Indent(builder);
+					builder.Append("[");
+					indent++;
+				}
+				else
+					builder.Append("[");
+			}
+
+			public override void EndArray(StringBuilder builder)
+			{
+				if (pretty)
+				{
+					builder.AppendLine();
+					indent--;
+					Indent(builder);
+					builder.Append("]");
+				}
+				else
+					builder.Append("]");
+			}
+
+			public override void BeginEntry(StringBuilder builder)
+			{
+				if (pretty)
+				{
+					builder.AppendLine();
+					Indent(builder);
+				}
+			}
+
+			public override void EndEntry(StringBuilder builder)
+			{
+			}
+
+			private void Indent(StringBuilder builder)
+			{
+				if (pretty)
+				{
+					builder.Append(string.Format("{0," + indent * 2 + "}", string.Empty));
+				}
 			}
 
 			protected override bool CanAddField(FieldInfo field)
