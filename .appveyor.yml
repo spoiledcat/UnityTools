@@ -21,8 +21,6 @@ environment:
   GIT_COMMITTER_EMAIL:
     secure: CNIdeIKP5CY48G4+NqkRfNREo4HgGlkSSfzSCv6x0To=
   nodejs_version: "12"
-  DOTNET_ROOT: $HOME/.dotnet
-  PATH: $DOTNET_ROOT:$DOTNET_ROOT/tools:$PATH
 
 install:
 - |
@@ -35,7 +33,7 @@ install:
 - |
   curl -fSL https://dot.net/v1/dotnet-install.sh > dotnet-install.sh
   chmod +x ./dotnet-install.sh
-  ./dotnet-install.sh --jsonfile global.json --no-path
+  ./dotnet-install.sh --jsonfile global.json --no-path --install-dir /usr/share/dotnet
 
 before_build:
 - dotnet --list-sdks
