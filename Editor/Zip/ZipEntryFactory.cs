@@ -282,7 +282,7 @@ namespace SpoiledCat.Utilities.ICSharpCode.SharpZipLib.Zip
 		/// <returns>Returns a new <see cref="ZipEntry"></see> representing a directory.</returns>
 		public ZipEntry MakeDirectoryEntry(string directoryName)
 		{
-			return MakeDirectoryEntry(directoryName, true);
+			return MakeDirectoryEntry(directoryName, null, true);
 		}
 
 		/// <summary>
@@ -293,7 +293,19 @@ namespace SpoiledCat.Utilities.ICSharpCode.SharpZipLib.Zip
 		/// <returns>Returns a new <see cref="ZipEntry"></see> representing a directory.</returns>
 		public ZipEntry MakeDirectoryEntry(string directoryName, bool useFileSystem)
 		{
-			var result = new ZipEntry(nameTransform_.TransformDirectory(directoryName));
+			return MakeDirectoryEntry(directoryName, null, useFileSystem);
+		}
+
+		/// <summary>
+		/// Make a new <see cref="ZipEntry"></see> for a directory.
+		/// </summary>
+		/// <param name="directoryName">The raw untransformed name for the new directory</param>
+		/// <param name="entryName">An alternative name to be used for the new entry. Null if not applicable.</param>
+		/// <param name="useFileSystem">If true entry detail is retrieved from the file system if the file exists.</param>
+		/// <returns>Returns a new <see cref="ZipEntry"></see> representing a directory.</returns>
+		public ZipEntry MakeDirectoryEntry(string directoryName, string entryName, bool useFileSystem)
+		{
+			var result = new ZipEntry(nameTransform_.TransformDirectory(!string.IsNullOrEmpty(entryName) ? entryName : directoryName));
 			result.IsUnicodeText = isUnicodeText_;
 			result.Size = 0;
 
