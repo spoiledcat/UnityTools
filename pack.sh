@@ -14,6 +14,7 @@ BUILD=0
 UPM=0
 UNITYVERSION=2019.2
 UNITYBUILD=0
+ISPUBLIC=0
 
 while (( "$#" )); do
   case "$1" in
@@ -43,6 +44,7 @@ while (( "$#" )); do
       shift
       if [[ x"$1" == x"1" ]]; then
         PUBLIC="-p:PublicRelease=true"
+        ISPUBLIC=1
       fi
     ;;
     -*|--*=) # unsupported flags
@@ -68,7 +70,9 @@ if [[ x"$BUILD" == x"1" ]]; then
 
 fi
 
-dotnet pack --no-build --no-restore -c $CONFIGURATION $PUBLIC
+if [[ x"$ISPUBLIC" == x"1" ]]; then
+  dotnet pack --no-build --no-restore -c $CONFIGURATION $PUBLIC
+fi
 
 if [[ x"$UPM" == x"1" ]]; then
   powershell scripts/Pack-Upm.ps1
