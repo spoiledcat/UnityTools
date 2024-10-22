@@ -30,6 +30,11 @@ install:
   7z -y -bb3 x deps.zip
   popd
 
+- |
+  curl -fSL -O dotnet-install.sh https://dot.net/v1/dotnet-install.sh
+  chmod +x ./dotnet-install.sh
+  ./dotnet-install.sh --jsonfile global.json
+
 before_build:
 - dotnet --list-sdks
 - node --version
