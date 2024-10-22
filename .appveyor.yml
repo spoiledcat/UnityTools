@@ -22,14 +22,12 @@ environment:
     secure: CNIdeIKP5CY48G4+NqkRfNREo4HgGlkSSfzSCv6x0To=
   nodejs_version: "12"
 
-before_install:
+install:
 - |
   curl -fSL https://dot.net/v1/dotnet-install.sh > dotnet-install.sh
   chmod +x ./dotnet-install.sh
   sudo ./dotnet-install.sh --jsonfile global.json --no-path --install-dir /usr/share/dotnet
 
-
-install:
 - |
   mkdir -p lib
   pushd lib
