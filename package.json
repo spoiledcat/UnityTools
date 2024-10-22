@@ -2,7 +2,7 @@
   "name": "com.spoiledcat.threading.tasks",
   "displayName": "SpoiledCat threading Tasks",
   "description": "Premade tasks for use with the SpoiledCat Threading package",
-  "version": "2.2.14-preview-g3711e77591",
+  "version": "2.2.14",
   "license": "Apache-2.0",
   "author": {
     "name": "Andreia Gaita",
@@ -17,10 +17,10 @@
     "registry": "https://registry.spoiledcat.com/"
   },
   "dependencies": {
-    "com.spoiledcat.threading": "2.2.14-preview-g3711e77591",
-    "com.spoiledcat.utilities": "2.2.14-preview-g3711e77591",
-    "com.spoiledcat.simpleio": "2.2.14-preview-g3711e77591",
-    "com.spoiledcat.logging": "2.2.14-preview-g3711e77591",
-    "com.spoiledcat.sharpziplib": "2.2.14-preview-g3711e77591"
+    "com.spoiledcat.threading": "2.2.14",
+    "com.spoiledcat.utilities": "2.2.14",
+    "com.spoiledcat.simpleio": "2.2.14",
+    "com.spoiledcat.logging": "2.2.14",
+    "com.spoiledcat.sharpziplib": "2.2.14"
   }
 }
