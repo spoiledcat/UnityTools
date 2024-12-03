@@ -59,19 +59,15 @@ if [[ x"${GITHUB_REPOSITORY:-}" != x"" ]]; then
   CI=1
 fi
 
-if [[ x"$UNITYBUILD" == x"1" ]]; then
+if [[ x"${UNITYBUILD}" == x"1" ]]; then
   CONFIGURATION="${CONFIGURATION}Unity"
 fi
 
-if [[ x"${CI}" == x"0" ]]; then
-  pushd $DIR >/dev/null 2>&1
-fi
+pushd $DIR >/dev/null 2>&1
 
 if [[ x"${CI}" == x"0" ]]; then
   dotnet restore
 fi
 dotnet build --no-restore -c $CONFIGURATION $PUBLIC
 
-if [[ x"${CI}" == x"0" ]]; then
-  popd >/dev/null 2>&1
-fi
+popd >/dev/null 2>&1

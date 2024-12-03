@@ -44,7 +44,9 @@ jobs:
 
     - run: for i in 1 2 3 4 5; do dotnet restore -v Minimal && break || sleep 1; done
     - run: ./build.sh -c $CONFIGURATION --ispublic $isPublic --trace
+      shell: bash
     - run: ./test.sh -c $CONFIGURATION --ispublic $isPublic --trace
+      shell: bash
 
     - name: SpoiledBot
       id: token
@@ -63,11 +65,14 @@ jobs:
         git config --global user.email "github@spoiledcat.net"
 
     - run: ./publish.sh --branches --version ${NBGV_NpmPackageVersion} --ispublic $isPublic
+      shell: bash
       if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
 
     - run: ./pack.sh -c $CONFIGURATION --ispublic $isPublic
+      shell: bash
 
     - run: ./publish.sh --npm --ispublic $isPublic
+      shell: bash
       if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
 
     - uses: actions/upload-artifact@v4
