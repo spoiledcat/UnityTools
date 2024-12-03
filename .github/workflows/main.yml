@@ -39,15 +39,20 @@ jobs:
     - if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
       run: echo "isPublic=1" >> $GITHUB_ENV
 
-    - if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
+    - if: ${{ github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/') }}
       run: echo "isPublic=1" >> $GITHUB_ENV
 
     - run: for i in 1 2 3 4 5; do dotnet restore -v Minimal && break || sleep 1; done
     - run: echo ./build.sh -c $CONFIGURATION --ispublic $isPublic
     - run: echo ./test.sh -c $CONFIGURATION --ispublic $isPublic
-    - run: echo ./publish.sh --branches --version $NpmPackageVersion --ispublic $isPublic
+
+    - run: echo ./publish.sh --branches --version ${NBGV_NpmPackageVersion} --ispublic $isPublic
+      if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
+
     - run: echo ./pack.sh -c $CONFIGURATION --ispublic $isPublic
+
     - run: echo ./publish.sh --npm --ispublic $isPublic
+      if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
 
     - uses: actions/upload-artifact@v4
       with:
