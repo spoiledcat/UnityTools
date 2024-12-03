@@ -92,6 +92,8 @@ jobs:
       working-directory: source
 
     - run: ./publish.sh --npm --ispublic $ISPUBLIC
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
       working-directory: source
 
