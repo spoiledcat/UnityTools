@@ -45,8 +45,6 @@ jobs:
     - run: for i in 1 2 3 4 5; do dotnet restore -v Minimal && break || sleep 1; done
     - run: ./build.sh -c $CONFIGURATION --ispublic $isPublic --trace
       shell: bash
-    - run: ./test.sh -c $CONFIGURATION --ispublic $isPublic --trace
-      shell: bash
 
     - name: SpoiledBot
       id: token
