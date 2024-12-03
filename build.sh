@@ -68,6 +68,6 @@ pushd $DIR >/dev/null 2>&1
 if [[ x"${CI}" == x"0" ]]; then
   dotnet restore
 fi
-dotnet build --no-restore -c $CONFIGURATION $PUBLIC
+dotnet build --no-restore -c $CONFIGURATION $PUBLIC -v d
 
 popd >/dev/null 2>&1

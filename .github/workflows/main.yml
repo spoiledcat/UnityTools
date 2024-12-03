@@ -43,7 +43,7 @@ jobs:
       run: echo "isPublic=1" >> $GITHUB_ENV
 
     - run: for i in 1 2 3 4 5; do dotnet restore -v Minimal && break || sleep 1; done
-    - run: ./build.sh -c $CONFIGURATION --ispublic $isPublic
+    - run: ./build.sh -c $CONFIGURATION --ispublic $isPublic --trace
     - run: ./test.sh -c $CONFIGURATION --ispublic $isPublic
 
     - name: SpoiledBot
