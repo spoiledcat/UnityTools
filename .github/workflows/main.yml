@@ -43,15 +43,31 @@ jobs:
       run: echo "isPublic=1" >> $GITHUB_ENV
 
     - run: for i in 1 2 3 4 5; do dotnet restore -v Minimal && break || sleep 1; done
-    - run: echo ./build.sh -c $CONFIGURATION --ispublic $isPublic
-    - run: echo ./test.sh -c $CONFIGURATION --ispublic $isPublic
+    - run: ./build.sh -c $CONFIGURATION --ispublic $isPublic
+    - run: ./test.sh -c $CONFIGURATION --ispublic $isPublic
 
-    - run: echo ./publish.sh --branches --version ${NBGV_NpmPackageVersion} --ispublic $isPublic
+    - name: SpoiledBot
+      id: token
+      uses: getsentry/action-github-app-token@v2
+      with:
+        app_id: ${{ secrets.SPOILEDBOT_ID }}
+        private_key: ${{ secrets.SPOILEDBOT_KEY }}
+
+    # this lets us do commits and pushes without fiddling with keys
+    - name: GH cli
+      run: |
+        gh --version
+        echo "${{ steps.token.outputs.token }}" | gh auth login --with-token
+        gh auth status
+        git config --global user.name "SpoiledBot"
+        git config --global user.email "github@spoiledcat.net"
+
+    - run: ./publish.sh --branches --version ${NBGV_NpmPackageVersion} --ispublic $isPublic
       if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
 
-    - run: echo ./pack.sh -c $CONFIGURATION --ispublic $isPublic
+    - run: ./pack.sh -c $CONFIGURATION --ispublic $isPublic
 
-    - run: echo ./publish.sh --npm --ispublic $isPublic
+    - run: ./publish.sh --npm --ispublic $isPublic
       if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
 
     - uses: actions/upload-artifact@v4
