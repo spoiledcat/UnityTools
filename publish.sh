@@ -16,6 +16,7 @@ BRANCHES=0
 NUGET=0
 VERSION=
 PUBLIC=0
+CI=0
 
 while (( "$#" )); do
   case "$1" in
@@ -42,6 +43,9 @@ while (( "$#" )); do
       shift
       PUBLIC=$1
     ;;
+    --ci)
+      CI=1
+    ;;
     --trace)
       { set -x; } 2>/dev/null
     ;;
@@ -53,7 +57,16 @@ while (( "$#" )); do
   shift
 done
 
+if [[ x"${APPVEYOR:-}" != x"" ]]; then
+  CI=1
+fi
+
+if [[ x"${GITHUB_REPOSITORY:-}" != x"" ]]; then
+  CI=1
+fi
+
 if [[ x"${YAMATO_JOB_ID:-}" != x"" ]]; then
+  CI=1
   YAMATO=1
   export GITLAB_CI=1
   export CI_COMMIT_TAG="${GIT_TAG:-}"
@@ -144,16 +157,26 @@ fi
 
 if [[ x"$NPM" == x"1" ]]; then
 
-  #if in appveyor, only publish if public or in master
-  if [[ x"${APPVEYOR:-}" != x"" ]]; then
+  #if in ci, only publish if public or in master
+  if [[ x"${CI}" == x"1" ]]; then
     if [[ x"$PUBLIC" != x"1" ]]; then
-      if [[ x"${APPVEYOR_PULL_REQUEST_NUMBER:-}" != x"" ]]; then
-        echo "Skipping publishing non-public packages in CI on pull request builds"
-        exit 0
+
+      if [[ x"${APPVEYOR:-}" != x"" ]]; then
+        if [[ x"${APPVEYOR_PULL_REQUEST_NUMBER:-}" != x"" ]]; then
+          echo "Skipping publishing non-public packages in CI on pull request builds"
+          exit 0
+        fi
+        if [[ x"${APPVEYOR_REPO_BRANCH:-}" != x"master" ]]; then
+          echo "Skipping publishing non-public packages in CI on pushes to branches other than master"
+          exit 0
+        fi
       fi
-      if [[ x"${APPVEYOR_REPO_BRANCH:-}" != x"master" ]]; then
-        echo "Skipping publishing non-public packages in CI on pushes to branches other than master"
-        exit 0
+
+      if [[ x"${GITHUB_REPOSITORY:-}" != x"" ]]; then
+        if [[ x"${GITHUB_REF:-}" != x"refs/heads/master" ]]; then
+          echo "Skipping publishing non-public packages in CI on pushes to branches other than master"
+          exit 0
+        fi
       fi
     fi
   fi

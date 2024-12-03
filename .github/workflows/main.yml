@@ -2,22 +2,57 @@ name: Build and Publish
 
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish packages'
+        type: boolean
+        required: false
+        default: false
   push:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      CONFIGURATION: Release
+
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - uses: actions/setup-dotnet@v4
-    - run: sudo apt-get install -y p7zip curl
-
+    - uses: dotnet/nbgv@master
+      with:
+        setAllVars: true
     - name: dependencies
-      shell: bash
       run: |
         mkdir -p lib
         pushd lib
         curl -fSL --output deps.zip https://files.spoiledcat.com/deps.zip
         7z -y -bb3 x deps.zip
         popd
+    - run: dotnet --list-sdks
+    - run: node --version
+    - run: npm --version
 
+    - run: echo "isPublic=0" >> $GITHUB_ENV
+    - if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+      run: echo "isPublic=1" >> $GITHUB_ENV
+
+    - if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
+      run: echo "isPublic=1" >> $GITHUB_ENV
+
+    - run: for i in 1 2 3 4 5; do dotnet restore -v Minimal && break || sleep 1; done
+    - run: echo ./build.sh -c $CONFIGURATION --ispublic $isPublic
+    - run: echo ./test.sh -c $CONFIGURATION --ispublic $isPublic
+    - run: echo ./publish.sh --branches --version $NpmPackageVersion --ispublic $isPublic
+    - run: echo ./pack.sh -c $CONFIGURATION --ispublic $isPublic
+    - run: echo ./publish.sh --npm --ispublic $isPublic
+
+    - uses: actions/upload-artifact@v4
+      with:
+        path: 'build/**/*.nupkg'
+
+    - uses: actions/upload-artifact@v4
+      with:
+        path: 'build/**/*.tgz'
