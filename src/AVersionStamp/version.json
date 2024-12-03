@@ -1,0 +1,7 @@
+{
+  "inherit": true,
+  "cloudBuild": {
+    "setVersionVariables": true,
+    "setAllVariables": true
+  }
+}

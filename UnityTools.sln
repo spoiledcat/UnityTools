@@ -1,17 +1,31 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29503.13
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AVersionStamp", "src\AVersionStamp\AVersionStamp.csproj", "{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Environment", "src\com.spoiledcat.environment\Editor\SpoiledCat.Unity.Environment.csproj", "{11F6F1B7-7E18-4ADA-87A4-2D65100CAE5E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Logging", "src\com.spoiledcat.logging\Editor\SpoiledCat.Unity.Logging.csproj", "{AAE57A75-EC73-4C1A-9095-6B943AA15BC7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A} = {01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.SimpleIO", "src\com.spoiledcat.simpleio\Editor\SpoiledCat.Unity.SimpleIO.csproj", "{BA3EC028-1970-4F51-95B5-2C18C7706924}"
+	ProjectSection(ProjectDependencies) = postProject
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A} = {01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.SimpleJson", "src\com.spoiledcat.simplejson\Editor\SpoiledCat.Unity.SimpleJson.csproj", "{2A572465-DE6D-42FA-BC88-C846D6931B5F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A} = {01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.SharpZipLib", "src\com.spoiledcat.sharpziplib\Editor\SpoiledCat.Unity.SharpZipLib.csproj", "{E74CD1E7-C4EB-43D3-A843-F520BC712BA4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A} = {01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Threading", "src\com.spoiledcat.threading\Editor\SpoiledCat.Unity.Threading.csproj", "{9699A2CF-3009-4272-AE5A-0A0C7AF6BCB6}"
 EndProject
@@ -24,6 +38,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Utilities.Editor", "src\com.spoiledcat.utilities\Editor\SpoiledCat.Unity.Utilities.Editor.csproj", "{D82E300E-7BD9-4B87-9522-847D4EDAABE7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.Unity.Utilities.Runtime", "src\com.spoiledcat.utilities.runtime\Runtime\SpoiledCat.Unity.Utilities.Runtime.csproj", "{D82E300E-7BD9-4B87-9522-847D4EDAABEF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A} = {01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1B6C7155-DF65-440B-B560-7414E4325AE3}"
 EndProject
@@ -38,6 +55,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBase", "tests\Helpers\TestBase\TestBase.csproj", "{D85495CD-E955-4E08-8D57-7381C6CA88EF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpoiledCat.SimpleIO.Runtime", "src\com.spoiledcat.simpleio.runtime\Runtime\SpoiledCat.SimpleIO.Runtime.csproj", "{BA3EC028-1970-4F51-95B5-2C18C7706925}"
+	ProjectSection(ProjectDependencies) = postProject
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A} = {01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +67,14 @@ Global
 		ReleaseUnity|Any CPU = ReleaseUnity|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}.DebugUnity|Any CPU.ActiveCfg = DebugUnity|Any CPU
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}.DebugUnity|Any CPU.Build.0 = DebugUnity|Any CPU
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}.ReleaseUnity|Any CPU.ActiveCfg = ReleaseUnity|Any CPU
+		{01F6F1B7-7E18-4ADA-87A4-2D65100CAE5A}.ReleaseUnity|Any CPU.Build.0 = ReleaseUnity|Any CPU
 		{11F6F1B7-7E18-4ADA-87A4-2D65100CAE5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{11F6F1B7-7E18-4ADA-87A4-2D65100CAE5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11F6F1B7-7E18-4ADA-87A4-2D65100CAE5E}.DebugUnity|Any CPU.ActiveCfg = DebugUnity|Any CPU

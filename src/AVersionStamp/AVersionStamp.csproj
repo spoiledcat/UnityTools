@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+  <PropertyGroup>
+    <TargetFrameworks>net471;netcoreapp3.1</TargetFrameworks>
+    <AssemblyName>$(ProjectName)</AssemblyName>
+    <DefaultNamespace>$(AssemblyName)</DefaultNamespace>
+    <Configurations>Debug;Release;ReleaseUnity;DebugUnity</Configurations>
+  </PropertyGroup>
+</Project>
