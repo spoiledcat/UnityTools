@@ -62,7 +62,7 @@ jobs:
         git config --global user.name "SpoiledBot"
         git config --global user.email "github@spoiledcat.net"
 
-    - run: ./publish.sh --branches --version ${NBGV_NpmPackageVersion} --ispublic $isPublic
+    - run: ./publish.sh --branches --version ${NBGV_NpmPackageVersion} --ispublic $isPublic --https
       shell: bash
       if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
 

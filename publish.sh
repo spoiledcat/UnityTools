@@ -17,6 +17,7 @@ NUGET=0
 VERSION=
 PUBLIC=0
 CI=0
+HTTPS=0
 
 while (( "$#" )); do
   case "$1" in
@@ -45,6 +46,9 @@ while (( "$#" )); do
     ;;
     --ci)
       CI=1
+    ;;
+    --https)
+      HTTPS=1
     ;;
     --trace)
       { set -x; } 2>/dev/null
@@ -117,7 +121,11 @@ if [[ x"$BRANCHES" == x"1" ]]; then
   destdir=$( cd .. >/dev/null 2>&1 && pwd )/branches
   test -d $destdir && rm -rf $destdir
   mkdir -p $destdir
-  git clone -q --branch=empty git@github.com:spoiledcat/UnityTools $destdir
+  if [[ x"${HTTPS}" == x"1" ]]; then
+    git clone -q --branch=empty https://github.com/spoiledcat/UnityTools $destdir
+  else
+    git clone -q --branch=empty git@github.com:spoiledcat/UnityTools $destdir
+  fi
 
   pushd $srcdir
 
@@ -128,7 +136,6 @@ if [[ x"$BRANCHES" == x"1" ]]; then
     pkgdir=$srcdir/$name
 
     updateBranchAndPush "$branch" "$destdir" "$pkgdir" "$msg" "$VERSION" $PUBLIC
-
   done
 
   popd
