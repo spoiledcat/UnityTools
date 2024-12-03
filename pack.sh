@@ -74,7 +74,9 @@ if [[ x"$UNITYBUILD" == x"1" ]]; then
   CONFIGURATION="${CONFIGURATION}Unity"
 fi
 
-pushd $DIR >/dev/null 2>&1
+if [[ x"${CI}" == x"0" ]]; then
+  pushd $DIR >/dev/null 2>&1
+fi
 
 if [[ x"$BUILD" == x"1" ]]; then
 
@@ -141,4 +143,8 @@ EOL
 
 fi
 fi
-popd >/dev/null 2>&1
+
+if [[ x"${CI}" == x"0" ]]; then
+  popd >/dev/null 2>&1
+fi
+
