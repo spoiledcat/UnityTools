@@ -18,6 +18,7 @@ VERSION=
 PUBLIC=0
 CI=0
 SKIP_CLONE=0
+LATEST=0
 
 while (( "$#" )); do
   case "$1" in
@@ -43,6 +44,10 @@ while (( "$#" )); do
     --ispublic)
       shift
       PUBLIC=$1
+    ;;
+    --latest)
+      shift
+      LATEST=$1
     ;;
     --ci)
       CI=1
@@ -100,7 +105,10 @@ function updateBranchAndPush() {
   cp -R $pkgdir/* .
   git add .
   git commit -m "$msg"
-  git push origin HEAD:$branch/latest
+
+  if [[ x"${LATEST}" == x"1" ]]; then
+    git push origin HEAD:$branch/latest
+  fi
 
   if [[ $publ -eq 1 ]]; then
       echo "Publishing branch: $branch/$VERSION"

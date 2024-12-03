@@ -4,5 +4,12 @@
   "publicReleaseRefSpec": [
     "^refs/tags/v\\d+\\.\\d+"
   ],
+  "cloudBuild": {
+    "setVersionVariables": true,
+    "setAllVariables": true,
+    "buildNumber": {
+      "enabled": true
+    }
+  },
   "inherit": false
 }

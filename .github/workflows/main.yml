@@ -15,15 +15,18 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CONFIGURATION: Release
+      ISPUBLIC: 0
+      LATEST: 0
 
     steps:
-    - run: echo "isPublic=0" >> $GITHUB_ENV
-
     - if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
-      run: echo "isPublic=1" >> $GITHUB_ENV
+      run: echo "ISPUBLIC=1" >> $GITHUB_ENV
 
     - if: ${{ github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/') }}
-      run: echo "isPublic=1" >> $GITHUB_ENV
+      run: echo "ISPUBLIC=1" >> $GITHUB_ENV
+
+    - if: ${{ github.ref == 'refs/heads/master' }}
+      run: echo "LATEST=1" >> $GITHUB_ENV
 
     - uses: actions/checkout@v4
       with:
@@ -33,10 +36,10 @@ jobs:
       with:
         global-json-file: source/global.json
 
-    - uses: dotnet/nbgv@master
-      with:
-        setAllVars: true
-        path: source
+    # - uses: dotnet/nbgv@master
+    #   with:
+    #     setAllVars: true
+    #     path: source
 
     - name: dependencies
       working-directory: source
@@ -56,7 +59,7 @@ jobs:
     - run: for i in 1 2 3 4 5; do dotnet restore -v Minimal && break || sleep 1; done
       working-directory: source
 
-    - run: ./build.sh -c $CONFIGURATION --ispublic $isPublic --trace
+    - run: ./build.sh -c $CONFIGURATION --ispublic $ISPUBLIC --trace
       working-directory: source
 
     - name: SpoiledBot
@@ -81,14 +84,14 @@ jobs:
         git config --global user.name "SpoiledBot"
         git config --global user.email "github@spoiledcat.net"
 
-    - run: ./publish.sh --ispublic $isPublic --branches --skip-clone
+    - run: ./publish.sh --ispublic $ISPUBLIC --branches --skip-clone --latest $LATEST
       if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
       working-directory: source
 
-    - run: ./pack.sh -c $CONFIGURATION --ispublic $isPublic
+    - run: ./pack.sh -c $CONFIGURATION --ispublic $ISPUBLIC
       working-directory: source
 
-    - run: ./publish.sh --npm --ispublic $isPublic
+    - run: ./publish.sh --npm --ispublic $ISPUBLIC
       if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
       working-directory: source
 
