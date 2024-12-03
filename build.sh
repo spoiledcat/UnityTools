@@ -70,7 +70,7 @@ fi
 if [[ x"${CI}" == x"0" ]]; then
   dotnet restore
 fi
-dotnet build --no-restore -c $CONFIGURATION $PUBLIC -v d
+dotnet build --no-restore -c $CONFIGURATION $PUBLIC
 
 if [[ x"${CI}" == x"0" ]]; then
   popd >/dev/null 2>&1

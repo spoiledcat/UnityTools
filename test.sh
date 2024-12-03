@@ -36,6 +36,8 @@ while (( "$#" )); do
       shift
       CONFIGURATION=$1
     ;;
+    --ispublic)
+    ;;
     --ci)
       CI=1
     ;;
