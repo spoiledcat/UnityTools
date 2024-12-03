@@ -1,6 +1,6 @@
 # Collection of Unity utilities
 
-[![Build status](https://ci.appveyor.com/api/projects/status/fg8obuf106x0ixu8?svg=true)](https://ci.appveyor.com/project/shana/unitytools)
+[![Build status](https://github.com/spoiledcat/UnityTools/actions/workflows/main.yml/badge.svg?event=push)](https://github.com/spoiledcat/UnityTools/actions/workflows/main.yml)
 
 
 ## Environment
