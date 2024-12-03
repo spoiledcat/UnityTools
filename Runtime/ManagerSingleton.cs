@@ -91,6 +91,9 @@ namespace SpoiledCat
 		public static T UnsafeInstance => instance;
 
 		[NonSerialized] private bool initialized;
+
+		public static T WakeUp() => Instance;
+
 		protected bool IsAutoCreated => IsAutoCreatedSingleton(name);
 
 		protected internal virtual void Awake()
