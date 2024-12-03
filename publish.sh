@@ -112,7 +112,7 @@ function updateBranchAndPush() {
 
   if [[ $publ -eq 1 ]]; then
       echo "Publishing branch: $branch/$VERSION"
-      git push origin HEAD:refs/heads/$branch/$VERSION
+      git push origin +HEAD:refs/heads/$branch/$VERSION
   fi
 
   popd

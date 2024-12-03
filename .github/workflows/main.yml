@@ -97,10 +97,10 @@ jobs:
       if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
       working-directory: source
 
-    - uses: actions/upload-artifact@v4
+    - uses: spoiledcat/upload-artifact@main
       with:
         path: 'source/build/**/*.nupkg'
 
-    - uses: actions/upload-artifact@v4
+    - uses: spoiledcat/upload-artifact@main
       with:
         path: 'source/build/**/*.tgz'
