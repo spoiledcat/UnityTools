@@ -107,12 +107,12 @@ function updateBranchAndPush() {
   git commit -m "$msg"
 
   if [[ x"${LATEST}" == x"1" ]]; then
-    git push origin HEAD:$branch/latest
+    git push origin HEAD:refs/heads/$branch/latest
   fi
 
   if [[ $publ -eq 1 ]]; then
       echo "Publishing branch: $branch/$VERSION"
-      git push origin HEAD:$branch/$VERSION
+      git push origin HEAD:refs/heads/$branch/$VERSION
   fi
 
   popd
