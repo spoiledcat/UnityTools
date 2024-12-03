@@ -17,7 +17,7 @@ NUGET=0
 VERSION=
 PUBLIC=0
 CI=0
-HTTPS=0
+SKIP_CLONE=0
 
 while (( "$#" )); do
   case "$1" in
@@ -47,8 +47,8 @@ while (( "$#" )); do
     --ci)
       CI=1
     ;;
-    --https)
-      HTTPS=1
+    --skip-clone)
+      SKIP_CLONE=1
     ;;
     --trace)
       { set -x; } 2>/dev/null
@@ -76,6 +76,10 @@ if [[ x"${YAMATO_JOB_ID:-}" != x"" ]]; then
   export CI_COMMIT_TAG="${GIT_TAG:-}"
   export CI_COMMIT_REF_NAME="${GIT_BRANCH:-}"
 fi
+
+if [[ x"$VERSION" == x"" ]]; then
+  VERSION=${NBGV_NpmPackageVersion:-}
+fi  
 
 function updateBranchAndPush() {
   local branch=$1
@@ -119,11 +123,10 @@ if [[ x"$BRANCHES" == x"1" ]]; then
 
   srcdir=$DIR/build/packages
   destdir=$( cd .. >/dev/null 2>&1 && pwd )/branches
-  test -d $destdir && rm -rf $destdir
-  mkdir -p $destdir
-  if [[ x"${HTTPS}" == x"1" ]]; then
-    git clone -q --branch=empty https://github.com/spoiledcat/UnityTools $destdir
-  else
+
+  if [[ x"${SKIP_CLONE}" == "0" ]]; then
+    test -d $destdir && rm -rf $destdir
+    mkdir -p $destdir
     git clone -q --branch=empty git@github.com:spoiledcat/UnityTools $destdir
   fi
 

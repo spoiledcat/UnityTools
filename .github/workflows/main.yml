@@ -17,14 +17,29 @@ jobs:
       CONFIGURATION: Release
 
     steps:
+    - run: echo "isPublic=0" >> $GITHUB_ENV
+
+    - if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+      run: echo "isPublic=1" >> $GITHUB_ENV
+
+    - if: ${{ github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/') }}
+      run: echo "isPublic=1" >> $GITHUB_ENV
+
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        path: source
     - uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: source/global.json
+
     - uses: dotnet/nbgv@master
       with:
         setAllVars: true
+        path: source
+
     - name: dependencies
+      working-directory: source
       run: |
         mkdir -p lib
         pushd lib
@@ -32,19 +47,17 @@ jobs:
         7z -y -bb3 x deps.zip
         popd
     - run: dotnet --list-sdks
+      working-directory: source
     - run: node --version
+      working-directory: source
     - run: npm --version
-
-    - run: echo "isPublic=0" >> $GITHUB_ENV
-    - if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
-      run: echo "isPublic=1" >> $GITHUB_ENV
-
-    - if: ${{ github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/') }}
-      run: echo "isPublic=1" >> $GITHUB_ENV
+      working-directory: source
 
     - run: for i in 1 2 3 4 5; do dotnet restore -v Minimal && break || sleep 1; done
+      working-directory: source
+
     - run: ./build.sh -c $CONFIGURATION --ispublic $isPublic --trace
-      shell: bash
+      working-directory: source
 
     - name: SpoiledBot
       id: token
@@ -53,8 +66,14 @@ jobs:
         app_id: ${{ secrets.SPOILEDBOT_ID }}
         private_key: ${{ secrets.SPOILEDBOT_KEY }}
 
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        path: branches
+
     # this lets us do commits and pushes without fiddling with keys
     - name: GH cli
+      working-directory: branches
       run: |
         gh --version
         echo "${{ steps.token.outputs.token }}" | gh auth login --with-token
@@ -62,21 +81,21 @@ jobs:
         git config --global user.name "SpoiledBot"
         git config --global user.email "github@spoiledcat.net"
 
-    - run: ./publish.sh --branches --version ${NBGV_NpmPackageVersion} --ispublic $isPublic --https
-      shell: bash
+    - run: ./publish.sh --ispublic $isPublic --branches --skip-clone
       if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
+      working-directory: source
 
     - run: ./pack.sh -c $CONFIGURATION --ispublic $isPublic
-      shell: bash
+      working-directory: source
 
     - run: ./publish.sh --npm --ispublic $isPublic
-      shell: bash
       if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
+      working-directory: source
 
     - uses: actions/upload-artifact@v4
       with:
-        path: 'build/**/*.nupkg'
+        path: 'source/build/**/*.nupkg'
 
     - uses: actions/upload-artifact@v4
       with:
-        path: 'build/**/*.tgz'
+        path: 'source/build/**/*.tgz'
