@@ -1,0 +1,23 @@
+name: Build and Publish
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+    - run: sudo apt-get install -y p7zip curl
+
+    - name: dependencies
+      shell: bash
+      run: |
+        mkdir -p lib
+        pushd lib
+        curl -fSL --output deps.zip https://files.spoiledcat.com/deps.zip
+        7z -y -bb3 x deps.zip
+        popd
+
