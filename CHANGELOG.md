@@ -2,7 +2,7 @@
 
 <!-- Do not change the line immediately below this comment, the build system will replace it with the actual version and date. -->
 
-## [2.2.16-preview-gb56d4c24c9] - 2024-12-03
+## [2.2.16-preview-ga6c816d8dc] - 2024-12-03
 
 - Merge back code from editor tasks
 
