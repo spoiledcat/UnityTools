@@ -2,7 +2,7 @@
     "name": "com.spoiledcat.quick-console",
     "displayName": "SpoiledCat Quick Console",
     "description": "An evaluation console for editor scripts without recompiling the whole project",
-    "version": "2.2.17-preview-gcd6971a238",
+    "version": "2.2.17-preview-g28c193a644",
     "license" : "MIT",
     "author": {
       "name": "Andreia Gaita",
@@ -17,8 +17,8 @@
         "registry":"https://registry.spoiledcat.com/"
     },
     "dependencies": {
-        "com.spoiledcat.simpleio": "2.2.17-preview-gcd6971a238",
-        "com.spoiledcat.simplejson": "2.2.17-preview-gcd6971a238",
-        "com.spoiledcat.ui": "2.2.17-preview-gcd6971a238"
+        "com.spoiledcat.simpleio": "2.2.17-preview-g28c193a644",
+        "com.spoiledcat.simplejson": "2.2.17-preview-g28c193a644",
+        "com.spoiledcat.ui": "2.2.17-preview-g28c193a644"
     }
 }
