@@ -2309,17 +2309,27 @@ namespace SpoiledCat.Json
 
 		private static JsonSerializationStrategy GetStrategy(bool lowerCase, bool onlyPublic, bool pretty = false)
 		{
-			return lowerCase switch
+			switch (lowerCase)
 			{
-				true when onlyPublic && pretty => publicLowerCasePrettyStrategy,
-				true when onlyPublic => publicLowerCaseStrategy,
-				true when pretty => privateLowerCasePrettyStrategy,
-				true => privateLowerCaseStrategy,
-				false when onlyPublic && pretty => publicUpperCasePrettyStrategy,
-				false when onlyPublic => publicUpperCaseStrategy,
-				false when pretty => privateUpperCasePrettyStrategy,
-				false => privateUpperCaseStrategy,
-			};
+				case true when onlyPublic && pretty:
+					return publicLowerCasePrettyStrategy;
+				case true when onlyPublic:
+					return publicLowerCaseStrategy;
+				case true when pretty:
+					return privateLowerCasePrettyStrategy;
+				case true:
+					return privateLowerCaseStrategy;
+				case false when onlyPublic && pretty:
+					return publicUpperCasePrettyStrategy;
+				case false when onlyPublic:
+					return publicUpperCaseStrategy;
+				case false when pretty:
+					return privateUpperCasePrettyStrategy;
+				case false:
+					return privateUpperCaseStrategy;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(lowerCase));
+			}
 		}
 
 		/// <summary>
